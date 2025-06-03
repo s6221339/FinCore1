@@ -1,4 +1,4 @@
-package com.example.FinCore.Dao;
+package com.example.FinCore.dao;
 
 import java.time.LocalDate;
 import java.util.List;

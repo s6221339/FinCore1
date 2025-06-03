@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 		errorMap.put("message", e.getAllErrors().get(0).getDefaultMessage());
 		// 返回的 Http Status Code 為 badRequest(400)
 		//	使所有錯誤訊細紀錄為error等級的日誌
-//		logger.error(e.getAllErrors().get(0).getDefaultMessage());
+		logger.error(e.getAllErrors().get(0).getDefaultMessage());
 		return ResponseEntity.badRequest().body(errorMap);
 	}
 	

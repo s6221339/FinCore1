@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
  * 屬性，另外有所屬帳號（account）以及群組編號（famliy_id），並以自己的編號（balance_id）
  * 為主鍵。
  */
-@Table(schema = "balance")
+@Table(name = "balance")
 @Entity
 public class Balance 
 {

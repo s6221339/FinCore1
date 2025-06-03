@@ -27,15 +27,15 @@ public interface UserDao extends JpaRepository<User, String>{
 	@Modifying
 	@Transactional
 	@Query(value = "insert into user "
-            + "(account, name, password, phone, avatar_url, super_admin, create_date) "
-            + "values (:account, :name, :password, :phone, :avatarUrl, :superAdmin, :createDate)",
+            + "(account, name, password, phone, avatar, super_admin, create_date) "
+            + "values (:account, :name, :password, :phone, :avatar, :superAdmin, :createDate)",
             nativeQuery = true)
 	public void create(//
 			@Param("account") String account, //
 			@Param("name") String name, //
 			@Param("password") String password, //
 			@Param("phone") String phone, //
-			@Param("avatarUrl") String avatarUrl, //
+			@Param("avatar") byte[] avatar, //
 			@Param("superAdmin") Boolean superAdmin, //
 			@Param("createDate") LocalDate createDate //
 			);
@@ -60,14 +60,13 @@ public interface UserDao extends JpaRepository<User, String>{
 	 */
 	@Modifying
 	@Transactional
-	 @Query(value = "update user set name = :name, password = :password, phone = :phone, avatar_url = :avatarUrl,"
+	 @Query(value = "update user set name = :name, password = :password, phone = :phone, avatar = :avatar,"
 	            + " super_admin = :superAdmin, create_date = :createDate where account = :account", nativeQuery = true)
-	//問洋羊是int還是void
 	public int update(@Param("account") String account,
 			@Param("name") String name,
 			@Param("password") String password,
 			@Param("phone") String phone,
-			@Param("avatarUrl") String avatarUrl,
+			@Param("avatar") byte[] avatar,
 			@Param("superAdmin") Boolean superAdmin,
 			@Param("createDate") LocalDate createDate);
 	

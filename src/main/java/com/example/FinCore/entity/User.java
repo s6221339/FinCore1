@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,8 +25,9 @@ public class User {
     @Column(name = "phone")
     private String phone;
     
-    @Column(name = "avatar_url")
-    private String avatarUrl;
+    @Lob
+    @Column(name = "avatar")
+    private byte[] avatar;
     
     @Column(name = "super_admin")
     private boolean superAdmin;
@@ -65,15 +67,15 @@ public class User {
         this.phone = phone;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
+    public byte[] getAvatar() {
+		return avatar;
+	}
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
+	public void setAvatar(byte[] avatar) {
+		this.avatar = avatar;
+	}
 
-    public boolean isSuperAdmin() {
+	public boolean isSuperAdmin() {
         return superAdmin;
     }
 

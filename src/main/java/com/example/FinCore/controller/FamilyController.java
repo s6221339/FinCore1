@@ -19,12 +19,12 @@ public class FamilyController {
 	@Autowired
 	private FamilyService service;
 	
-	@PostMapping(value = "quiz/create")
+	@PostMapping(value = "finbook/createFamily")
 	public BasicResponse create(CreateFamilyRequest req) {
 		return service.create(req);
 	}
 	
-	@PostMapping(value = "quiz/update")
+	@PostMapping(value = "finbook/updateFamily")
 	public BasicResponse update(UpdateRequest req) {
 		return service.update(req);
 	}

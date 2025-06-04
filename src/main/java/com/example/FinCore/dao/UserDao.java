@@ -104,6 +104,14 @@ public interface UserDao extends JpaRepository<User, String>{
 	@Query(value = "select * from user where account in (?1)", nativeQuery = true)
 	public List<User> selectByAccountIn(List<String> accountList);
 	
+	/**
+	 * 取得帳號在資料庫的資料筆數
+	 * @param account 會員帳號(Email)
+	 * @return 返回值只有1跟0
+	 */
+	@Query(value = "select count(account) from user where account = ?1 ", nativeQuery = true)
+	public int selectCountByAccount(String account);
+	
 	
 
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 @Table(name = "family")
 public class Family {
     
+	//id是流水號
     @Id
     @Column(name = "id")
     private int id;

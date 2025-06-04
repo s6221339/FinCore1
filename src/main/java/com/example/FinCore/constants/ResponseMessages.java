@@ -3,7 +3,9 @@ package com.example.FinCore.constants;
 public enum ResponseMessages 
 {
 	
-	SUCCESS(200, "成功！");
+	SUCCESS(200, "成功！"),
+	ACCOUNT_NOT_FOUND(404, "查無此帳號！"),
+	ITEM_EXISTED(400, "已存在相同物件。");
 	
 	private int code;
 	

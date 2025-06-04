@@ -29,10 +29,10 @@ public interface PaymentTypeDao extends JpaRepository<PaymentType, PaymentTypePK
 	public void create(String type, String item, String account);
 	
 	/**
-	 * 取得指定帳號創立的所有類別。
+	 * 取得指定帳號創立的所有類別，回傳結果也包含預設類別。
 	 * @return 指定帳號創立的所有類別
 	 */
-	@Query(value = "select * from payment_type where account = ?1", nativeQuery = true)
+	@Query(value = "select * from payment_type where account = ?1 or account = 'default'", nativeQuery = true)
 	public List<PaymentType> getTypeByAccount(String account);
 	
 	/**
@@ -45,5 +45,15 @@ public interface PaymentTypeDao extends JpaRepository<PaymentType, PaymentTypePK
 	@Modifying
 	@Query(value = "delete from payment_type where type = ?1 and item = ?2 and account = ?3", nativeQuery = true)
 	public void delete(String type, String item, String account);
+	
+	/**
+	 * 使用主鍵搜尋並取得指定資料在資料庫中的數量。
+	 * @param type 類型
+	 * @param item 細項
+	 * @param account 新增者
+	 * @return 1 或 0
+	 */
+	@Query(value = "select COUNT(type) from payment_type where type = ?1 and item = ?2 and account = ?3", nativeQuery = true)
+	public int selectCount(String type, String item, String account);
 	
 }

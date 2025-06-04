@@ -5,6 +5,8 @@ public class BasicResponse {
 	private int code;
 
 	private String message;
+	
+	private Object data;
 
 	public BasicResponse() {
 		super();
@@ -30,6 +32,14 @@ public class BasicResponse {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public Object getData() {
+		return data;
+	}
+
+	public void setData(Object data) {
+		this.data = data;
 	}
 	
 	

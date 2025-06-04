@@ -6,7 +6,7 @@ import com.example.FinCore.constants.ConstantsMessage;
 
 import jakarta.validation.constraints.NotEmpty;
 
-public class DeleteRequest {
+public class DeleteRequest extends UpdateRequest{
 
 	@NotEmpty(message = ConstantsMessage.PARAM_FAMILY_ID_ERROR)
 	private List<Integer> idList;

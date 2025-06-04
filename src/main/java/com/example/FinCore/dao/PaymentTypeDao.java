@@ -51,9 +51,9 @@ public interface PaymentTypeDao extends JpaRepository<PaymentType, PaymentTypePK
 	 * @param type 類型
 	 * @param item 細項
 	 * @param account 新增者
-	 * @return 1 或 0
+	 * @return 資料筆數
 	 */
-	@Query(value = "select COUNT(type) from payment_type where type = ?1 and item = ?2 and account = ?3", nativeQuery = true)
+	@Query(value = "select COUNT(type) from payment_type where type = ?1 and item = ?2 and (account = ?3 or account = 'default')", nativeQuery = true)
 	public int selectCount(String type, String item, String account);
 	
 }

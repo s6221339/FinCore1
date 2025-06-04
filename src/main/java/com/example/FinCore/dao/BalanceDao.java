@@ -1,0 +1,61 @@
+package com.example.FinCore.dao;
+
+import java.time.LocalDate;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.example.FinCore.entity.Balance;
+
+import jakarta.transaction.Transactional;
+
+@Repository
+public interface BalanceDao extends JpaRepository<Balance, Integer>
+{
+	
+	/**
+	 * 用帳號創建一個帳戶資料，代表該帳戶將綁定在一個帳號之下。
+	 * @param account 帳號
+	 * @param name 帳戶名稱
+	 * @param createDate 創建日期
+	 */
+	@Transactional
+	@Modifying
+	@Query(value = "insert into balance (famliy_id, account, name, create_date) "
+			+ "values (-1, ?1, ?2, ?3)", nativeQuery = true)
+	public void createByAccount(String account, String name, LocalDate createDate);
+	
+	/**
+	 * 用家庭編號創建一個帳戶，代表該帳戶將綁定在一個群組之下。
+	 * @param familyId 家庭編號
+	 * @param name 帳戶名稱
+	 * @param createDate 創建日期
+	 */
+	@Transactional
+	@Modifying
+	@Query(value = "insert into balance (famliy_id, account, name, create_date) "
+			+ "values (?1, NULL, ?2, ?3)", nativeQuery = true)
+	public void createByFamliyId(int familyId, String name, LocalDate createDate);
+	
+	/**
+	 * 更新帳戶名稱。
+	 * @param balanceId 指定帳戶編號
+	 * @param name 要更新的名稱
+	 */
+	@Transactional
+	@Modifying
+	@Query(value = "update balance set name = ?2 where balance_id = ?1", nativeQuery = true)
+	public void updateName(int balanceId, String name);
+	
+	/**
+	 * 刪除指定帳戶。
+	 * @param balanceId 帳戶編號
+	 */
+	@Transactional
+	@Modifying
+	@Query(value = "delete from balance where balance_id = ?1", nativeQuery = true)
+	public void deleteByBalanceId(int balanceId);
+
+}

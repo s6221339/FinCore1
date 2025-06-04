@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.FamilyDao;
@@ -22,6 +23,7 @@ import com.example.FinCore.vo.response.BasicResponse;
 /**
  * 家族群組相關服務實作
  */
+@Service
 public class FamilyServiceImpl implements FamilyService {
 
 	@Autowired

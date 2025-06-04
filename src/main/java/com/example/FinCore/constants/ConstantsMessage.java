@@ -1,5 +1,6 @@
 package com.example.FinCore.constants;
 
+
 public class ConstantsMessage {
 
 	public static final String PARAM_OWNER_ERROR = "Param owner error!!";
@@ -9,6 +10,13 @@ public class ConstantsMessage {
 	public static final String PARAM_CREATE_DATE_ERROR = "Param create date error!!";
 	
 	public static final String PARAM_FAMILY_ID_ERROR = "Param family id error!!";
+
+	public final static String PARAM_TYPE_BLANK_ERROR = "參數「type」空白！";
 	
+	public final static String PARAM_ITEM_BLANK_ERROR = "參數「item」空白！";
+	
+	public final static String PARAM_ACCOUNT_BLANK_ERROR = "參數「account」空白！";
+	
+	private ConstantsMessage() {}
 	
 }

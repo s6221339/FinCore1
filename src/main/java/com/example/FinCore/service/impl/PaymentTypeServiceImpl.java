@@ -34,7 +34,7 @@ public class PaymentTypeServiceImpl implements PaymentTypeService
 			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
 		count = paymentTypeDao.selectCount(req.type(), req.item(), req.account());
-		if(count == 1)
+		if(count > 0)
 			return new BasicResponse(ResponseMessages.ITEM_EXISTED);
 		
 		paymentTypeDao.create(req.type(), req.item(), req.account());

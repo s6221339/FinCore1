@@ -55,7 +55,7 @@ public interface UserDao extends JpaRepository<User, String>{
 	 * @param name 會員名稱
 	 * @param password 密碼
 	 * @param phone 手機號碼
-	 * @param avatarUrl 頭像
+	 * @param avatar 頭像
 	 * @param superAdmin 是否為超級管理員
 	 * @param createDate 建立日期
 	 * @return

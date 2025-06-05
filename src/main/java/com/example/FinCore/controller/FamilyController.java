@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
-import com.example.FinCore.vo.request.UpdateRequest;
+import com.example.FinCore.vo.request.DeleteFamilyRequest;
+import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 
 
@@ -25,8 +26,13 @@ public class FamilyController {
 	}
 	
 	@PostMapping(value = "finbook/updateFamily")
-	public BasicResponse update(UpdateRequest req) {
+	public BasicResponse update(UpdateFamilyRequest req) {
 		return service.update(req);
+	}
+	
+	@PostMapping(value = "finbook/deleteFamily")
+	public BasicResponse delete(DeleteFamilyRequest req) {
+		return service.delete(req);
 	}
 
 }

@@ -24,9 +24,10 @@ public interface FamilyDao extends JpaRepository<Family, Integer> {
 	 */
 	@Modifying
 	@Transactional
-	@Query(value = "insert into family (owner, invitor, createDate) "//
-			+ " values (:owner, :invitor, :createDate)", nativeQuery = true)
+	@Query(value = "insert into family (name, owner, invitor, createDate) "//
+			+ " values (:name, :owner, :invitor, :createDate)", nativeQuery = true)
 	public void create(//
+			@Param("name")String name,
 			@Param("owner") String owner, //
 			@Param("invitor") String invitor, //
 			@Param("createDate") LocalDate createDate);
@@ -55,9 +56,10 @@ public interface FamilyDao extends JpaRepository<Family, Integer> {
 	 */
 	@Modifying
 	@Transactional
-	@Query(value = "update family set owner = :owner, invitor = :invitor, createDate = :createDate"
+	@Query(value = "update family set name = :name, owner = :owner," //
+			+ " invitor = :invitor, createDate = :createDate" //
 			+ " where id = :id", nativeQuery = true)
-	public int update(@Param("id") int id, @Param("owner") String owner, @Param("invitor") String invitor //
+	public int update(@Param("id") int id,@Param("name")String name, @Param("owner") String owner, @Param("invitor") String invitor //
 			, @Param("createDate") LocalDate createDate);
 
 	/**

@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public class CreateFamilyRequest {
 	
+	private String name;
+
 	@NotBlank(message = ConstantsMessage.PARAM_OWNER_ERROR)
 	private String owner;
 	
@@ -30,6 +32,14 @@ public class CreateFamilyRequest {
 
 	public void setInvitor(List<String> invitor) {
 		this.invitor = invitor;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 

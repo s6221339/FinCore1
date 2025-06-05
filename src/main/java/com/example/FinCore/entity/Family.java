@@ -16,6 +16,9 @@ public class Family {
     @Column(name = "id")
     private int id;
     
+    @Column(name = "name")
+    private String name;
+    
     @Column(name = "owner")
     private String owner;
     
@@ -33,7 +36,15 @@ public class Family {
         this.id = id;
     }
 
-    public String getOwner() {
+    public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getOwner() {
         return owner;
     }
 

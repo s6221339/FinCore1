@@ -13,4 +13,6 @@ public interface PaymentService
 	 */
 	public BasicResponse create(CreatePaymentRequest req);
 	
+	public BasicResponse delete();
+	
 }

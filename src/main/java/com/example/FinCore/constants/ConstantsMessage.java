@@ -17,6 +17,12 @@ public class ConstantsMessage {
 	
 	public final static String PARAM_ACCOUNT_BLANK_ERROR = "參數「account」空白！";
 	
+	public final static String BALANCE_ID_VALUE_ERROR = "「balanceId」不得小於 1";
+	
+	public final static String AMOUNT_NEGATIVE_ERROR = "「amount」不得為負數";
+	
+	public final static String RECURRING_PERIOD_NEGATIVE_ERROR = "「recurringPeriod」不得為負數";
+	
 	private ConstantsMessage() {}
 	
 }

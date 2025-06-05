@@ -1,0 +1,27 @@
+package com.example.FinCore.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.FinCore.service.itfc.PaymentService;
+import com.example.FinCore.vo.request.CreatePaymentRequest;
+import com.example.FinCore.vo.response.BasicResponse;
+
+import jakarta.validation.Valid;
+
+@RestController
+@CrossOrigin(allowedHeaders = "*")
+@RequestMapping(value = "finbook/")
+public class PaymentController 
+{
+	
+	@Autowired
+	private PaymentService service;
+	
+	@PostMapping(value = "createPayment")
+	public BasicResponse create(@Valid @RequestBody CreatePaymentRequest req)
+	{
+		return service.create(req);
+	}
+	
+}

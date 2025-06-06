@@ -24,7 +24,9 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	 * @param type 款項類型
 	 * @param item 類型細項
 	 * @param amount 金額
-	 * @param recurringPeriod 循環週期
+	 * @param recurringPeriodYear 循環週期（年）
+	 * @param recurringPeriodMonth　循環週期（月）
+	 * @param recurringPeriodDay 循環週期（日）
 	 * @param createDate 款項建立日期
 	 * @param recordDate 款項記錄日期
 	 * @param year 年，查詢用
@@ -33,20 +35,23 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	 */
 	@Transactional
 	@Modifying
-	@Query(value = "insert into payment (balance_id, description, type, item, amount, recurring_period, create_date, record_date, year, month, day) "
-			+ "values (:balanceId, :description, :type, :item, :amount, :recurringPeriod, :createDate, :recordDate, :year, :month, :day)", nativeQuery = true)
+	@Query(value = "insert into payment (balance_id, description, type, item, amount, recurring_period_year, recurring_period_month, recurring_period_day, create_date, record_date, year, month, day) "
+			+ "values (:balanceId, :description, :type, :item, :amount, :recurringPeriodYear, :recurringPeriodMonth, :recurringPeriodDay, :createDate, :recordDate, :year, :month, :day)", nativeQuery = true)
 	public void create(
-			@Param("balanceId") 		int balanceId, 
-			@Param("description") 		String description, 
-			@Param("type") 				String type, 
-			@Param("item") 				String item, 
-			@Param("amount") 			int amount, 
-			@Param("recurringPeriod") 	int recurringPeriod, 
-			@Param("createDate") 		LocalDate createDate, 
-			@Param("recordDate") 		LocalDate recordDate, 
-			@Param("year") 				int year, 
-			@Param("month") 			int month, 
-			@Param("day") 				int day);
+			@Param("balanceId") 			int balanceId, 
+			@Param("description") 			String description, 
+			@Param("type") 					String type, 
+			@Param("item") 					String item, 
+			@Param("amount") 				int amount, 
+			@Param("recurringPeriodYear") 	int recurringPeriodYear, 
+			@Param("recurringPeriodMonth") 	int recurringPeriodMonth, 
+			@Param("recurringPeriodDay") 	int recurringPeriodDay, 
+			@Param("createDate") 			LocalDate createDate, 
+			@Param("recordDate") 			LocalDate recordDate, 
+			@Param("year") 					int year, 
+			@Param("month") 				int month, 
+			@Param("day") 					int day
+			);
 	
 	/**
 	 * 更新指定款項資料。如果敘述為 {@code NULL} 時不更新；對於類型與細項永遠更新；
@@ -56,7 +61,13 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	 * @param type 類型
 	 * @param item 細項
 	 * @param amount 金額
-	 * @param recurringPeriod 循環週期
+	 * @param recurringPeriodYear 循環週期（年）
+	 * @param recurringPeriodMonth 循環週期（月）
+	 * @param recurringPeriodDay 循環週期（日）
+	 * @param recordDate 記帳日期
+	 * @param year 記帳年，查詢用
+	 * @param month 記帳月，查詢用
+	 * @param day 記帳日，查詢用
 	 */
 	@Transactional
 	@Modifying
@@ -65,15 +76,33 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 			+ "type = :type, "
 			+ "item = :item, "
 			+ "amount = case when :amount < 0 then amount else :amount end, "
-			+ "recurring_period = case when :recurringPeriod < 0 then recurring_period else :recurringPeriod end "
+			+ "recurring_period_year = case when :recurringPeriodYear < 0 then recurring_period_year else :recurringPeriodYear end, "
+			+ "recurring_period_month = case when :recurringPeriodMonth < 0 then recurring_period_month else :recurringPeriodMonth end, "
+			+ "recurring_period_day = case when :recurringPeriodDay < 0 then recurring_period_day else :recurringPeriodDay end, "
+			+ "record_date = :recordDate, "
+			+ "year = :year, "
+			+ "month = :month, "
+			+ "day = :day "
 			+ "where payment_id = :paymentId", nativeQuery = true)
 	public void update(
-			@Param("paymentId") 		int paymentId, 
-			@Param("description") 		String description, 
-			@Param("type") 				String type, 
-			@Param("item") 				String item, 
-			@Param("amount") 			int amount, 
-			@Param("recurringPeriod") 	int recurringPeriod);
+			@Param("paymentId") 			int paymentId, 
+			@Param("description") 			String description, 
+			@Param("type") 					String type, 
+			@Param("item") 					String item, 
+			@Param("amount") 				int amount, 
+			@Param("recurringPeriodYear") 	int recurringPeriodYear, 
+			@Param("recurringPeriodMonth") 	int recurringPeriodMonth, 
+			@Param("recurringPeriodDay") 	int recurringPeriodDay,
+			@Param("recordDate") LocalDate recordDate,
+			@Param("year") int year,
+			@Param("month") int month,
+			@Param("day") int day
+			);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update payment set delete_date = ?2 where payment_id = ?1", nativeQuery = true)
+	public void updateDeleteDate(int paymentId, LocalDate deleteDate);
 	
 	/**
 	 * 刪除指定款項。
@@ -125,7 +154,23 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 			@Param("idList") 	List<Integer> balanceIdList, 
 			@Param("year") 		int year, 
 			@Param("month") 	int month, 
-			@Param("day") 		int day);
+			@Param("day") 		int day
+			);
 	
+	/**
+	 * 取得指定款項的刪除日期。
+	 * @param paymentId 款項編號
+	 * @return 該款項的刪除日期
+	 */
+	@Query(value = "select delete_date from payment where payment_id = ?1", nativeQuery = true)
+	public LocalDate getDeleteDate(int paymentId);
+	
+	/**
+	 * 取得指定款項的完整資料。
+	 * @param paymentId 款項編號
+	 * @return 實體
+	 */
+	@Query(value = "select * from payment where payment_id = ?1", nativeQuery = true)
+	public Payment getEntity(int paymentId);
 	
 }

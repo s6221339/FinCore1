@@ -6,9 +6,11 @@ public enum ResponseMessages
 	SUCCESS(200, "成功！"),
 	ACCOUNT_NOT_FOUND(404, "查無此帳號！"),
 	BALANCE_NOT_FOUND(404, "查無此帳戶！"),
+	PAYMENT_NOT_FOUND(404, "查無此帳款！"),
 	ITEM_EXISTED(400, "已存在相同物件。"),
 	PAST_RECORD_DATE(400, "該款項不能記錄在過去時間。"),
-	FUTURE_RECORD_DATE(400, "該款項不能記錄在未來時間。");
+	FUTURE_RECORD_DATE(400, "該款項不能記錄在未來時間。"),
+	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料");
 	
 	private int code;
 	

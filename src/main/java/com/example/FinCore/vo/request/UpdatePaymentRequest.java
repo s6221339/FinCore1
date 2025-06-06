@@ -8,10 +8,14 @@ import com.example.FinCore.vo.RecurringPeriodVO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-public record CreatePaymentRequest(
-		@Min(value = 1, message = ConstantsMessage.BALANCE_ID_VALUE_ERROR)
-		int balanceId,
+/**
+ * 更新款項的請求資料
+ */
+public record UpdatePaymentRequest(
+		@Min(value = 1, message = ConstantsMessage.PAYMENT_ID_VALUE_ERROR)
+		int paymentId,
 		
 		String description,
 		
@@ -27,6 +31,7 @@ public record CreatePaymentRequest(
 		@Valid
 		RecurringPeriodVO recurringPeriod,
 		
+		@NotNull(message = ConstantsMessage.INVALID_RECORD_DATE)
 		LocalDate recordDate
 		) {
 

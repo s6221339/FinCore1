@@ -34,8 +34,14 @@ public class Payment
 	private int amount;
 	
 	/** 循環週期，如果不為零代表該款項為循環款項 */
-	@Column(name = "recurring_period")
-	private int recurringPeriod;
+	@Column(name = "recurring_period_year")
+	private int recurringPeriodYear;
+	
+	@Column(name = "recurring_period_month")
+	private int recurringPeriodMonth;
+	
+	@Column(name = "recurring_period_day")
+	private int recurringPeriodDay;
 	
 	@Column(name = "create_date")
 	private LocalDate createDate;
@@ -103,12 +109,28 @@ public class Payment
 		this.amount = amount;
 	}
 
-	public int getRecurringPeriod() {
-		return recurringPeriod;
+	public int getRecurringPeriodYear() {
+		return recurringPeriodYear;
 	}
 
-	public void setRecurringPeriod(int recurringPeriod) {
-		this.recurringPeriod = recurringPeriod;
+	public void setRecurringPeriodYear(int recurringPeriodYear) {
+		this.recurringPeriodYear = recurringPeriodYear;
+	}
+
+	public int getRecurringPeriodMonth() {
+		return recurringPeriodMonth;
+	}
+
+	public void setRecurringPeriodMonth(int recurringPeriodMonth) {
+		this.recurringPeriodMonth = recurringPeriodMonth;
+	}
+
+	public int getRecurringPeriodDay() {
+		return recurringPeriodDay;
+	}
+
+	public void setRecurringPeriodDay(int recurringPeriodDay) {
+		this.recurringPeriodDay = recurringPeriodDay;
 	}
 
 	public LocalDate getCreateDate() {

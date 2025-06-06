@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.FinCore.service.itfc.PaymentService;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
+import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 
 import jakarta.validation.Valid;
@@ -22,6 +23,18 @@ public class PaymentController
 	public BasicResponse create(@Valid @RequestBody CreatePaymentRequest req)
 	{
 		return service.create(req);
+	}
+	
+	@PostMapping(value = "deletePayment")
+	public BasicResponse delete(@RequestParam("paymentId") int paymentId)
+	{
+		return service.delete(paymentId);
+	}
+	
+	@PostMapping(value = "updatePayment")
+	public BasicResponse update(@Valid @RequestBody UpdatePaymentRequest req) 
+	{
+		return service.update(req);
 	}
 	
 }

@@ -19,9 +19,13 @@ public class ConstantsMessage {
 	
 	public final static String BALANCE_ID_VALUE_ERROR = "「balanceId」不得小於 1";
 	
+	public final static String PAYMENT_ID_VALUE_ERROR = "「paymentId」不得小於 1";
+	
 	public final static String AMOUNT_NEGATIVE_ERROR = "「amount」不得為負數";
 	
-	public final static String RECURRING_PERIOD_NEGATIVE_ERROR = "「recurringPeriod」不得為負數";
+	public final static String RECURRING_PERIOD_NEGATIVE_ERROR = "循環週期不得為負數";
+	
+	public final static String INVALID_RECORD_DATE = "無效的「recordDate」";
 	
 	private ConstantsMessage() {}
 	

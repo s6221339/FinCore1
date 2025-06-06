@@ -1,6 +1,7 @@
 package com.example.FinCore.service.itfc;
 
 import com.example.FinCore.vo.request.CreatePaymentRequest;
+import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 
 public interface PaymentService 
@@ -13,6 +14,19 @@ public interface PaymentService
 	 */
 	public BasicResponse create(CreatePaymentRequest req);
 	
-	public BasicResponse delete();
+	/**
+	 * 刪除指定帳款服務。值得一提的是，該服務並非直接刪除資料，而是將資料的
+	 * 刪除日期進行更新。
+	 * @param paymentId 指定款項編號
+	 * @return 基本回應資料
+	 */
+	public BasicResponse delete(int paymentId);
+	
+	/**
+	 * 更新款項內容服務。
+	 * @param req 更新請求資料
+	 * @return 基本回應資料
+	 */
+	public BasicResponse update(UpdatePaymentRequest req);
 	
 }

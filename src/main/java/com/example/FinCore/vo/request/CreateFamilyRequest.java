@@ -1,5 +1,6 @@
 package com.example.FinCore.vo.request;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.example.FinCore.constants.ConstantsMessage;
@@ -12,10 +13,7 @@ public class CreateFamilyRequest {
 
 	@NotBlank(message = ConstantsMessage.PARAM_OWNER_ERROR)
 	private String owner;
-	
-	// @NotEmpty(message = ConstantsMessage.PARAM_INVITOR_ERROR)<----
-	// @NotBlank 只能用在 String 欄位上。如果你要驗證 List 不是 null、不是空，應該用 @NotEmpty
-	@NotBlank(message = ConstantsMessage.PARAM_INVITOR_ERROR)
+
 	private List<String> invitor;
 
 	public String getOwner() {
@@ -42,7 +40,24 @@ public class CreateFamilyRequest {
 		this.name = name;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("CreateFamilyRequest：{");
+		sb.append("name: '" + name + "', ");
+		sb.append("owner: '" + owner + "', ");
+		sb.append("invitor: " + (invitor == null ? "[]" : Arrays.toString(invitor.toArray())) + "}");
+		String str = "";
+		
+		if(invitor == null)
+			str = "[]";
+		else
+			str = Arrays.toString(invitor.toArray());
+		
+		return sb.toString();
+	}
 
+	
 
 	
 

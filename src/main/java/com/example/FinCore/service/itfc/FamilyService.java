@@ -21,7 +21,7 @@ public interface FamilyService {
      * @param req 新增請求
      * @return 基本回應物件
      */
-	public BasicResponse create(CreateFamilyRequest req);
+	public BasicResponse create(CreateFamilyRequest req) throws Exception;
 	
 	/**
      * 更新家族群組資料

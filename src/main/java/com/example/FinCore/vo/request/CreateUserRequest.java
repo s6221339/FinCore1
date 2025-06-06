@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class CreateUserRequest {
 
-	@NotBlank(message = ConstantsMessage.PARAM_OWNER_ERROR)
+	@NotBlank(message = ConstantsMessage.PARAM_ACCOUNT_ERROR)
 	private String account;
 	
 	@NotBlank(message = ConstantsMessage.PARAM_NAME_ERROR)
@@ -19,7 +19,7 @@ public class CreateUserRequest {
 	
 	private byte[] avatar;
 	
-	private Boolean superAdmin;
+	private boolean superAdmin;
 
 	public String getAccount() {
 		return account;
@@ -61,11 +61,11 @@ public class CreateUserRequest {
 		this.avatar = avatar;
 	}
 
-	public Boolean getSuperAdmin() {
+	public boolean getSuperAdmin() {
 		return superAdmin;
 	}
 
-	public void setSuperAdmin(Boolean superAdmin) {
+	public void setSuperAdmin(boolean superAdmin) {
 		this.superAdmin = superAdmin;
 	}
 	

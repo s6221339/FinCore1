@@ -27,6 +27,8 @@ import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 家族群組相關服務實作
@@ -41,10 +43,10 @@ public class FamilyServiceImpl implements FamilyService {
 	private UserDao userDao;
 
 	@Override
-	public BasicResponse create(CreateFamilyRequest req) {
+	public BasicResponse create(CreateFamilyRequest req) throws Exception {
+		System.out.println(req);
 		// 1. 檢查必要欄位
-		if (req.getOwner() == null || req.getOwner().isEmpty() || req.getInvitor() == null
-				|| req.getInvitor().isEmpty()) {
+		if (req.getOwner() == null || req.getOwner().isEmpty()) {
 			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD.getCode(),
 					ResponseMessages.MISSING_REQUIRED_FIELD.getMessage());
 		}
@@ -64,21 +66,27 @@ public class FamilyServiceImpl implements FamilyService {
 			return new BasicResponse(ResponseMessages.OWNER_NOT_FOUND.getCode(),
 					ResponseMessages.OWNER_NOT_FOUND.getMessage());
 		}
+		for (String member : req.getInvitor())
+			if (!userDao.existsById(member))
+				return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND.getCode(),
+						ResponseMessages.MEMBER_NOT_FOUND.getMessage());
+
+		// List轉String
+		ObjectMapper mapper = new ObjectMapper();
+		String invitorStr = mapper.writeValueAsString(req.getInvitor());
 
 		// 4. 建立 Family 物件
 		Family family = new Family();
 		family.setOwner(req.getOwner());
+		family.setName(req.getName());
+		family.setInvitor(invitorStr);
 		family.setCreateDate(LocalDate.now());
 
 		// 5. 儲存資料庫
-		try {
-			familyDao.save(family);
-			return new BasicResponse(ResponseMessages.SUCCESS.getCode(), //
-					ResponseMessages.SUCCESS.getMessage());
-		} catch (Exception ex) {
-			return new BasicResponse(ResponseMessages.CREATE_FAMILY_FAIL.getCode(),
-					ResponseMessages.CREATE_FAMILY_FAIL.getMessage());
-		}
+		familyDao.save(family);
+		return new BasicResponse(ResponseMessages.SUCCESS.getCode(), //
+				ResponseMessages.SUCCESS.getMessage());
+
 	}
 
 	@Override
@@ -117,6 +125,7 @@ public class FamilyServiceImpl implements FamilyService {
 
 		// 6. 更新資料（這裡假設 family 只有 owner、invitor 只能放一個）
 		family.setOwner(req.getOwner());
+		family.setName(req.getName());
 		// family.setInvitor(...) // 若有這一欄，請依你實際結構設定
 		family.setCreateDate(LocalDate.now());
 
@@ -349,8 +358,8 @@ public class FamilyServiceImpl implements FamilyService {
 	@Override
 	public BasicResponse renameFamily(RenameFamilyRequest req) {
 		// 1. 參數檢查
-		if (req.getFamilyId() < 1 || req.getOwner() == null || req.getOwner().isEmpty()
-				|| req.getNewName() == null || req.getNewName().isEmpty()) {
+		if (req.getFamilyId() < 1 || req.getOwner() == null || req.getOwner().isEmpty() || req.getNewName() == null
+				|| req.getNewName().isEmpty()) {
 			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD.getCode(),
 					ResponseMessages.MISSING_REQUIRED_FIELD.getMessage());
 		}

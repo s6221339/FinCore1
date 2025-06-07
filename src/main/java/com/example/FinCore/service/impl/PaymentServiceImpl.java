@@ -1,6 +1,11 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,12 +13,16 @@ import org.springframework.stereotype.Service;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.PaymentDao;
+import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Payment;
 import com.example.FinCore.service.itfc.PaymentService;
+import com.example.FinCore.vo.BalanceWithPaymentVO;
+import com.example.FinCore.vo.PaymentInfoVO;
 import com.example.FinCore.vo.RecurringPeriodVO;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.SearchPaymentResponse;
 
 @Service
 public class PaymentServiceImpl implements PaymentService 
@@ -24,6 +33,9 @@ public class PaymentServiceImpl implements PaymentService
 	
 	@Autowired
 	private BalanceDao balanceDao;
+	
+	@Autowired
+	private UserDao userDao;
 
 	@Override
 	public BasicResponse create(CreatePaymentRequest req) 
@@ -122,6 +134,56 @@ public class PaymentServiceImpl implements PaymentService
 			return new BasicResponse(ResponseMessages.FUTURE_RECORD_DATE);
 		
 		return null;
+	}
+
+	@Override
+	public SearchPaymentResponse getPaymentInfoByAccount(String account) 
+	{
+		if(!userDao.existsById(account))
+			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
+		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
+		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();
+		generateBalanceWithPaymentMap(map, paymentList);
+		for(Entry<Integer, List<PaymentInfoVO>> entry : map.entrySet())
+			resultList.add(new BalanceWithPaymentVO(entry.getKey(), entry.getValue()));
+		
+		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
+	}
+	
+	/**
+	 * 設定 BalanceWithPaymentMap，會將同一個帳戶的款項設定在一起
+	 * @param map 要設定的 Map
+	 * @param paymentList 款項列表
+	 */
+	private void generateBalanceWithPaymentMap(Map<Integer, List<PaymentInfoVO>> map, List<Payment> paymentList)
+	{
+		for(Payment payment : paymentList)
+		{
+//			DeleteDate 存在代表該款項已標記刪除，不進行設定
+			if(payment.getDeleteDate() != null)
+				continue;
+			
+			var period = new RecurringPeriodVO(
+					payment.getRecurringPeriodYear(), 
+					payment.getRecurringPeriodMonth(), 
+					payment.getRecurringPeriodDay()
+					);
+			var paymentInfo = new PaymentInfoVO(
+					payment.getDescription(), 
+					payment.getType(), 
+					payment.getItem(), 
+					payment.getAmount(), 
+					period, 
+					payment.getRecordDate()
+					);
+			List<PaymentInfoVO> voList = 
+					map.containsKey(payment.getBalanceId()) ? map.get(payment.getBalanceId()) : new ArrayList<>();
+			voList.add(paymentInfo);
+			map.put(payment.getBalanceId(), voList);
+		}
 	}
 
 }

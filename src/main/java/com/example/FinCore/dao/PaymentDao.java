@@ -173,4 +173,12 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	@Query(value = "select * from payment where payment_id = ?1", nativeQuery = true)
 	public Payment getEntity(int paymentId);
 	
+	/**
+	 * 使用一組帳戶編號取得所有相關的款項資料
+	 * @param balanceIdList 帳戶編號列表
+	 * @return 與該帳戶編號相關的所有款項資料
+	 */
+	@Query(value = "select * from payment where balance_id in (?1)", nativeQuery = true)
+	public List<Payment> getPaymentListByBalanceIdList(List<Integer> balanceIdList);
+	
 }

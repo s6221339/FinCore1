@@ -1,6 +1,7 @@
 package com.example.FinCore.dao;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -57,5 +58,13 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	@Modifying
 	@Query(value = "delete from balance where balance_id = ?1", nativeQuery = true)
 	public void deleteByBalanceId(int balanceId);
+	
+	/**
+	 * 取得與指定帳號關聯的所有帳戶編號。
+	 * @param account 帳號
+	 * @return 帳戶編號列表
+	 */
+	@Query(value = "select balance_id from balance where account = ?1", nativeQuery = true)
+	public List<Integer> selectBalanceIdListByAccount(String account);
 
 }

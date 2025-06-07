@@ -3,6 +3,7 @@ package com.example.FinCore.service.itfc;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.SearchPaymentResponse;
 
 public interface PaymentService 
 {
@@ -28,5 +29,12 @@ public interface PaymentService
 	 * @return 基本回應資料
 	 */
 	public BasicResponse update(UpdatePaymentRequest req);
+	
+	/**
+	 * 取得和帳號相關聯的所有款項。
+	 * @param account 帳號
+	 * @return 存放款項資料的回應資料
+	 */
+	public SearchPaymentResponse getPaymentInfoByAccount(String account);
 	
 }

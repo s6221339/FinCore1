@@ -26,7 +26,10 @@ public enum ResponseMessages
 	MEMBER_NOT_FOUND(404,"家族成員不存在"),
 	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料。"),
 	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
-	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。");
+	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。"),
+	UPDATE_USER_FAIL(400, "更新會員失敗"),
+	ACCOUNT_EXIST(400, "帳號已存在");
+
 	
 	private int code;
 	

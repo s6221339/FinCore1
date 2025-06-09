@@ -1,37 +1,24 @@
 package com.example.FinCore.vo.request;
 
-public class InviteMemberRequest {
+import java.util.List;
 
-	private int familyId;
+import com.example.FinCore.constants.ConstantsMessage;
 
-	private String owner;
+import jakarta.validation.constraints.NotEmpty;
 
-	private String invitor;
-
-	public int getFamilyId() {
-		return familyId;
-	}
-
-	public void setFamilyId(int familyId) {
-		this.familyId = familyId;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
-	public String getInvitor() {
-		return invitor;
-	}
-
-	public void setInvitor(String invitor) {
-		this.invitor = invitor;
-	}
-	
-	
+/**
+ * 家族成員邀請請求物件
+ * familyId：家族ID
+ * owner：操作者（發起邀請的人，一定是 owner）
+ * invitor：被邀請的成員帳號清單
+ */
+public record InviteMemberRequest(
+		
+		int familyId, 
+		
+		String owner, 
+		
+		@NotEmpty(message = ConstantsMessage.PARAM_INVITOR_ERROR)
+		List<String> invitor) {
 
 }

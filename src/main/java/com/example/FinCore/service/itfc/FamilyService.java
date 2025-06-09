@@ -12,6 +12,7 @@ import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 
 public interface FamilyService {
@@ -65,7 +66,7 @@ public interface FamilyService {
 	 * @param invitor 邀請的成員帳號
 	 * @return 回應物件
 	 */
-	public BasicResponse inviteMember(InviteMemberRequest req);
+	public BasicResponse inviteMember(InviteMemberRequest req) throws JsonProcessingException;
 	
 	/**
 	 * 解散家族（僅限 owner）

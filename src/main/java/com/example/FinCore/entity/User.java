@@ -25,6 +25,9 @@ public class User {
     @Column(name = "phone")
     private String phone;
     
+    @Column(name = "birthday")
+    private LocalDate birthday;
+    
     @Lob
     @Column(name = "avatar")
     private byte[] avatar;

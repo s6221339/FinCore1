@@ -8,18 +8,14 @@ public class CreateUserRequest {
 
 	@NotBlank(message = ConstantsMessage.PARAM_ACCOUNT_ERROR)
 	private String account;
-	
+
 	@NotBlank(message = ConstantsMessage.PARAM_NAME_ERROR)
 	private String name;
-	
+
 	@NotBlank(message = ConstantsMessage.PARAM_PASSWORD_ERROR)
 	private String password;
-	
+
 	private String phone;
-	
-	private byte[] avatar;
-	
-	private boolean superAdmin;
 
 	public String getAccount() {
 		return account;
@@ -53,21 +49,4 @@ public class CreateUserRequest {
 		this.phone = phone;
 	}
 
-	public byte[] getAvatar() {
-		return avatar;
-	}
-
-	public void setAvatar(byte[] avatar) {
-		this.avatar = avatar;
-	}
-
-	public boolean getSuperAdmin() {
-		return superAdmin;
-	}
-
-	public void setSuperAdmin(boolean superAdmin) {
-		this.superAdmin = superAdmin;
-	}
-	
-	
 }

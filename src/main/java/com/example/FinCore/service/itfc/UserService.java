@@ -7,11 +7,11 @@ import com.example.FinCore.vo.response.BasicResponse;
 public interface UserService {
 
 	/**
-	 * 新增會員
+	 * 註冊會員
 	 * @param req
 	 * @return
 	 */
-	public BasicResponse create(CreateUserRequest req);
+	public BasicResponse register(CreateUserRequest req);
 	
 	/**
 	 * 修改會員資料
@@ -21,9 +21,11 @@ public interface UserService {
 	public BasicResponse update(UpdateUserRequest req);
 	
 	/**
-	 * 刪除會員
+	 * 註銷會員
 	 * @param account
 	 * @return
 	 */
-	public BasicResponse delete(String account);
+	public BasicResponse cancel(String account);
+	
+	//修改密碼 1.帳號 2.舊密碼 3.新密碼
 }

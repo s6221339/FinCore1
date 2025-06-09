@@ -1,6 +1,8 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,11 +11,14 @@ import org.springframework.util.StringUtils;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
+import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.CreateBalanceRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class BalanceServiceImpl implements BalanceService 
@@ -27,6 +32,9 @@ public class BalanceServiceImpl implements BalanceService
 	
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private PaymentDao paymentDao;
 
 	@Override
 	public BasicResponse create(CreateBalanceRequest req) 
@@ -62,6 +70,48 @@ public class BalanceServiceImpl implements BalanceService
 			return new BasicResponse(ResponseMessages.BALANCE_NOT_FOUND);
 		
 		balanceDao.updateName(req.balanceId(), req.name());
+		return new BasicResponse(ResponseMessages.SUCCESS);
+	}
+
+	@Transactional(rollbackOn = Exception.class)
+	@Override
+	public BasicResponse delete(int balanceId) throws Exception
+	{
+		if(!balanceDao.existsById(balanceId))
+			return new BasicResponse(ResponseMessages.BALANCE_NOT_FOUND);
+		
+//		balanceList 永遠只有一個值
+		List<Integer> balanceIdList = new ArrayList<Integer>();
+		balanceIdList.add(balanceId);
+		return deleteOpration(balanceIdList);
+	}
+
+	@Transactional(rollbackOn = Exception.class)
+	@Override
+	public BasicResponse deleteByAccount(String account) throws Exception
+	{
+		if(!userDao.existsById(account))
+			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		return deleteOpration(balanceIdList);
+	}
+	
+	private BasicResponse deleteOpration(List<Integer> balanceIdList) throws Exception
+	{
+		List<Integer> paymentIdList = paymentDao.getPaymentIdListByBalanceIdList(balanceIdList);
+		try
+		{
+			paymentDao.deleteAllById(paymentIdList);
+			
+//			TODO：AI查詢資料也要刪除
+			
+			balanceDao.deleteAllById(balanceIdList);
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 

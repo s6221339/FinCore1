@@ -181,4 +181,21 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	@Query(value = "select * from payment where balance_id in (?1)", nativeQuery = true)
 	public List<Payment> getPaymentListByBalanceIdList(List<Integer> balanceIdList);
 	
+	/**
+	 * 使用一組帳戶編號取得所有相關的款項編號
+	 * @param balanceIdList 帳戶編號列表
+	 * @return 與該帳戶編號相關的所有款項編號
+	 * @see PaymentDao#getPaymentListByBalanceIdList(List)
+	 */
+	@Query(value = "select payment_id from payment where balance_id in (?1)", nativeQuery = true)
+	public List<Integer> getPaymentIdListByBalanceIdList(List<Integer> balanceIdList);
+	
+	/**
+	 * 使用一組款項編號刪除款項資料。<br>
+	 * ⚠️：與標記刪除不同，該方法會永久刪除資料
+	 * @param paymentIdList 款項編號列表
+	 */
+	@Query(value = "delete from payment where payment_id in (?1)", nativeQuery = true)
+	public void deletePaymentByPaymentId(List<Integer> paymentIdList);
+	
 }

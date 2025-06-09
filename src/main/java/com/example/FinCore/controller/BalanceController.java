@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.BalanceService;
@@ -33,6 +34,18 @@ public class BalanceController
 	public BasicResponse update(@Valid @RequestBody UpdateBalanceRequest req)
 	{
 		return service.update(req);
+	}
+	
+	@PostMapping(value = "delete")
+	public BasicResponse delete(@RequestParam("balanceId") int balanceId) throws Exception
+	{
+		return service.delete(balanceId);
+	}
+	
+	@PostMapping(value = "deleteByAccount")
+	public BasicResponse deleteByAccount(@RequestParam("account") String account) throws Exception
+	{
+		return service.deleteByAccount(account);
 	}
 	
 }

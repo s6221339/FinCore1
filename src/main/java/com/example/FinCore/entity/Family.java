@@ -1,6 +1,7 @@
 package com.example.FinCore.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,15 +53,15 @@ public class Family {
         this.owner = owner;
     }
 
-    public String getInvitor() {
-        return invitor;
-    }
+	public String getInvitor() {
+		return invitor;
+	}
 
-    public void setInvitor(String invitor) {
-        this.invitor = invitor;
-    }
+	public void setInvitor(String invitor) {
+		this.invitor = invitor;
+	}
 
-    public LocalDate getCreateDate() {
+	public LocalDate getCreateDate() {
         return createDate;
     }
 

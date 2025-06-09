@@ -5,10 +5,12 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.service.itfc.PaymentService;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.request.CreateUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
@@ -27,54 +29,70 @@ public class UserServiceImpl implements UserService {
 
 	@Override
     @Transactional
-	public BasicResponse create(CreateUserRequest req) {
-		// 1. 檢查必要欄位
-        if (req.getAccount() == null || req.getAccount().isEmpty() ||
-            req.getName() == null || req.getName().isEmpty() ||
-            req.getPassword() == null || req.getPassword().isEmpty()) {
-            return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD.getCode(),
-                                     ResponseMessages.MISSING_REQUIRED_FIELD.getMessage());
-        }
-
-        // 2. 帳號不可重複
+	public BasicResponse register(CreateUserRequest req) {
+        // 1. 帳號不可重複
         int exists = userDao.selectCountByAccount(req.getAccount());
         if (exists > 0) {
-//            return new BasicResponse(ResponseMessages.ACCOUNT_EXIST.getCode(),
-//                                     ResponseMessages.ACCOUNT_EXIST.getMessage());
+            return new BasicResponse(ResponseMessages.ACCOUNT_EXIST);
         }
 
-        // 3. 密碼加密
+        // 2. 密碼加密
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         
         String encodedPwd = encoder.encode(req.getPassword());
 
-        // 4. 建立新帳號
-        userDao.create(
+        // 3. 建立新帳號
+        userDao.register(
             req.getAccount(),
             req.getName(),
             encodedPwd,
             req.getPhone(),
-            req.getAvatar(),
-            req.getSuperAdmin(),
             LocalDate.now()
         );
 
-        return new BasicResponse(ResponseMessages.SUCCESS.getCode(),
-                                 ResponseMessages.SUCCESS.getMessage());
+        return new BasicResponse(ResponseMessages.SUCCESS);
 	    
 	}
 
 	@Override
 	public BasicResponse update(UpdateUserRequest req) {
-		// TODO Auto-generated method stub
-		return null;
+        // 1. 確認帳號存在
+        int exists = userDao.selectCountByAccount(req.getAccount());
+        if (exists == 0) {
+            return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+        }
+
+        // 2. 更新
+        int updated = userDao.update(
+            req.getAccount(),
+            req.getName(),
+            req.getPhone(),
+            req.getBirthday(),
+            req.getAvatar()
+        );
+        if (updated > 0) {
+            return new BasicResponse(ResponseMessages.SUCCESS);
+        } else {
+            return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
+        }
 	}
 
 	@Override
-	public BasicResponse delete(String account) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+	public BasicResponse cancel(String account) {
+		 // 1. 檢查必要欄位
+        if (!StringUtils.hasText(account)) {
+            return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+        }
+
+        // 2. 確認帳號存在
+        int exists = userDao.selectCountByAccount(account);
+        if (exists == 0) {
+            return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+        }
+
+        // 3. 執行刪除
+        userDao.cancel(account);
+        return new BasicResponse(ResponseMessages.SUCCESS);
+    }
 	
 }

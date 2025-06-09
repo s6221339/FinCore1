@@ -24,7 +24,9 @@ public enum ResponseMessages
 	UPDATE_FAMILY_FAIL(400,"更新家族群組失敗"),
 	DELETE_FAMILY_FAIL(400, "刪除家庭群組失敗"),
 	NO_PERMISSION(400, "沒有 owner 權限"),
-	MEMBER_NOT_FOUND(404,"家族成員不存在");
+	MEMBER_NOT_FOUND(404,"家族成員不存在"),
+	UPDATE_USER_FAIL(400, "更新會員失敗"),
+	ACCOUNT_EXIST(400, "帳號已存在");
 	
 	private int code;
 	

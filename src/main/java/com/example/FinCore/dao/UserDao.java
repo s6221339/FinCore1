@@ -55,7 +55,7 @@ public interface UserDao extends JpaRepository<User, String>{
 	 * @param name 會員名稱
 	 * @param password 密碼
 	 * @param phone 手機號碼
-	 * @param avatarUrl 頭像
+	 * @param avatar 頭像
 	 * @param superAdmin 是否為超級管理員
 	 * @param createDate 建立日期
 	 * @return
@@ -107,12 +107,20 @@ public interface UserDao extends JpaRepository<User, String>{
 	public List<User> selectByAccountIn(List<String> accountList);
 	
 	/**
-	 * 取得帳號在資料庫的資料筆數
-	 * @param account 會員帳號(Email)
-	 * @return 返回值只有1跟0
-	 */
+     * 查詢指定帳號在資料庫中的筆數
+     * @param account 會員帳號(Email)
+     * @return 筆數（只有0或1）
+     */
 	@Query(value = "select count(account) from user where account = ?1 ", nativeQuery = true)
 	public int selectCountByAccount(String account);
+	
+	/**
+     * 查詢多個帳號在資料庫中的筆數
+     * @param accounts 會員帳號(Email)清單
+     * @return 資料庫中存在的帳號數量
+     */
+	@Query(value = "select count(account) from user where account in (:accounts)", nativeQuery = true)
+	public int countByAccountIn(@Param("accounts") List<String> accounts);
 	
 	
 

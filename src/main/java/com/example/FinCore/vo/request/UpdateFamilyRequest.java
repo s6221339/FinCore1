@@ -4,7 +4,7 @@ import com.example.FinCore.constants.ConstantsMessage;
 
 import jakarta.validation.constraints.Min;
 
-public class UpdateRequest extends CreateFamilyRequest {
+public class UpdateFamilyRequest extends CreateFamilyRequest {
 	
 	@Min(value = 1, message = ConstantsMessage.PARAM_FAMILY_ID_ERROR)
 	private int familyId;

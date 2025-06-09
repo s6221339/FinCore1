@@ -13,32 +13,32 @@ import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin(allowedHeaders = "*")
-@RequestMapping(value = "finbook/")
+@RequestMapping(value = "finbook/payment/")
 public class PaymentController 
 {
 	
 	@Autowired
 	private PaymentService service;
 	
-	@PostMapping(value = "createPayment")
+	@PostMapping(value = "create")
 	public BasicResponse create(@Valid @RequestBody CreatePaymentRequest req)
 	{
 		return service.create(req);
 	}
 	
-	@PostMapping(value = "deletePayment")
+	@PostMapping(value = "delete")
 	public BasicResponse delete(@RequestParam("paymentId") int paymentId)
 	{
 		return service.delete(paymentId);
 	}
 	
-	@PostMapping(value = "updatePayment")
+	@PostMapping(value = "update")
 	public BasicResponse update(@Valid @RequestBody UpdatePaymentRequest req) 
 	{
 		return service.update(req);
 	}
 	
-	@PostMapping(value = "getPaymentInfoByAccount")
+	@PostMapping(value = "getByAccount")
 	public SearchPaymentResponse getPaymentInfoByAccount(@RequestParam("account") String account) 
 	{
 		return service.getPaymentInfoByAccount(account);

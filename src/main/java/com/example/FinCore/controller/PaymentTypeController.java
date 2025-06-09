@@ -17,20 +17,20 @@ import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin(allowedHeaders = "*")
-@RequestMapping(value = "finbook/")
+@RequestMapping(value = "finbook/paymentType/")
 public class PaymentTypeController 
 {
 	
 	@Autowired
 	private PaymentTypeService service;
 	
-	@PostMapping(value = "createType")
+	@PostMapping(value = "create")
 	public BasicResponse createType(@Valid @RequestBody CreatePaymentTypeRequest req)
 	{
 		return service.createType(req);
 	}
 	
-	@PostMapping(value = "getType")
+	@PostMapping(value = "getByAccount")
 	public GetPaymentTypeListResponse getTypeByAccount(@RequestParam("account") String account)
 	{
 		return service.getTypeByAccount(account);

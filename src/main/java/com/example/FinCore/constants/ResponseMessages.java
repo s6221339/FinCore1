@@ -7,11 +7,10 @@ public enum ResponseMessages
 	ACCOUNT_NOT_FOUND(404, "查無此帳號！"),
 	BALANCE_NOT_FOUND(404, "查無此帳戶！"),
 	PAYMENT_NOT_FOUND(404, "查無此帳款！"),
+	FAMLIY_NOT_FOUND(404, "查無此群組（家庭）！"),
 	ITEM_EXISTED(400, "已存在相同物件。"),
 	PAST_RECORD_DATE(400, "該款項不能記錄在過去時間。"),
 	FUTURE_RECORD_DATE(400, "該款項不能記錄在未來時間。"),
-	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料"),
-	
 	BAD_REQUEST(400, "請求參數錯誤"),
     FORBIDDEN(403, "無權限"),
     NOT_FOUND(404, "查無資料"),
@@ -24,7 +23,10 @@ public enum ResponseMessages
 	UPDATE_FAMILY_FAIL(400,"更新家族群組失敗"),
 	DELETE_FAMILY_FAIL(400, "刪除家庭群組失敗"),
 	NO_PERMISSION(400, "沒有 owner 權限"),
-	MEMBER_NOT_FOUND(404,"家族成員不存在");
+	MEMBER_NOT_FOUND(404,"家族成員不存在"),
+	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料。"),
+	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
+	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。");
 	
 	private int code;
 	

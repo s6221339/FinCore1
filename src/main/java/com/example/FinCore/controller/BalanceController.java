@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.CreateBalanceRequest;
+import com.example.FinCore.vo.request.GetBudgetRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.BudgetResponse;
 
 import jakarta.validation.Valid;
 
@@ -25,13 +27,13 @@ public class BalanceController
 	private BalanceService service;
 
 	@PostMapping(value = "create")
-	public BasicResponse create(@Valid @RequestBody CreateBalanceRequest req)
+	public BasicResponse create(@Valid @RequestBody CreateBalanceRequest req) throws Exception
 	{
 		return service.create(req);
 	}
 	
 	@PostMapping(value = "update")
-	public BasicResponse update(@Valid @RequestBody UpdateBalanceRequest req)
+	public BasicResponse update(@Valid @RequestBody UpdateBalanceRequest req) throws Exception
 	{
 		return service.update(req);
 	}
@@ -46,6 +48,12 @@ public class BalanceController
 	public BasicResponse deleteByAccount(@RequestParam("account") String account) throws Exception
 	{
 		return service.deleteByAccount(account);
+	}
+	
+	@PostMapping(value = "getBudget")
+	public BudgetResponse getBudget(@Valid @RequestBody GetBudgetRequest req) 
+	{
+		return service.getBudget(req);
 	}
 	
 }

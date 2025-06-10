@@ -10,7 +10,10 @@ public record UpdateBalanceRequest(
 		int balanceId,
 		
 		@NotBlank(message = ConstantsMessage.EMPTY_NAME_ERROR)
-		String name
+		String name,
+		
+		@Min(value = 0, message = ConstantsMessage.SAVINGS_VALUE_ERROR)
+		int savings
 		) {
 
 }

@@ -2,6 +2,8 @@ package com.example.FinCore.entity;
 
 import java.time.LocalDate;
 
+import com.example.FinCore.vo.RecurringPeriodVO;
+
 import jakarta.persistence.*;
 
 /**
@@ -60,6 +62,8 @@ public class Payment
 	
 	@Column(name = "day")
 	private int day;
+	
+	private final static String INCOME = "收入";
 
 	public int getPaymentId() {
 		return paymentId;
@@ -179,6 +183,25 @@ public class Payment
 
 	public void setDay(int day) {
 		this.day = day;
+	}
+	
+	/**
+	 * 檢查該款項是否為「收入款項」。
+	 * @return 若類型為收入時返回 {@code TRUE}，否則返回 {@code FALSE}
+	 */
+	public boolean isIncome()
+	{
+		return this.type.equals(INCOME);
+	}
+	
+	/**
+	 * 檢查該款項是否為「固定／循環款項」。
+	 * @return 若存在循環週期時返回 {@code TRUE}，否則返回 {@code FALSE}
+	 */
+	public boolean hasPeriod()
+	{
+		var period = new RecurringPeriodVO(recurringPeriodYear, recurringPeriodMonth, recurringPeriodDay);
+		return period.hasPeriod();
 	}
 	
 }

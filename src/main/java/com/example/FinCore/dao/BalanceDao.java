@@ -41,9 +41,10 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	public void createByFamliyId(int familyId, String name, LocalDate createDate);
 	
 	/**
-	 * 更新帳戶名稱。
+	 * 更新帳戶名稱與儲蓄金額。
 	 * @param balanceId 指定帳戶編號
 	 * @param name 要更新的名稱
+	 * @param savings 儲蓄金額
 	 */
 	@Transactional
 	@Modifying
@@ -66,5 +67,12 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	 */
 	@Query(value = "select balance_id from balance where account = ?1", nativeQuery = true)
 	public List<Integer> selectBalanceIdListByAccount(String account);
+	
+	/**
+	 * 取得資料表中當前最新一筆資料編號。
+	 * @return 最新的資料編號
+	 */
+	@Query(value = "select max(balance_id) from balance", nativeQuery = true)
+	public int getLastedId();
 
 }

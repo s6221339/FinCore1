@@ -172,6 +172,7 @@ public class PaymentServiceImpl implements PaymentService
 					payment.getRecurringPeriodDay()
 					);
 			var paymentInfo = new PaymentInfoVO(
+					payment.getPaymentId(),
 					payment.getDescription(), 
 					payment.getType(), 
 					payment.getItem(), 

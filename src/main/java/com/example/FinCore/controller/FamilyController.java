@@ -11,8 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
+import com.example.FinCore.vo.request.DismissFamilyRequest;
+import com.example.FinCore.vo.request.InviteMemberRequest;
+import com.example.FinCore.vo.request.KickMemberRequest;
+import com.example.FinCore.vo.request.OwnerResignAndAssignRequest;
+import com.example.FinCore.vo.request.QuitFamilyRequest;
+import com.example.FinCore.vo.request.RenameFamilyRequest;
 import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.FamilyListResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.validation.Valid;
 
@@ -40,6 +48,50 @@ public class FamilyController {
 	@PostMapping(value = "delete")
 	public BasicResponse delete(@Valid @RequestBody DeleteFamilyRequest req) {
 		return service.delete(req);
+	}
+	
+	//該怎麼測試
+	@PostMapping(value = "getFamilyById")
+	public BasicResponse getFamilyById(@RequestParam("familyId") int familyId) {
+		return service.getFamilyById(familyId);
+	}
+	
+	//測試成功
+	@PostMapping(value = "listAllFamily")
+	public FamilyListResponse listAllFamily() throws JsonProcessingException {
+		return service.listAllFamily();
+	}
+	
+	
+	@PostMapping(value = "invite")
+	public BasicResponse inviteMember(@Valid @RequestBody InviteMemberRequest req) //
+	throws JsonProcessingException{
+		return service.inviteMember(req);
+	}
+	
+	@PostMapping(value = "dismiss")
+	public BasicResponse dismissFamily(@Valid @RequestBody DismissFamilyRequest req) {
+		return service.dismissFamily(req);
+	}
+	
+	@PostMapping(value = "kick")
+	public BasicResponse kickMember(@Valid @RequestBody KickMemberRequest req) {
+		return service.kickMember(req);
+	}
+	
+	@PostMapping(value = "ownerResignAndAssign")
+	public BasicResponse ownerResignAndAssign(@Valid @RequestBody OwnerResignAndAssignRequest req) {
+		return service.ownerResignAndAssign(req);
+	}
+	
+	@PostMapping(value = "quit")
+	public BasicResponse quitFamily(@Valid @RequestBody QuitFamilyRequest req) {
+		return service.quitFamily(req);
+	}
+	
+	@PostMapping(value = "rename")
+	public BasicResponse renameFamily(@Valid @RequestBody RenameFamilyRequest req) {
+		return service.renameFamily(req);
 	}
 
 }

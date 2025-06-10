@@ -8,8 +8,6 @@ public class ConstantsMessage {
 
 	public final static String PARAM_CREATE_DATE_ERROR = "參數 create date 錯誤!!";
 
-	public final static String PARAM_FAMILY_ID_ERROR = "參數 family id 錯誤!!";
-
 	public final static String PARAM_FAMILY_ID_VALUE_ERROR = "參數 family id 不能小於1!!";
 
 	public final static String PARAM_ACCOUNT_ERROR = "參數 account 錯誤!!";

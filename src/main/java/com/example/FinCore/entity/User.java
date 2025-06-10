@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
+/**
+ * 會員
+ */
 @Entity
 @Table(name = "user")
 public class User {

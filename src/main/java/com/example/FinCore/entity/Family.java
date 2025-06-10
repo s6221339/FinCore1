@@ -8,6 +8,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * 家庭群組，由1個或多個User組成，
+ * 只會有1名owner跟0~多個invitor
+ */
 @Entity
 @Table(name = "family")
 public class Family {

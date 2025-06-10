@@ -49,7 +49,7 @@ public interface FamilyService {
 	 * 查詢所有家族群組
 	 * @return 家族清單
 	 */
-	public FamilyListResponse listAllFamily();
+	public FamilyListResponse listAllFamily() throws JsonProcessingException;
 	
 	/*
 	 * TODO: 5個功能

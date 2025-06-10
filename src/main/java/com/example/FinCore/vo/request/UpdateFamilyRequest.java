@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min;
 
 public record UpdateFamilyRequest(
 		
-		@Min(value = 1, message = ConstantsMessage.PARAM_FAMILY_ID_ERROR)
+		@Min(value = 1, message = ConstantsMessage.PARAM_FAMILY_ID_VALUE_ERROR)
 		int familyId, 
 		
 		String name) {

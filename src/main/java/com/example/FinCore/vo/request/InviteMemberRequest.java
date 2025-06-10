@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.FinCore.constants.ConstantsMessage;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 
 /**
@@ -14,6 +15,7 @@ import jakarta.validation.constraints.NotEmpty;
  */
 public record InviteMemberRequest(
 		
+		@Min(value = 1, message = ConstantsMessage.PARAM_FAMILY_ID_VALUE_ERROR)
 		int familyId, 
 		
 		String owner, 

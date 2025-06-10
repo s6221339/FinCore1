@@ -1,30 +1,45 @@
 package com.example.FinCore.vo.response;
 
+import com.example.FinCore.constants.ResponseMessages;
+import com.example.FinCore.entity.Family;
+
 public class FamilyIdResponse extends BasicResponse{
 	
-	private int familyId;
+	private Family family;
 
 	public FamilyIdResponse() {
 		super();
+	}
+
+	public FamilyIdResponse(Family family) {
+		super();
+		this.family = family;
 	}
 
 	public FamilyIdResponse(int code, String message) {
 		super(code, message);
 	}
 	
-	public FamilyIdResponse(int code, String message, int familyId) {
+	public FamilyIdResponse(int code, String message, Family family) {
 		super(code, message);
-		this.familyId = familyId;
+		this.family = family;
 	}
 
-	public int getFamilyId() {
-		return familyId;
+	public FamilyIdResponse(ResponseMessages res) {
+		super(res);
 	}
 
-	public void setFamilyId(int familyId) {
-		this.familyId = familyId;
+	public FamilyIdResponse(ResponseMessages res, Family family) {
+		super(res);
+		this.family = family;
+	}
+
+	public Family getFamily() {
+		return family;
+	}
+
+	public void setFamily(Family family) {
+		this.family = family;
 	}
 	
-	
-
 }

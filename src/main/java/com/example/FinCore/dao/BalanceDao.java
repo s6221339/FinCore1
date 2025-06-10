@@ -24,8 +24,8 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	 */
 	@Transactional
 	@Modifying
-	@Query(value = "insert into balance (famliy_id, account, name, create_date) "
-			+ "values (-1, ?1, ?2, ?3)", nativeQuery = true)
+	@Query(value = "insert into balance (family_id, account, name, create_date) "
+			+ "values (0, ?1, ?2, ?3)", nativeQuery = true)
 	public void createByAccount(String account, String name, LocalDate createDate);
 	
 	/**
@@ -36,7 +36,7 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	 */
 	@Transactional
 	@Modifying
-	@Query(value = "insert into balance (famliy_id, account, name, create_date) "
+	@Query(value = "insert into balance (family_id, account, name, create_date) "
 			+ "values (?1, NULL, ?2, ?3)", nativeQuery = true)
 	public void createByFamliyId(int familyId, String name, LocalDate createDate);
 	

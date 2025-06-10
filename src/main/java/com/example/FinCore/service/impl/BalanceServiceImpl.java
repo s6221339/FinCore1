@@ -66,7 +66,7 @@ public class BalanceServiceImpl implements BalanceService
 			}
 			else if(StringUtils.hasText(req.account()))
 			{
-				if(userDao.existsById(req.account()))
+				if(!userDao.existsById(req.account()))
 					return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 				
 				balanceDao.createByAccount(req.account(), req.name(), LocalDate.now());

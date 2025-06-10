@@ -38,7 +38,7 @@ public class PaymentController
 		return service.update(req);
 	}
 	
-	@PostMapping(value = "getByAccount")
+	@PostMapping(value = "getInfoByAccount")
 	public SearchPaymentResponse getPaymentInfoByAccount(@RequestParam("account") String account) 
 	{
 		return service.getPaymentInfoByAccount(account);

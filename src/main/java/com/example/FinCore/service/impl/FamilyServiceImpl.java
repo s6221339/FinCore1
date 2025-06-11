@@ -33,6 +33,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.transaction.Transactional;
+
 /**
  * 家族群組相關服務實作
  */
@@ -48,6 +50,7 @@ public class FamilyServiceImpl implements FamilyService {
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
+	@Transactional
 	public BasicResponse create(CreateFamilyRequest req) throws Exception {
 		System.out.println(req);
 		// 1. 檢查必要欄位
@@ -89,6 +92,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	@Override
+	@Transactional
 	public BasicResponse update(UpdateFamilyRequest req) {
 
 		// 1. 查找家族
@@ -112,6 +116,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	@Override
+	@Transactional
 	public BasicResponse delete(DeleteFamilyRequest req) {
 
 		Optional<Family> familyOpt = familyDao.findById(req.getFamilyId());
@@ -144,7 +149,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 	
 	
-
+	@Override
 	public FamilyListResponse listAllFamily() throws JsonProcessingException {
 		List<Family> familyList = familyDao.selectAll();
 		List<FamilyVO> voList = new ArrayList<>();
@@ -163,6 +168,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	@Override
+	@Transactional
 	public BasicResponse inviteMember(InviteMemberRequest req) throws JsonProcessingException {
 		// 1. 查詢家族資料
 		Optional<Family> familyOpt = familyDao.findById(req.familyId());
@@ -218,6 +224,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	@Override
+	@Transactional
 	public BasicResponse dismissFamily(DismissFamilyRequest req) {
 		// 1. 查詢家族
 		Optional<Family> familyOpt = familyDao.findById(req.getFamilyId());
@@ -236,6 +243,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	@Override
+	@Transactional
 	public BasicResponse kickMember(KickMemberRequest req) {
 		// 1. 查詢家族
 		Optional<Family> familyOpt = familyDao.findById(req.familyId());
@@ -288,6 +296,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	@Override
+	@Transactional
 	public BasicResponse ownerResignAndAssign(OwnerResignAndAssignRequest req) {
 		// 1. 查詢家族
 	    Optional<Family> familyOpt = familyDao.findById(req.getFamilyId());
@@ -364,6 +373,7 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	@Override
+	@Transactional
 	public BasicResponse quitFamily(QuitFamilyRequest req) {
 		// 1. 查詢家族
 	    Optional<Family> familyOpt = familyDao.findById(req.getFamilyId());

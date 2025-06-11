@@ -116,6 +116,17 @@ public interface UserDao extends JpaRepository<User, String>{
 	@Query(value = "select count(account) from user where account in (:accounts)", nativeQuery = true)
 	public int countByAccountIn(@Param("accounts") List<String> accounts);
 	
+	/**
+     * 更新密碼
+     * @param account 會員帳號(Email)
+     * @param password 新密碼（加密後）
+     * @return 更新筆數（1 = 成功, 0 = 失敗）
+     */
+    @Modifying
+    @Transactional
+    @Query(value = "update user set password = :password where account = :account", nativeQuery = true)
+    public int updatePassword(@Param("account") String account, @Param("password") String password);
+	
 	
 
 }

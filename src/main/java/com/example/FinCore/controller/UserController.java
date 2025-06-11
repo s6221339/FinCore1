@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.request.CreateUserRequest;
+import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 
@@ -37,6 +38,11 @@ public class UserController {
 	    public BasicResponse cancel(@RequestParam String account) {
 	        return service.cancel(account);
 	    }
+	
+	@PostMapping(value = "updatePasswordUser")
+	public BasicResponse updatePasswordUser(@Valid @RequestBody UpdatePasswordUserRequest req) {
+		return service.updatePasswordUser(req);
+	}
 	
 	
 	

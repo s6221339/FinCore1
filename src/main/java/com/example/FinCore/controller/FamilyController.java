@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
-import com.example.FinCore.vo.request.DeleteFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
 import com.example.FinCore.vo.request.InviteMemberRequest;
 import com.example.FinCore.vo.request.KickMemberRequest;

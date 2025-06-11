@@ -1,6 +1,7 @@
 package com.example.FinCore.service.itfc;
 
 import com.example.FinCore.vo.request.CreateUserRequest;
+import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 
@@ -26,6 +27,13 @@ public interface UserService {
 	 * @return
 	 */
 	public BasicResponse cancel(String account);
+	
+	/**
+	 * 會員更新密碼
+	 * @param req
+	 * @return
+	 */
+	public BasicResponse updatePasswordUser(UpdatePasswordUserRequest req);
 	
 	/**
 	 * 1.更新密碼 a.帳號 b.舊密碼 c.新密碼

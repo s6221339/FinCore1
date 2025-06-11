@@ -51,15 +51,6 @@ public interface FamilyService {
 	 */
 	public FamilyListResponse listAllFamily() throws JsonProcessingException;
 	
-	/*
-	 * TODO: 5個功能
-	 * 1.owner 的邀請.
-	 * 2.解散.
-	 * 3.踢出，owner的退出需要指派家庭群組裡的一人，若沒指派，取群組成員的第一人
-	 * 4.成員可退出
-	 * 5.owner 可改群組名稱
-	 */
-	
 	/**
 	 * Owner 邀請新成員加入家族
 	 * @param familyId 家族ID

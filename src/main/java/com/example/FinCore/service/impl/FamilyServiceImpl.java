@@ -204,7 +204,7 @@ public class FamilyServiceImpl implements FamilyService {
 		Set<String> allSet = new HashSet<>(currentList);
 		for (String invitee : req.invitor()) {
 		    if (invitee.equals(req.owner()) || !allSet.add(invitee)) {
-		        return new BasicResponse(ResponseMessages.DUPLICATE_MEMBER);
+		        return new BasicResponse(ResponseMessages.DUPLICATE_FAMILY_MEMBERS);
 		    }
 		}
 		// 將舊成員與新成員合併在一起

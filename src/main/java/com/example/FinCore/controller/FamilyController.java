@@ -45,24 +45,22 @@ public class FamilyController {
 		return service.update(req);
 	}
 	
-	@PostMapping(value = "delete")
-	public BasicResponse delete(@Valid @RequestBody DeleteFamilyRequest req) {
-		return service.delete(req);
-	}
+	//解散家庭群族用 finbook/family/dismiss
+//	@PostMapping(value = "delete")
+//	public BasicResponse delete(@Valid @RequestBody DeleteFamilyRequest req) {
+//		return service.delete(req);
+//	}
 	
-	//該怎麼測試
 	@PostMapping(value = "getFamilyById")
 	public BasicResponse getFamilyById(@RequestParam("familyId") int familyId) {
 		return service.getFamilyById(familyId);
 	}
 	
-	//測試成功
 	@PostMapping(value = "listAllFamily")
 	public FamilyListResponse listAllFamily() throws JsonProcessingException {
 		return service.listAllFamily();
 	}
-	
-	
+
 	@PostMapping(value = "invite")
 	public BasicResponse inviteMember(@Valid @RequestBody InviteMemberRequest req) //
 	throws JsonProcessingException{

@@ -27,5 +27,9 @@ public interface UserService {
 	 */
 	public BasicResponse cancel(String account);
 	
-	//修改密碼 1.帳號 2.舊密碼 3.新密碼
+	/**
+	 * 1.更新密碼 a.帳號 b.舊密碼 c.新密碼
+	 * 2.查詢會員資料
+	 * 3.查詢會員在哪個家庭群組
+	 */
 }

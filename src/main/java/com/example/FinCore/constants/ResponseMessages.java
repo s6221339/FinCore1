@@ -28,7 +28,8 @@ public enum ResponseMessages
 	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
 	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。"),
 	UPDATE_USER_FAIL(400, "更新會員失敗"),
-	ACCOUNT_EXIST(400, "帳號已存在");
+	ACCOUNT_EXIST(400, "帳號已存在"),
+	DUPLICATE_FAMILY_MEMBERS(400, "家庭成員重複");
 
 	
 	private int code;

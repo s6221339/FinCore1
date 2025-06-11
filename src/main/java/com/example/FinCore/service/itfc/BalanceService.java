@@ -1,8 +1,10 @@
 package com.example.FinCore.service.itfc;
 
-import com.example.FinCore.vo.request.GetBudgetRequest;
+import com.example.FinCore.vo.request.GetBudgetByAccountRequest;
+import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.BudgetListResponse;
 import com.example.FinCore.vo.response.BudgetResponse;
 
 public interface BalanceService 
@@ -39,10 +41,17 @@ public interface BalanceService
 	public BasicResponse deleteByAccount(String account) throws Exception;
 	
 	/**
-	 * 取得該帳戶的當前餘額與總餘額。
+	 * 取得該帳戶的預算餘額與總預算。
 	 * @param req 請求資料
-	 * @return 帳戶底下相關餘額資料的回應資料
+	 * @return 帳戶底下相關預算資料的回應資料
 	 */
-	public BudgetResponse getBudget(GetBudgetRequest req);
+	public BudgetResponse getBudget(GetBudgetByBalanceIdRequest req);
+	
+	/**
+	 * 取得指定帳號底下「所有帳戶」的預算餘額與總預算
+	 * @param req 請求資料
+	 * @return 包括了帳號底下的所有帳戶預算資料的回應資料
+	 */
+	public BudgetListResponse getBudgetByAccount(GetBudgetByAccountRequest req);
 	
 }

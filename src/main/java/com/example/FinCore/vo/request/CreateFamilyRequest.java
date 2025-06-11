@@ -47,13 +47,6 @@ public class CreateFamilyRequest {
 		sb.append("name: '" + name + "', ");
 		sb.append("owner: '" + owner + "', ");
 		sb.append("invitor: " + (invitor == null ? "[]" : Arrays.toString(invitor.toArray())) + "}");
-		String str = "";
-		
-		if(invitor == null)
-			str = "[]";
-		else
-			str = Arrays.toString(invitor.toArray());
-		
 		return sb.toString();
 	}
 

@@ -2,8 +2,11 @@ package com.example.FinCore.entity;
 
 import java.time.LocalDate;
 
+import org.springframework.util.Assert;
+
 import com.example.FinCore.vo.RecurringPeriodVO;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 /**
@@ -200,8 +203,105 @@ public class Payment
 	 */
 	public boolean hasPeriod()
 	{
-		var period = new RecurringPeriodVO(recurringPeriodYear, recurringPeriodMonth, recurringPeriodDay);
+		var period = getPeriod();
 		return period.hasPeriod();
+	}
+	
+	/**
+	 * 檢查該款項是否被標記刪除。
+	 * @return 如果存在刪除日期，表示被標記為刪除，返回 {@code TRUE}，若不存在則返回 {@code FALSE}
+	 */
+	public boolean isDeleted()
+	{
+		return deleteDate != null;
+	}
+	
+	/**
+	 * 檢查該款項與傳入的「年月日」是否一致。
+	 * @see Payment#isOnTime(int, int)
+	 * @see Payment#isOnTime(int)
+	 */
+	public boolean isOnTime(int year, int month, int day)
+	{
+		return this.year == year && this.month == month && this.day == day;
+	}
+	
+	/**
+	 * 檢查該款項與傳入的「年月」是否一致。
+	 * @see Payment#isOnTime(int, int, int)
+	 * @see Payment#isOnTime(int)
+	 */
+	public boolean isOnTime(int year, int month)
+	{
+		return this.year == year && this.month == month;
+	}
+	
+	/**
+	 * 檢查該款項與傳入的「年」是否一致。
+	 * @see Payment#isOnTime(int, int, int)
+	 * @see Payment#isOnTime(int, int)
+	 */
+	public boolean isOnTime(int year)
+	{
+		return this.year == year;
+	}
+	
+	/**
+	 * 取得該款項的週期物件映射。
+	 * @return 該款項的週期物件映射
+	 */
+	public RecurringPeriodVO getPeriod()
+	{
+		return new RecurringPeriodVO(
+				recurringPeriodYear, 
+				recurringPeriodMonth, 
+				recurringPeriodDay
+				);
+	}
+	
+	/**
+	 * 從該款項的記帳日期開始，計算到結束日期之間（不包含）的循環次數。<p>
+	 * 
+	 * 如果結束日期設定於記帳日期之前，或者該款項為「非循環」，皆返回 0。
+	 * @param end 結束日期，如果值為 {@code NULL} 將預設為執行的日期
+	 * @return 循環次數
+	 */
+	public int getRecurringTimes(@Nullable LocalDate end)
+	{
+		if(end == null)
+			end = LocalDate.now();
+		
+		if(recordDate.isAfter(end))
+			return 0;
+		
+		var temp = recordDate;
+		int result = 0;
+		var period = getPeriod();
+		if(!period.hasPeriod())
+			return 0;
+		
+		while(temp.isAfter(end))
+		{
+			result++;
+			temp.plusDays(period.day());
+			temp.plusMonths(period.month());
+			temp.plusYears(period.year());
+		}
+		return result;
+	}
+	
+	/**
+	 * 判斷該循環款項是否「最靠近」設定的日期。最靠近的意思是該款項進入下次循環
+	 * 之前沒有其他的循環週期。<p>
+	 * 
+	 * 如果在計算前就已經超過設定日期、或該款項不為循環款項時檢查不通過。
+	 * @param date 要判斷的日期
+	 * @return 如果前置檢查通過、且下次循環日期在檢查日期之後時返回 {@code TRUE}
+	 */
+	public boolean isClose(LocalDate date)
+	{
+		Assert.notNull(date, "檢查日期不得為空值");
+		return getRecurringTimes(date) == 1;
 	}
 	
 }

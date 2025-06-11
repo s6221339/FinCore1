@@ -26,7 +26,8 @@ public enum ResponseMessages
 	MEMBER_NOT_FOUND(404,"家族成員不存在"),
 	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料。"),
 	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
-	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。");
+	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。"),
+	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定");
 	
 	private int code;
 	

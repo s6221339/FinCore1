@@ -4,7 +4,7 @@ import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.vo.BudgetVO;
 
 /**
- * 該回應資料搭載了帳戶餘額的相關資料。
+ * 該回應資料搭載了帳戶預算的相關資料。
  */
 public class BudgetResponse extends BasicResponse
 {

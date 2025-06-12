@@ -6,6 +6,7 @@ import java.time.LocalDate;
  * 紀載款項的所有基本資料
  */
 public record PaymentInfoVO(
+		int paymentId,
 		String description, 
 		String type, 
 		String item, 

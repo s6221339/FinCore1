@@ -87,7 +87,7 @@ public class PaymentServiceImpl implements PaymentService
 		if(entity == null)
 			return new BasicResponse(ResponseMessages.PAYMENT_NOT_FOUND);
 		
-		if(entity.getDeleteDate() != null)
+		if(entity.isDeleted())
 			return new BasicResponse(ResponseMessages.PAYMENT_HAS_BEEN_DELETED);
 		
 		var period = req.recurringPeriod();
@@ -117,10 +117,10 @@ public class PaymentServiceImpl implements PaymentService
 	/**
 	 * 檢查日期合法性，項目如下：
 	 * <ol>
-	 * 	<li>如果該款項是固定款項，但記帳時間在過去時不通過</li>
-	 * 	<li>如果該款項是非固定款項，但記帳時間在未來時不通過</li>
+	 * 	<li>如果該款項是固定款項，但記帳時間在過去（包含今天）時不通過</li>
+	 * 	<li>如果該款項是非固定款項，但記帳時間在未來（不包含今天）時不通過</li>
 	 * </ol>
-	 * @param date
+	 * @param date 
 	 * @param period
 	 * @return
 	 */
@@ -130,7 +130,7 @@ public class PaymentServiceImpl implements PaymentService
 		if(period.hasPeriod() && date.isBefore(today))
 			return new BasicResponse(ResponseMessages.PAST_RECORD_DATE);
 		
-		if(!period.hasPeriod() && date.isAfter(today))
+		if(!period.hasPeriod() && !date.isBefore(today))
 			return new BasicResponse(ResponseMessages.FUTURE_RECORD_DATE);
 		
 		return null;
@@ -163,7 +163,7 @@ public class PaymentServiceImpl implements PaymentService
 		for(Payment payment : paymentList)
 		{
 //			DeleteDate 存在代表該款項已標記刪除，不進行設定
-			if(payment.getDeleteDate() != null)
+			if(payment.isDeleted())
 				continue;
 			
 			var period = new RecurringPeriodVO(
@@ -172,6 +172,7 @@ public class PaymentServiceImpl implements PaymentService
 					payment.getRecurringPeriodDay()
 					);
 			var paymentInfo = new PaymentInfoVO(
+					payment.getPaymentId(),
 					payment.getDescription(), 
 					payment.getType(), 
 					payment.getItem(), 

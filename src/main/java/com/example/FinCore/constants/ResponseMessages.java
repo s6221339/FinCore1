@@ -30,8 +30,8 @@ public enum ResponseMessages
 	UPDATE_USER_FAIL(400, "更新會員失敗"),
 	ACCOUNT_EXIST(400, "帳號已存在"),
 	DUPLICATE_FAMILY_MEMBERS(400, "家庭成員重複"),
-	PASSWORD_NOT_MATCH(400, "密碼不一致");
-
+	PASSWORD_NOT_MATCH(400, "密碼不一致"),
+	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定");
 	
 	private int code;
 	

@@ -47,6 +47,15 @@ public interface PaymentTypeDao extends JpaRepository<PaymentType, PaymentTypePK
 	public void delete(String type, String item, String account);
 	
 	/**
+	 * 刪除指定創建者建立的所有類別與細項。
+	 * @param account 指定創建者
+	 */
+	@Transactional
+	@Modifying
+	@Query(value = "delete from payment_type where account = ?1", nativeQuery = true)
+	public void deleteByAccount(String account);
+	
+	/**
 	 * 使用主鍵搜尋並取得指定資料在資料庫中的數量。
 	 * @param type 類型
 	 * @param item 細項

@@ -36,6 +36,10 @@ public class ConstantsMessage {
 
 	public final static String EMPTY_NAME_ERROR = "名稱不可為空白！";
 	
+	public final static String SAVINGS_VALUE_ERROR = "「savings」不得為負數！";
+	
+	public final static String INVALID_DATE_ERROR = "無效的日期索引";
+	
 	private ConstantsMessage() {}
 
 }

@@ -133,11 +133,5 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Query(value = "update user set password = :password where account = :account", nativeQuery = true)
 	public int updatePassword(@Param("account") String account, @Param("password") String password);
 	
-	/**
-	 * 查詢會員在哪個家庭群組
-	 * @param account
-	 * @return
-	 */
-	@Query(value = "select * from family where owner = :account or invitor = :account", nativeQuery = true)
-	public List<Family> getFamilyByAccount(@Param("account") String account);
+	
 }

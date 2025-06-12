@@ -1,8 +1,10 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.UserService;
+import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.CreateUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
@@ -22,6 +25,11 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.UserResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 
@@ -33,6 +41,8 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDao userDao;
+	
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
 	@Transactional
@@ -122,27 +132,42 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public BasicResponse getUser(String account) {
+	public UserResponse getUser(String account) {
 		if (account == null || account.isEmpty()) {
-			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+			return new UserResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 		}
 		User user = userDao.selectById(account);
 		if(user == null) {
-			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+			return new UserResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		}
-		return new BasicResponse(ResponseMessages.SUCCESS);
+		UserVO vo = new UserVO(user.getAccount(), user.getName(),
+				user.getPhone(), user.getBirthday(), user.getAvatar());
+		
+		return new UserResponse(ResponseMessages.SUCCESS, vo);
 	}
 
+	// 檢查 family 的 owner 是否和 account 一致（用 String 的 equals 方法）
+	// 檢查 family 的 invitorList 是否存在 account（用 List 的 contains 方法）
+	// 符合其中一項加到voList
+	// 也可以用 or 判斷式
 	@Override
-	public BasicResponse getFamilyByAccount(String account) {
+	public FamilyListResponse getFamilyByAccount(String account) throws JsonProcessingException {
 		if(account == null || account.isEmpty()) {
-			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+			return new FamilyListResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 		}
-		List<Family> family = userDao.getFamilyByAccount(account);
-		return null;
-		
-//				new BasicResponse(ResponseMessages.SUCCESS.getCode(),
-//                ResponseMessages.SUCCESS.getMessage(), family);
+		List<FamilyVO> voList = new ArrayList<FamilyVO>();
+		List<Family> familyList = familyDao.selectAllFamily();
+		for(Family family : familyList)
+		{
+			List<String> invitorList = mapper.readValue(
+					family.getInvitor(), 
+					new TypeReference<List<String>>() {});
+			
+			FamilyVO vo = new FamilyVO(family.getId(), family.getName()
+					, family.getOwner(), invitorList);
+			voList.add(vo);
+		}
+		return new FamilyListResponse(ResponseMessages.SUCCESS, voList);
 		
 	}
 	
@@ -161,14 +186,7 @@ public class UserServiceImpl implements UserService {
 	    }
 
 	    // 3. 登入成功（你可以選擇只回傳成功，不帶 user，或帶 user 資料給前端）
-	    UserVO vo = new UserVO(user.getAccount(), user.getName(), user.getPhone());
-	    return null;
-	    		
-//	    		new BasicResponse(ResponseMessages.SUCCESS.getCode(),
-//	                            ResponseMessages.SUCCESS.getMessage(),
-//	                            vo);
-	    
-	    
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 	
 }

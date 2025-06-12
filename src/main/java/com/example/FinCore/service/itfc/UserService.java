@@ -5,6 +5,9 @@ import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.UserResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public interface UserService {
 
@@ -48,14 +51,14 @@ public interface UserService {
 	 * @param account
 	 * @return
 	 */
-	public BasicResponse getUser(String account);
+	public UserResponse getUser(String account);
 	
 	/**
 	 * 查詢會員在哪個家庭群組
 	 * @param account
 	 * @return
 	 */
-	public BasicResponse getFamilyByAccount(String account);
+	public FamilyListResponse getFamilyByAccount(String account) throws JsonProcessingException;
 	
 	/**
 	 * 會員登入

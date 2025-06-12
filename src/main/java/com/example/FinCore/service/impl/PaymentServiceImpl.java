@@ -19,6 +19,7 @@ import com.example.FinCore.service.itfc.PaymentService;
 import com.example.FinCore.vo.BalanceWithPaymentVO;
 import com.example.FinCore.vo.PaymentInfoVO;
 import com.example.FinCore.vo.RecurringPeriodVO;
+import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
@@ -142,13 +143,18 @@ public class PaymentServiceImpl implements PaymentService
 		if(!userDao.existsById(account))
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
-		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
-		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
-		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();
-		generateBalanceWithPaymentMap(map, paymentList);
-		for(Entry<Integer, List<PaymentInfoVO>> entry : map.entrySet())
-			resultList.add(new BalanceWithPaymentVO(entry.getKey(), entry.getValue()));
+		var resultList = getPaymentInfoOpration(account, 0, 0);
+		
+		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
+	}
+	
+	@Override
+	public SearchPaymentResponse getPaymentInfoWithDateFilter(AccountWithDateFilterRequest req) 
+	{
+		if(!userDao.existsById(req.account()))
+			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		var resultList = getPaymentInfoOpration(req.account(), req.year(), req.month());
 		
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
 	}
@@ -158,12 +164,15 @@ public class PaymentServiceImpl implements PaymentService
 	 * @param map 要設定的 Map
 	 * @param paymentList 款項列表
 	 */
-	private void generateBalanceWithPaymentMap(Map<Integer, List<PaymentInfoVO>> map, List<Payment> paymentList)
+	private void generateBalanceWithPaymentMap(Map<Integer, List<PaymentInfoVO>> map, List<Payment> paymentList, int yearFilter, int monthFilter)
 	{
 		for(Payment payment : paymentList)
 		{
 //			DeleteDate 存在代表該款項已標記刪除，不進行設定
 			if(payment.isDeleted())
+				continue;
+			
+			if((yearFilter != 0 && monthFilter != 0) && payment.isOnTime(yearFilter, monthFilter))
 				continue;
 			
 			var period = new RecurringPeriodVO(
@@ -185,6 +194,18 @@ public class PaymentServiceImpl implements PaymentService
 			voList.add(paymentInfo);
 			map.put(payment.getBalanceId(), voList);
 		}
+	}
+	
+	private List<BalanceWithPaymentVO> getPaymentInfoOpration(String account, int year, int month)
+	{
+		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
+		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
+		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();
+		generateBalanceWithPaymentMap(map, paymentList, year, month);
+		for(Entry<Integer, List<PaymentInfoVO>> entry : map.entrySet())
+			resultList.add(new BalanceWithPaymentVO(entry.getKey(), entry.getValue()));
+		return resultList;
 	}
 
 }

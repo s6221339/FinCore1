@@ -1,5 +1,6 @@
 package com.example.FinCore.service.itfc;
 
+import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
@@ -36,5 +37,13 @@ public interface PaymentService
 	 * @return 存放款項資料的回應資料
 	 */
 	public SearchPaymentResponse getPaymentInfoByAccount(String account);
+	
+	/**
+	 * 和 {@link PaymentService#getPaymentInfoByAccount(String)} 類似，但增加
+	 * 了年月過濾，因此回傳資料時將會鎖定指定年月的款項
+	 * @param req 請求資料
+	 * @return 存放款項資料的回應資料
+	 */
+	public SearchPaymentResponse getPaymentInfoWithDateFilter(AccountWithDateFilterRequest req);
 	
 }

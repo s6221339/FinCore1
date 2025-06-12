@@ -11,6 +11,7 @@ public enum ResponseMessages
 	ITEM_EXISTED(400, "已存在相同物件。"),
 	PAST_RECORD_DATE(400, "該款項不能記錄在過去時間。"),
 	FUTURE_RECORD_DATE(400, "該款項不能記錄在未來時間。"),
+	FUTURE_SEARCH_DATE(400, "無法搜尋未來的時間"),
 	BAD_REQUEST(400, "請求參數錯誤"),
     FORBIDDEN(403, "無權限"),
     NOT_FOUND(404, "查無資料"),

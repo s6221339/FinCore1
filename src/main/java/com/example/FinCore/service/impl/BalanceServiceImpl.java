@@ -22,7 +22,7 @@ import com.example.FinCore.entity.Savings;
 import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.CreateBalanceRequest;
 import com.example.FinCore.vo.BudgetVO;
-import com.example.FinCore.vo.request.GetBudgetByAccountRequest;
+import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BasicResponse;
@@ -160,6 +160,11 @@ public class BalanceServiceImpl implements BalanceService
 	@Override
 	public BudgetResponse getBudget(GetBudgetByBalanceIdRequest req) 
 	{
+		LocalDate today = LocalDate.now();
+		LocalDate check = LocalDate.of(req.year(), req.month(), today.getDayOfMonth());
+		if(check.isAfter(today))
+			return new BudgetResponse(ResponseMessages.FUTURE_SEARCH_DATE);
+		
 		List<Integer> idList = new ArrayList<>();
 		idList.add(req.balanceId());
 		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(idList);
@@ -245,7 +250,7 @@ public class BalanceServiceImpl implements BalanceService
 	}
 
 	@Override
-	public BudgetListResponse getBudgetByAccount(GetBudgetByAccountRequest req) 
+	public BudgetListResponse getBudgetByAccount(AccountWithDateFilterRequest req) 
 	{
 		if(!userDao.existsById(req.account()))
 			return new BudgetListResponse(ResponseMessages.ACCOUNT_NOT_FOUND);

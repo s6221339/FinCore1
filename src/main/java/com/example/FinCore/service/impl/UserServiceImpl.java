@@ -1,6 +1,7 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,12 +11,17 @@ import org.springframework.util.StringUtils;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.UserService;
+import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.CreateUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
+import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.FamilyIdResponse;
+import com.example.FinCore.vo.response.FamilyListResponse;
 
 import jakarta.transaction.Transactional;
 
@@ -90,27 +96,19 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public BasicResponse updatePasswordUser(UpdatePasswordUserRequest req) {
-		// 1.檢查欄位
-		if (req.account() == null || req.account().isEmpty() || //
-				req.oldPassword() == null || req.oldPassword().isEmpty() || //
-				req.newPassword() == null || req.newPassword().isEmpty()) {
-			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-
-		}
-
-		// 2.查詢帳號
+		// 1.查詢帳號
 		User user = userDao.selectById(req.account());
 		if (user == null) {
 			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		}
 
-		// 3.比對舊密碼
+		// 2.比對舊密碼
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		if (!encoder.matches(req.oldPassword(), user.getPassword())) {
 			return new BasicResponse(ResponseMessages.PASSWORD_NOT_MATCH);
 
 		}
-		// 4.新密碼加密再存回資料庫
+		// 3.新密碼加密再存回資料庫
 		String encodeNewPwd = encoder.encode(req.newPassword());
 
 		// 更新密碼的 Dao 方法
@@ -123,4 +121,54 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	@Override
+	public BasicResponse getUser(String account) {
+		if (account == null || account.isEmpty()) {
+			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+		}
+		User user = userDao.selectById(account);
+		if(user == null) {
+			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		}
+		return new BasicResponse(ResponseMessages.SUCCESS);
+	}
+
+	@Override
+	public BasicResponse getFamilyByAccount(String account) {
+		if(account == null || account.isEmpty()) {
+			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+		}
+		List<Family> family = userDao.getFamilyByAccount(account);
+		return null;
+		
+//				new BasicResponse(ResponseMessages.SUCCESS.getCode(),
+//                ResponseMessages.SUCCESS.getMessage(), family);
+		
+	}
+	
+	@Override
+	public BasicResponse login(loginRequest req) {
+	    // 1. 查詢會員
+	    User user = userDao.selectById(req.account());
+	    if (user == null) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
+
+	    // 2. 密碼比對
+	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    if (!encoder.matches(req.password(), user.getPassword())) {
+	        return new BasicResponse(ResponseMessages.PASSWORD_NOT_MATCH);
+	    }
+
+	    // 3. 登入成功（你可以選擇只回傳成功，不帶 user，或帶 user 資料給前端）
+	    UserVO vo = new UserVO(user.getAccount(), user.getName(), user.getPhone());
+	    return null;
+	    		
+//	    		new BasicResponse(ResponseMessages.SUCCESS.getCode(),
+//	                            ResponseMessages.SUCCESS.getMessage(),
+//	                            vo);
+	    
+	    
+	}
+	
 }

@@ -39,12 +39,13 @@ public class FamilyController {
 		return service.create(req);
 	}
 	
-	@PostMapping(value = "update")
-	public BasicResponse update(@Valid @RequestBody UpdateFamilyRequest req) {
-		return service.update(req);
-	}
+	// update目前只有更新名稱的功能，變更名稱用 finbook/family/rename
+//	@PostMapping(value = "update")
+//	public BasicResponse update(@Valid @RequestBody UpdateFamilyRequest req) {
+//		return service.update(req);
+//	}
 	
-	//解散家庭群族用 finbook/family/dismiss
+	// 解散家庭群族用 finbook/family/dismiss
 //	@PostMapping(value = "delete")
 //	public BasicResponse delete(@Valid @RequestBody DeleteFamilyRequest req) {
 //		return service.delete(req);

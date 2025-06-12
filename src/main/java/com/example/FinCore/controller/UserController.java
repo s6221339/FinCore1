@@ -44,6 +44,11 @@ public class UserController {
 		return service.updatePasswordUser(req);
 	}
 	
+	@PostMapping(value = "getUser")
+	public BasicResponse getUser(@RequestParam String account) {
+		return service.getUser(account);
+	}
+	
 	
 	
 	

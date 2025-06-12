@@ -304,4 +304,14 @@ public class Payment
 		return getRecurringTimes(date) == 1;
 	}
 	
+	/**
+	 * 檢查該款項是否為記錄在未來的款項。
+	 * @return 
+	 */
+	public boolean isFuture()
+	{
+		LocalDate today = LocalDate.now();
+		return recordDate.isAfter(today);
+	}
+	
 }

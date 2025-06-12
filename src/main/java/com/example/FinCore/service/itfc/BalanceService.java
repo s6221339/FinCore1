@@ -1,6 +1,6 @@
 package com.example.FinCore.service.itfc;
 
-import com.example.FinCore.vo.request.GetBudgetByAccountRequest;
+import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BasicResponse;
@@ -52,6 +52,6 @@ public interface BalanceService
 	 * @param req 請求資料
 	 * @return 包括了帳號底下的所有帳戶預算資料的回應資料
 	 */
-	public BudgetListResponse getBudgetByAccount(GetBudgetByAccountRequest req);
+	public BudgetListResponse getBudgetByAccount(AccountWithDateFilterRequest req);
 	
 }

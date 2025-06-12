@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.CreateBalanceRequest;
-import com.example.FinCore.vo.request.GetBudgetByAccountRequest;
+import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BasicResponse;
@@ -59,7 +59,7 @@ public class BalanceController
 	}
 	
 	@PostMapping(value = "getBudgetByAccount")
-	public BudgetListResponse getBudgetByAccount(@Valid @RequestBody GetBudgetByAccountRequest req) 
+	public BudgetListResponse getBudgetByAccount(@Valid @RequestBody AccountWithDateFilterRequest req) 
 	{
 		return service.getBudgetByAccount(req);
 	}

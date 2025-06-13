@@ -14,6 +14,13 @@ public class SavingsPK implements Serializable
 
 	private int month;
 
+	public SavingsPK(int balanceId, int year, int month) {
+		super();
+		this.balanceId = balanceId;
+		this.year = year;
+		this.month = month;
+	}
+
 	public int getBalanceId() {
 		return balanceId;
 	}

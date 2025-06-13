@@ -20,6 +20,7 @@ import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Balance;
 import com.example.FinCore.entity.Payment;
 import com.example.FinCore.entity.Savings;
+import com.example.FinCore.entity.SavingsPK;
 import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.CreateBalanceRequest;
 import com.example.FinCore.vo.BudgetVO;
@@ -103,10 +104,19 @@ public class BalanceServiceImpl implements BalanceService
 			var today = LocalDate.now();
 			int year = today.getYear();
 			int month = today.getMonthValue();
+//			如果有名稱資料則更新
 			if(StringUtils.hasText(req.name()))
 				balanceDao.updateName(req.balanceId(), req.name());
+//			如果有儲蓄資料則更新
 			if(req.savings() >= 0)
-				savingsDao.update(req.balanceId(), year, month, req.savings());
+			{
+				SavingsPK pk = new SavingsPK(req.balanceId(), year, month);
+				if(savingsDao.existsById(pk))
+					savingsDao.update(req.balanceId(), year, month, req.savings());
+				
+				else
+					savingsDao.create(req.balanceId(), year, month, req.savings());	
+			}
 			return new BasicResponse(ResponseMessages.SUCCESS);
 		}
 		catch (Exception e) 

@@ -6,6 +6,16 @@ import jakarta.persistence.Table;
 public class Transfer 
 {
 	
+	private int id;
+	
+	private String fromBalance;
+	
+	private String toBalance;
+	
+	private int amount;
+	
+	private String description;
+	
 	
 	
 }

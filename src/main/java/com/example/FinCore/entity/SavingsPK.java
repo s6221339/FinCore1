@@ -13,6 +13,8 @@ public class SavingsPK implements Serializable
 	private int year;
 
 	private int month;
+	
+	public SavingsPK() {}
 
 	public SavingsPK(int balanceId, int year, int month) {
 		super();

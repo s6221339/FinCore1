@@ -13,6 +13,7 @@ import com.example.FinCore.service.itfc.CreateBalanceRequest;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
+import com.example.FinCore.vo.response.BalanceListResponse;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.BudgetListResponse;
 import com.example.FinCore.vo.response.BudgetResponse;
@@ -62,6 +63,12 @@ public class BalanceController
 	public BudgetListResponse getBudgetByAccount(@Valid @RequestBody AccountWithDateFilterRequest req) 
 	{
 		return service.getBudgetByAccount(req);
+	}
+	
+	@PostMapping(value = "getAllByAccount")
+	public BalanceListResponse getAllBalance(String account) 
+	{
+		return service.getAllBalance(account);
 	}
 	
 }

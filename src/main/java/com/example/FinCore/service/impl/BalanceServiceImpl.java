@@ -17,6 +17,7 @@ import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.entity.Balance;
 import com.example.FinCore.entity.Payment;
 import com.example.FinCore.entity.Savings;
 import com.example.FinCore.service.itfc.BalanceService;
@@ -25,6 +26,7 @@ import com.example.FinCore.vo.BudgetVO;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
+import com.example.FinCore.vo.response.BalanceListResponse;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.BudgetListResponse;
 import com.example.FinCore.vo.response.BudgetResponse;
@@ -101,8 +103,10 @@ public class BalanceServiceImpl implements BalanceService
 			var today = LocalDate.now();
 			int year = today.getYear();
 			int month = today.getMonthValue();
-			balanceDao.updateName(req.balanceId(), req.name());
-			savingsDao.update(req.balanceId(), year, month, req.savings());
+			if(StringUtils.hasText(req.name()))
+				balanceDao.updateName(req.balanceId(), req.name());
+			if(req.savings() >= 0)
+				savingsDao.update(req.balanceId(), year, month, req.savings());
 			return new BasicResponse(ResponseMessages.SUCCESS);
 		}
 		catch (Exception e) 
@@ -375,6 +379,16 @@ public class BalanceServiceImpl implements BalanceService
 			voList.add(vo);
 		}
 		return new BudgetListResponse(ResponseMessages.SUCCESS, voList);
+	}
+
+	@Override
+	public BalanceListResponse getAllBalance(String account) 
+	{
+		if(!userDao.existsById(account))
+			return new BalanceListResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		List<Balance> balanceList = balanceDao.getAllBalanceByAccount(account);
+		return new BalanceListResponse(ResponseMessages.SUCCESS, balanceList);
 	}
 	
 	

@@ -3,6 +3,7 @@ package com.example.FinCore.service.itfc;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
+import com.example.FinCore.vo.response.BalanceListResponse;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.BudgetListResponse;
 import com.example.FinCore.vo.response.BudgetResponse;
@@ -18,7 +19,7 @@ public interface BalanceService
 	public BasicResponse create(CreateBalanceRequest req) throws Exception;
 	
 	/**
-	 * 更新帳戶服務，可更新帳戶名稱與當月儲蓄設定。
+	 * 更新帳戶服務，可更新帳戶名稱與當月儲蓄設定。如果更新名稱留空則不更新名稱、儲蓄負值時不更新儲蓄。
 	 * @param req 更新請求資料
 	 * @return 基本回應資料
 	 */
@@ -53,5 +54,12 @@ public interface BalanceService
 	 * @return 包括了帳號底下的所有帳戶預算資料的回應資料
 	 */
 	public BudgetListResponse getBudgetByAccount(AccountWithDateFilterRequest req);
+	
+	/**
+	 * 使用帳號取得所有關聯帳戶
+	 * @param account 指定帳號
+	 * @return 包括了所有帳戶資料的回應資料
+	 */
+	public BalanceListResponse getAllBalance(String account);
 	
 }

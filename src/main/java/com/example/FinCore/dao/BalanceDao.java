@@ -74,5 +74,13 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	 */
 	@Query(value = "select max(balance_id) from balance", nativeQuery = true)
 	public int getLastedId();
+	
+	/**
+	 * 取得與指定帳號關聯的所有帳戶資料。
+	 * @param account 帳號
+	 * @return 帳戶資料列表
+	 */
+	@Query(value = "select * from balance where account = ?1", nativeQuery = true)
+	public List<Balance> getAllBalanceByAccount(String account);
 
 }

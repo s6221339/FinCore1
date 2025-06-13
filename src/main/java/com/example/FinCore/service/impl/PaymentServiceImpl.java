@@ -143,7 +143,7 @@ public class PaymentServiceImpl implements PaymentService
 		if(!userDao.existsById(account))
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		var resultList = getPaymentInfoOpration(account, 0, 0);
+		var resultList = getPaymentInfoOpration(account, -1, 0);
 		
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
 	}
@@ -159,6 +159,18 @@ public class PaymentServiceImpl implements PaymentService
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
 	}
 	
+	private List<BalanceWithPaymentVO> getPaymentInfoOpration(String account, int year, int month)
+	{
+		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
+		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
+		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();
+		generateBalanceWithPaymentMap(map, paymentList, year, month);
+		for(Entry<Integer, List<PaymentInfoVO>> entry : map.entrySet())
+			resultList.add(new BalanceWithPaymentVO(entry.getKey(), entry.getValue()));
+		return resultList;
+	}
+	
 	/**
 	 * 設定 BalanceWithPaymentMap，會將同一個帳戶的款項設定在一起
 	 * @param map 要設定的 Map
@@ -172,7 +184,7 @@ public class PaymentServiceImpl implements PaymentService
 			if(payment.isDeleted())
 				continue;
 			
-			if((yearFilter != 0 && monthFilter != 0) && payment.isOnTime(yearFilter, monthFilter))
+			if((yearFilter == -1 && monthFilter == 0) || !payment.isOnTime(yearFilter, monthFilter))
 				continue;
 			
 			var period = new RecurringPeriodVO(
@@ -194,18 +206,6 @@ public class PaymentServiceImpl implements PaymentService
 			voList.add(paymentInfo);
 			map.put(payment.getBalanceId(), voList);
 		}
-	}
-	
-	private List<BalanceWithPaymentVO> getPaymentInfoOpration(String account, int year, int month)
-	{
-		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
-		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
-		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
-		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();
-		generateBalanceWithPaymentMap(map, paymentList, year, month);
-		for(Entry<Integer, List<PaymentInfoVO>> entry : map.entrySet())
-			resultList.add(new BalanceWithPaymentVO(entry.getKey(), entry.getValue()));
-		return resultList;
 	}
 
 }

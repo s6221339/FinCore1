@@ -128,7 +128,7 @@ public class PaymentServiceImpl implements PaymentService
 	private BasicResponse checkDate(LocalDate date, RecurringPeriodVO period)
 	{
 		LocalDate today = LocalDate.now();
-		if(period.hasPeriod() && date.isBefore(today))
+		if(period.hasPeriod() && !date.isAfter(today))
 			return new BasicResponse(ResponseMessages.PAST_RECORD_DATE);
 		
 		if(!period.hasPeriod() && date.isAfter(today))

@@ -131,7 +131,7 @@ public class PaymentServiceImpl implements PaymentService
 		if(period.hasPeriod() && date.isBefore(today))
 			return new BasicResponse(ResponseMessages.PAST_RECORD_DATE);
 		
-		if(!period.hasPeriod() && !date.isBefore(today))
+		if(!period.hasPeriod() && date.isAfter(today))
 			return new BasicResponse(ResponseMessages.FUTURE_RECORD_DATE);
 		
 		return null;

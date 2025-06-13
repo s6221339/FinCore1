@@ -54,7 +54,7 @@ public class UserController {
 	public UserResponse getUser(@RequestParam("account") String account) {
 		return service.getUser(account);
 	}
-	
+	// 測試成功
 	@PostMapping(value = "getFamilyByAccount")
 	public FamilyListResponse getFamilyByAccount(@RequestParam("account") String account) throws JsonProcessingException {
 		return service.getFamilyByAccount(account);

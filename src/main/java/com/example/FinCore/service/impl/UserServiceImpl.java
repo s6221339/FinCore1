@@ -146,29 +146,39 @@ public class UserServiceImpl implements UserService {
 		return new UserResponse(ResponseMessages.SUCCESS, vo);
 	}
 
-	// 檢查 family 的 owner 是否和 account 一致（用 String 的 equals 方法）
-	// 檢查 family 的 invitorList 是否存在 account（用 List 的 contains 方法）
-	// 符合其中一項加到voList
-	// 也可以用 or 判斷式
 	@Override
 	public FamilyListResponse getFamilyByAccount(String account) throws JsonProcessingException {
-		if(account == null || account.isEmpty()) {
-			return new FamilyListResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-		}
-		List<FamilyVO> voList = new ArrayList<FamilyVO>();
-		List<Family> familyList = familyDao.selectAllFamily();
-		for(Family family : familyList)
-		{
-			List<String> invitorList = mapper.readValue(
-					family.getInvitor(), 
-					new TypeReference<List<String>>() {});
-			
-			FamilyVO vo = new FamilyVO(family.getId(), family.getName()
-					, family.getOwner(), invitorList);
-			voList.add(vo);
-		}
-		return new FamilyListResponse(ResponseMessages.SUCCESS, voList);
-		
+		// 1. 檢查帳號有沒有填，沒填就直接回傳錯誤
+	    if (account == null || account.isEmpty()) {
+	        return new FamilyListResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
+	    // 2. 準備一個結果清單，把有關的家族資料都丟進去
+	    List<FamilyVO> voList = new ArrayList<FamilyVO>();
+	    // 3. 從資料庫撈出所有家族，之後要一個一個檢查
+	    List<Family> familyList = familyDao.selectAllFamily(); // 取出所有家族
+	    // 4. 逐一檢查每個 family，看這個帳號是不是 owner 或 invitor
+	    for (Family family : familyList) {
+	        // 4-1. family 的 invitor 欄位是 JSON 字串，要先轉成 List 才能判斷
+	        List<String> invitorList = mapper.readValue(
+	                family.getInvitor(),
+	                new TypeReference<List<String>>() {});
+	        // 4-2. 判斷自己是不是這個家族的 owner
+	        boolean isOwner = account.equals(family.getOwner());
+	        // 4-3. 判斷自己是不是 invitor（家族成員）
+	        boolean isInvitor = invitorList != null && invitorList.contains(account);
+	        // 4-4. 只要有其中一個符合（是 owner 或是成員），就加進回傳清單
+	        if (isOwner || isInvitor) {
+	            FamilyVO vo = new FamilyVO(
+	                family.getId(),         // 家族編號
+	                family.getName(),       // 家族名稱
+	                family.getOwner(),      // 家族負責人
+	                invitorList             // 家族成員帳號清單
+	            );
+	            voList.add(vo);
+	        }
+	    }
+	    // 5. 統一回傳查詢成功與結果清單
+	    return new FamilyListResponse(ResponseMessages.SUCCESS, voList);
 	}
 	
 	@Override

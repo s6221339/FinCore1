@@ -3,6 +3,7 @@ package com.example.FinCore.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +15,6 @@ import com.example.FinCore.vo.response.TransfersListResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,12 +41,7 @@ public class TransfersController
 		@ApiResponse(responseCode = "200", description = "資料建立成功"),
 		@ApiResponse(responseCode = "404", description = "設定的帳戶不存在（任一不存在皆會觸發）")
 	})
-	public BasicResponse create(
-			@Valid 
-			@RequestBody(
-					required = true, 
-					description = "創建資料請求") 
-			CreateTransfersRequest req) 
+	public BasicResponse create(@Valid @RequestBody CreateTransfersRequest req)
 	{
 		return service.create(req);
 	}

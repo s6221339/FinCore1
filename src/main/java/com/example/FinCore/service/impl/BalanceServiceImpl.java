@@ -146,7 +146,7 @@ public class BalanceServiceImpl implements BalanceService
 	 */
 //	考量該操作不應該被單獨呼叫而應作為附帶操作，關閉此API
 	@Transactional(rollbackOn = Exception.class)
-	protected BasicResponse deleteByAccount(String account) throws Exception
+	public BasicResponse deleteByAccount(String account) throws Exception
 	{
 		if(!userDao.existsById(account))
 			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);

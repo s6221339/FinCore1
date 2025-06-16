@@ -9,7 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.example.FinCore.constants.ResponseMessages;
+import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
+import com.example.FinCore.dao.PaymentDao;
+import com.example.FinCore.dao.PaymentTypeDao;
+import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
@@ -34,6 +38,18 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private BalanceDao balanceDao;
+	
+	@Autowired
+	private PaymentDao paymentDao;
+	
+	@Autowired
+	private SavingsDao savingsDao;
+	
+	@Autowired
+	private PaymentTypeDao paymentTypeDao;
 
 	@Override
 	@Transactional
@@ -90,9 +106,23 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 3. 執行刪除
-		BalanceServiceImpl bs = new BalanceServiceImpl();
-		bs.deleteByAccount(account);
-		userDao.cancel(account);
+		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		List<Integer> paymentIdList = paymentDao.getPaymentIdListByBalanceIdList(balanceIdList);
+		try
+		{
+			paymentDao.deleteAllById(paymentIdList);
+			savingsDao.deleteByBalanceIdList(balanceIdList);
+			
+//			TODO：AI查詢資料也要刪除
+			
+			balanceDao.deleteAllById(balanceIdList);
+			paymentTypeDao.deleteByAccount(account);
+			userDao.cancel(account);
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 

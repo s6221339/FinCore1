@@ -2,7 +2,7 @@ package com.example.FinCore.constants;
 
 public final class ApiDocConstants 
 {
-	
+	//測試
 	/* === 請求資料規則 === */
 	
 	public final static String USER_REQUEST_BODY_RULE = "<ul>"

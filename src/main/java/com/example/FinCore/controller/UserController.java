@@ -13,7 +13,11 @@ import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.request.CreateUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
+import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.UserResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +33,7 @@ public class UserController {
 	@Autowired
 	private UserService service;
 	
+	// 測試成功
 	@PostMapping(value = "register")
 	@Operation(
 			summary = "註冊新會員", 
@@ -45,7 +50,7 @@ public class UserController {
     public BasicResponse register(@Valid @RequestBody CreateUserRequest req) {
         return service.register(req);
     }
-	
+	// 測試成功
 	@PostMapping(value = "update")
 	@Operation(
 			summary = "更新會員資料", 
@@ -64,6 +69,7 @@ public class UserController {
     }
 	
 	@PostMapping(value = "cancel")
+
 	@Operation(
 			summary = "註銷會員資料", 
 			description = "刪除會員資料，該操作會將所有關聯資料－包含帳戶、設定等等全數刪除且無法復原，須謹慎操作。<br>"
@@ -81,6 +87,7 @@ public class UserController {
         return service.cancel(account);
     }
 	
+	// 測試成功
 	@PostMapping(value = "updatePasswordUser")
 	@Operation(
 			summary = "更新會員密碼", 
@@ -97,8 +104,9 @@ public class UserController {
 	public BasicResponse updatePasswordUser(@Valid @RequestBody UpdatePasswordUserRequest req) {
 		return service.updatePasswordUser(req);
 	}
-	
+	// 測試成功
 	@PostMapping(value = "getUser")
+
 	@Operation(
 			summary = "取得會員資料", 
 			description = "取得單一筆會員資料。<br>"
@@ -113,11 +121,20 @@ public class UserController {
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST)
 	})
-	public BasicResponse getUser(@RequestParam("account") String account) {
+	
+	public UserResponse getUser(@RequestParam("account") String account) {
+
 		return service.getUser(account);
 	}
-	
-	
-	
+	// 測試成功
+	@PostMapping(value = "getFamilyByAccount")
+	public FamilyListResponse getFamilyByAccount(@RequestParam("account") String account) throws JsonProcessingException {
+		return service.getFamilyByAccount(account);
+	}
+	// 測試成功
+	@PostMapping(value = "login")
+	public BasicResponse login(@Valid @RequestBody loginRequest req) {
+		return service.login(req);
+	}
 	
 }

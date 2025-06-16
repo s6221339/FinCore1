@@ -1,5 +1,6 @@
 package com.example.FinCore.service.itfc;
 
+import com.example.FinCore.vo.request.AcceptInviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
@@ -102,8 +103,20 @@ public interface FamilyService {
 	 */
 	public BasicResponse renameFamily(RenameFamilyRequest req);
 	
+	/**
+	 * 被邀請人接受邀請並加入家族
+	 * @param account 被邀請人
+	 * @param　familyId 家族ID
+	 * @return 回應物件
+	 */
+	public BasicResponse acceptInvite(AcceptInviteRequest req) throws JsonProcessingException;
 	
-	
-
+	/**
+     * 被邀請人拒絕邀請
+     * @param account 被邀請人
+	 * @param　familyId 家族ID
+     * @return 回應物件
+     */
+    public BasicResponse rejectInvite(AcceptInviteRequest req) throws JsonProcessingException;
 
 }

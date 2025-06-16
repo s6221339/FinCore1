@@ -2,6 +2,7 @@ package com.example.FinCore.vo.response;
 
 import java.util.List;
 
+import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.vo.FamilyVO;
 
@@ -21,6 +22,16 @@ public class FamilyListResponse extends BasicResponse{
 		super(code, message);
 		this.familyList = familyList;
 	}
+
+	public FamilyListResponse(ResponseMessages res) {
+		super(res);
+	}
+	
+	public FamilyListResponse(ResponseMessages res, List<FamilyVO> familyList) {
+		super(res);
+		this.familyList = familyList;
+	}
+
 
 	public List<FamilyVO> getFamilyList() {
 		return familyList;

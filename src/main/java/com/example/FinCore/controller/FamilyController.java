@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.FamilyService;
+import com.example.FinCore.vo.request.AcceptInviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
 import com.example.FinCore.vo.request.InviteMemberRequest;
@@ -90,6 +91,16 @@ public class FamilyController {
 	@PostMapping(value = "rename")
 	public BasicResponse renameFamily(@Valid @RequestBody RenameFamilyRequest req) {
 		return service.renameFamily(req);
+	}
+	
+	@PostMapping(value = "acceptInvite")
+	public BasicResponse acceptInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
+	    return service.acceptInvite(req);
+	}
+
+	@PostMapping(value = "rejectInvite")
+	public BasicResponse rejectInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
+	    return service.rejectInvite(req);
 	}
 
 }

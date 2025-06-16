@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.FinCore.entity.Family;
+import com.example.FinCore.entity.User;
 
 import jakarta.transaction.Transactional;
 
@@ -102,6 +103,14 @@ public interface FamilyDao extends JpaRepository<Family, Integer> {
 	 * @return 擁有者建立的所有家族群組
 	 */
 	@Query(value = "select * from family where owner = :owner", nativeQuery = true)
-	List<Family> findByOwner(@Param("owner") String owner);
+	public List<Family> findByOwner(@Param("owner") String owner);
+	
+	/**
+	 * 查詢會員在哪個家庭群組
+	 * @param account
+	 * @return
+	 */
+	@Query(value = "select * from family", nativeQuery = true)
+	public List<Family> selectAllFamily();
 
 }

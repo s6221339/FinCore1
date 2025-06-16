@@ -1,8 +1,10 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.UserService;
+import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.CreateUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
@@ -27,6 +30,11 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.UserResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 
@@ -50,6 +58,8 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private PaymentTypeDao paymentTypeDao;
+
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
 	@Transactional
@@ -155,28 +165,53 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public BasicResponse getUser(String account) {
+	public UserResponse getUser(String account) {
 		if (account == null || account.isEmpty()) {
-			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+			return new UserResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 		}
 		User user = userDao.selectById(account);
 		if(user == null) {
-			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+			return new UserResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		}
-		return new BasicResponse(ResponseMessages.SUCCESS);
+		UserVO vo = new UserVO(user.getAccount(), user.getName(),
+				user.getPhone(), user.getBirthday(), user.getAvatar());
+		
+		return new UserResponse(ResponseMessages.SUCCESS, vo);
 	}
 
 	@Override
-	public BasicResponse getFamilyByAccount(String account) {
-		if(account == null || account.isEmpty()) {
-			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-		}
-		List<Family> family = userDao.getFamilyByAccount(account);
-		return null;
-		
-//				new BasicResponse(ResponseMessages.SUCCESS.getCode(),
-//                ResponseMessages.SUCCESS.getMessage(), family);
-		
+	public FamilyListResponse getFamilyByAccount(String account) throws JsonProcessingException {
+		// 1. 檢查帳號有沒有填，沒填就直接回傳錯誤
+	    if (account == null || account.isEmpty()) {
+	        return new FamilyListResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
+	    // 2. 準備一個結果清單，把有關的家族資料都丟進去
+	    List<FamilyVO> voList = new ArrayList<FamilyVO>();
+	    // 3. 從資料庫撈出所有家族，之後要一個一個檢查
+	    List<Family> familyList = familyDao.selectAllFamily(); // 取出所有家族
+	    // 4. 逐一檢查每個 family，看這個帳號是不是 owner 或 invitor
+	    for (Family family : familyList) {
+	        // 4-1. family 的 invitor 欄位是 JSON 字串，要先轉成 List 才能判斷
+	        List<String> invitorList = mapper.readValue(
+	                family.getInvitor(),
+	                new TypeReference<List<String>>() {});
+	        // 4-2. 判斷自己是不是這個家族的 owner
+	        boolean isOwner = account.equals(family.getOwner());
+	        // 4-3. 判斷自己是不是 invitor（家族成員）
+	        boolean isInvitor = invitorList != null && invitorList.contains(account);
+	        // 4-4. 只要有其中一個符合（是 owner 或是成員），就加進回傳清單
+	        if (isOwner || isInvitor) {
+	            FamilyVO vo = new FamilyVO(
+	                family.getId(),         // 家族編號
+	                family.getName(),       // 家族名稱
+	                family.getOwner(),      // 家族負責人
+	                invitorList             // 家族成員帳號清單
+	            );
+	            voList.add(vo);
+	        }
+	    }
+	    // 5. 統一回傳查詢成功與結果清單
+	    return new FamilyListResponse(ResponseMessages.SUCCESS, voList);
 	}
 	
 	@Override
@@ -194,14 +229,7 @@ public class UserServiceImpl implements UserService {
 	    }
 
 	    // 3. 登入成功（你可以選擇只回傳成功，不帶 user，或帶 user 資料給前端）
-	    UserVO vo = new UserVO(user.getAccount(), user.getName(), user.getPhone());
-	    return null;
-	    		
-//	    		new BasicResponse(ResponseMessages.SUCCESS.getCode(),
-//	                            ResponseMessages.SUCCESS.getMessage(),
-//	                            vo);
-	    
-	    
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 	
 }

@@ -96,6 +96,14 @@ public class User {
     public void setCreateDate(LocalDate createDate) {
         this.createDate = createDate;
     }
+
+	public LocalDate getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(LocalDate birthday) {
+		this.birthday = birthday;
+	}
     
     
 }

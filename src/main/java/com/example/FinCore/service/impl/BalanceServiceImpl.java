@@ -138,9 +138,15 @@ public class BalanceServiceImpl implements BalanceService
 		return deleteOpration(balanceIdList);
 	}
 
+	/**
+	 * 刪除指定帳號底下的所有帳戶。<br>
+	 * ⚠️：該操作會將帳戶下的所有關聯資料一併清除，不可復原。
+	 * @param account 指定帳號
+	 * @return 基本回應資料
+	 */
+//	考量該操作不應該被單獨呼叫而應作為附帶操作，關閉此API
 	@Transactional(rollbackOn = Exception.class)
-	@Override
-	public BasicResponse deleteByAccount(String account) throws Exception
+	protected BasicResponse deleteByAccount(String account) throws Exception
 	{
 		if(!userDao.existsById(account))
 			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);

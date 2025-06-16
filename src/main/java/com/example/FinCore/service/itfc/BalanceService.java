@@ -34,14 +34,6 @@ public interface BalanceService
 	public BasicResponse delete(int balanceId) throws Exception;
 	
 	/**
-	 * 刪除指定帳號底下的所有帳戶。<br>
-	 * ⚠️：該操作會將帳戶下的所有關聯資料一併清除，不可復原。
-	 * @param account 指定帳號
-	 * @return 基本回應資料
-	 */
-	public BasicResponse deleteByAccount(String account) throws Exception;
-	
-	/**
 	 * 取得該帳戶的預算餘額與總預算。
 	 * @param req 請求資料
 	 * @return 帳戶底下相關預算資料的回應資料

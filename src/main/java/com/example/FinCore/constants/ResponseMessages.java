@@ -8,6 +8,7 @@ public enum ResponseMessages
 	BALANCE_NOT_FOUND(404, "查無此帳戶！"),
 	PAYMENT_NOT_FOUND(404, "查無此帳款！"),
 	FAMLIY_NOT_FOUND(404, "查無此群組（家庭）！"),
+	TRANSFERS_NOT_FOUND(404, "查無此轉帳紀錄！"),
 	ITEM_EXISTED(400, "已存在相同物件。"),
 	PAST_RECORD_DATE(400, "該款項不能記錄在過去時間。"),
 	FUTURE_RECORD_DATE(400, "該款項不能記錄在未來時間。"),
@@ -32,7 +33,8 @@ public enum ResponseMessages
 	ACCOUNT_EXIST(400, "帳號已存在"),
 	DUPLICATE_FAMILY_MEMBERS(400, "家庭成員重複"),
 	PASSWORD_NOT_MATCH(400, "密碼不一致"),
-	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定");
+	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定"),
+	BALANCE_ACTIVATION(400, "帳戶未停用，無法刪除");
 	
 	private int code;
 	

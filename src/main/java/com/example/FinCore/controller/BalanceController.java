@@ -47,11 +47,11 @@ public class BalanceController
 		return service.delete(balanceId);
 	}
 	
-	@PostMapping(value = "deleteByAccount")
-	public BasicResponse deleteByAccount(@RequestParam("account") String account) throws Exception
-	{
-		return service.deleteByAccount(account);
-	}
+//	@PostMapping(value = "deleteByAccount")
+//	public BasicResponse deleteByAccount(@RequestParam("account") String account) throws Exception
+//	{
+//		return service.deleteByAccount(account);
+//	}
 	
 	@PostMapping(value = "getBudget")
 	public BudgetResponse getBudget(@Valid @RequestBody GetBudgetByBalanceIdRequest req) 
@@ -66,7 +66,7 @@ public class BalanceController
 	}
 	
 	@PostMapping(value = "getAllByAccount")
-	public BalanceListResponse getAllBalance(String account) 
+	public BalanceListResponse getAllBalance(@RequestParam("account") String account) 
 	{
 		return service.getAllBalance(account);
 	}

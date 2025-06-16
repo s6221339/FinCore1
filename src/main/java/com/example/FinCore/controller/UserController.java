@@ -14,6 +14,7 @@ import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @CrossOrigin
@@ -24,6 +25,7 @@ public class UserController {
 	@Autowired
 	private UserService service;
 	
+	@Operation(summary = "註冊會員", description = "註冊一個帳號成為會員。")
 	@PostMapping(value = "register")
     public BasicResponse register(@Valid @RequestBody CreateUserRequest req) {
         return service.register(req);
@@ -35,7 +37,7 @@ public class UserController {
     }
 	
 	@PostMapping(value = "cancel")
-	    public BasicResponse cancel(@RequestParam String account) {
+	    public BasicResponse cancel(@RequestParam String account) throws Exception {
 	        return service.cancel(account);
 	    }
 	

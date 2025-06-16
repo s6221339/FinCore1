@@ -27,7 +27,7 @@ public interface UserService {
 	 * @param account
 	 * @return
 	 */
-	public BasicResponse cancel(String account);
+	public BasicResponse cancel(String account) throws Exception;
 	
 	/**
 	 * 1.更新密碼 a.帳號 b.舊密碼 c.新密碼

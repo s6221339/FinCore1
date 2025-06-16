@@ -13,6 +13,7 @@ import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
+import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.CreateUserRequest;
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public BasicResponse cancel(String account) {
+	public BasicResponse cancel(String account) throws Exception {
 		// 1. 檢查必要欄位
 		if (!StringUtils.hasText(account)) {
 			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
@@ -89,6 +90,8 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 3. 執行刪除
+		BalanceServiceImpl bs = new BalanceServiceImpl();
+		bs.deleteByAccount(account);
 		userDao.cancel(account);
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}

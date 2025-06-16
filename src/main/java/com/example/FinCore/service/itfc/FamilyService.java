@@ -20,21 +20,24 @@ public interface FamilyService {
 	
 	/**
      * 新增家族群組
-     * @param req 新增請求
+     * @param name 新建的群組名稱
+     * @param owner 家族群組管理者
+     * @param invitor 家族群組成員
      * @return 基本回應物件
      */
 	public BasicResponse create(CreateFamilyRequest req) throws Exception;
 	
 	/**
      * 更新家族群組資料
-     * @param req 更新請求
+     * @param familyId 家族ID
+     * @param name 變更的群組名稱
      * @return 基本回應物件
      */
 	public BasicResponse update(UpdateFamilyRequest req);
 	
 	/**
      * 刪除家族群組
-     * @param req 刪除請求
+     * @param familyId 家族ID(要刪除的群組)
      * @return 基本回應物件
      */
 	public BasicResponse delete(DeleteFamilyRequest req);
@@ -71,8 +74,8 @@ public interface FamilyService {
 	/**
 	 * 踢出家族成員（owner 或管理員操作）
 	 * @param familyId 家族ID
-	 * @param operator 操作者帳號（驗證身分）
-	 * @param memberToKick 被踢成員帳號
+	 * @param owner 操作者帳號（驗證身分）
+	 * @param memberAccount 被踢成員帳號
 	 * @return 回應物件
 	 */
 	public BasicResponse kickMember(KickMemberRequest req);
@@ -97,7 +100,7 @@ public interface FamilyService {
 	/**
 	 * owner 更改家族名稱
 	 * @param familyId 家族ID
-	 * @param owner 操作者帳號（驗證身份）
+	 * @param owner 管理者帳號（驗證身份）
 	 * @param newName 新名稱
 	 * @return 回應物件
 	 */

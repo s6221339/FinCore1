@@ -13,7 +13,15 @@ public final class ApiDocConstants
 			+ "<li>帳號、新舊密碼不可為空</li>"
 			+ "</ul>";
 	
+	public final static String FAMILY_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>至少需要一位owner</li>"
+			+ "</ul>";
+	
 	public final static String ACCOUNT_NOT_EXIST = "帳號不存在";
+	
+	public final static String ACCOUNT_EXIST = "帳號已存在";
+	
+	public final static String FAMILY_NOT_EXIST = "群組不存在";
 	
 	public final static String CREATE_SUCCESS = "新增成功";
 	
@@ -22,6 +30,8 @@ public final class ApiDocConstants
 	public final static String UPDATE_SUCCESS = "更新成功";
 	
 	public final static String SEARCH_SUCCESS = "搜尋成功";
+	
+	public final static String NO_PERMISSION = "無權限";
 	
 	public final static String NOT_TEST = "⚠️尚未進行任何測試";
 	

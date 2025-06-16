@@ -136,17 +136,14 @@ public class FamilyServiceImpl implements FamilyService {
 
 	public FamilyIdResponse getFamilyById(int familyId) {
 		if (familyId < 1) {
-			return new FamilyIdResponse(ResponseMessages.MISSING_REQUIRED_FIELD.getCode(), //
-					ResponseMessages.MISSING_REQUIRED_FIELD.getMessage());
+			return new FamilyIdResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 		}
 		Optional<Family> familyOpt = familyDao.findById(familyId);
 		if (familyOpt.isPresent()) {
 
-			return new FamilyIdResponse(ResponseMessages.SUCCESS.getCode(), //
-					ResponseMessages.SUCCESS.getMessage(), familyOpt.get());
+			return new FamilyIdResponse(ResponseMessages.SUCCESS, familyOpt.get());
 		} else {
-			return new FamilyIdResponse(ResponseMessages.FAMILY_NOT_FOUND.getCode(), //
-					ResponseMessages.FAMILY_NOT_FOUND.getMessage());
+			return new FamilyIdResponse(ResponseMessages.FAMILY_NOT_FOUND);
 		}
 	}
 	
@@ -165,8 +162,7 @@ public class FamilyServiceImpl implements FamilyService {
 			voList.add(vo);
 		}
 		
-		return new FamilyListResponse(ResponseMessages.SUCCESS.getCode(), //
-				ResponseMessages.SUCCESS.getMessage(), voList);
+		return new FamilyListResponse(ResponseMessages.SUCCESS, voList);
 	}
 
 	@Override

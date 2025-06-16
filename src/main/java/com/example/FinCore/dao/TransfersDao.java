@@ -57,7 +57,7 @@ public interface TransfersDao extends JpaRepository<Transfers, Integer>
 	 */
 	@Transactional
 	@Modifying
-	@Query(value = "delete from transfers where from_balance = ?1 and to_balance = ?2", nativeQuery = true)
+	@Query(value = "delete from transfers where from_balance = ?1 or from_balance = ?2 and to_balance = ?1 or to_balance = ?2", nativeQuery = true)
 	public void deleteByBalanceId(int from, int to);
 	
 	/**

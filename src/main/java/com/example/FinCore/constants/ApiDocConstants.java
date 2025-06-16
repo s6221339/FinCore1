@@ -13,7 +13,29 @@ public final class ApiDocConstants
 			+ "<li>帳號、新舊密碼不可為空</li>"
 			+ "</ul>";
 	
+	public final static String TRANSFERS_CREATE_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>帳戶編號不得小於1</li>"
+			+ "<li>轉帳金額不得為負數</li>"
+			+ "</ul>";
+	
 	public final static String ACCOUNT_NOT_EXIST = "帳號不存在";
+	
+	public final static String BALANCE_NOT_FOUND = "帳戶不存在";
+	
+	public final static String TRANSFERS_DELETE_RESPONSE_404 = "<ol>"
+			+ "<li>指定刪除的紀錄不存在</li>"
+			+ "<li>執行者不存在</li>"
+			+ "</ol>";
+	
+	public final static String SAME_BALANCE_OPERATION = "無法對同一個帳戶進行操作";
+	
+	public final static String NOT_SUPER_ADMIN = "執行者不是超級管理員";
+	
+	public final static String BALANCE_ACTIVATION = "帳戶未停用";
+	
+	public final static String TRANSFERS_DELETE_BY_BALANCE_ID_RESPONSE_400 = 
+			  "<li>" + BALANCE_ACTIVATION + "（任一存在皆會觸發）</li>"
+			+ "<li>" + SAME_BALANCE_OPERATION + "</li>";
 	
 	public final static String CREATE_SUCCESS = "新增成功";
 	

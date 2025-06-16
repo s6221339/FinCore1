@@ -23,11 +23,21 @@ public final class ApiDocConstants
 	public final static String PAYMENT_TYPE_CREATE_REQUEST_BODY_RULE = 
 			"<li>類型、項目、新增者均不得為空值</li>";
 	
+	public final static String FAMILY_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>至少需要一位owner</li>"
+			+ "</ul>";
+	
 	/* === 各種錯誤訊息 === */
 	
 	public final static String ACCOUNT_NOT_EXIST = "帳號不存在";
 	
 	public final static String BALANCE_NOT_FOUND = "帳戶不存在";
+	
+	public final static String ACCOUNT_EXIST = "帳號已存在";
+	
+	public final static String FAMILY_NOT_EXIST = "群組不存在";
+	
+	public final static String NO_PERMISSION = "無權限";
 	
 	public final static String TRANSFERS_DELETE_RESPONSE_404 = "<ol>"
 			+ "<li>指定刪除的紀錄不存在</li>"
@@ -55,9 +65,9 @@ public final class ApiDocConstants
 	public final static String UPDATE_SUCCESS = "更新成功";
 	
 	public final static String SEARCH_SUCCESS = "搜尋成功";
-	
+
 	/* === 測試狀態 === */
-	
+
 	public final static String NOT_TEST = "⚠️尚未進行任何測試";
 	
 	public final static String TEST_PASS = "⭕已通過測試";

@@ -35,7 +35,6 @@ public class UserController {
 	@Autowired
 	private UserService service;
 	
-	// 測試成功
 	@PostMapping(value = "register")
 	@Operation(
 			summary = "註冊新會員", 
@@ -47,12 +46,12 @@ public class UserController {
 			)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
-		@ApiResponse(responseCode = "400", description = "相同帳號已存在")
+		@ApiResponse(responseCode = "400", description = ApiDocConstants.ACCOUNT_EXIST)
 	})
     public BasicResponse register(@Valid @RequestBody CreateUserRequest req) {
         return service.register(req);
     }
-	// 測試成功
+	
 	@PostMapping(value = "update")
 	@Operation(
 			summary = "更新會員資料", 
@@ -89,7 +88,6 @@ public class UserController {
         return service.cancel(account);
     }
 	
-	// 測試成功
 	@PostMapping(value = "updatePasswordUser")
 	@Operation(
 			summary = "更新會員密碼", 
@@ -106,35 +104,56 @@ public class UserController {
 	public BasicResponse updatePasswordUser(@Valid @RequestBody UpdatePasswordUserRequest req) {
 		return service.updatePasswordUser(req);
 	}
-	// 測試成功
+	
 	@PostMapping(value = "getUser")
-
 	@Operation(
 			summary = "取得會員資料", 
 			description = "取得單一筆會員資料。<br>"
-					+ ApiDocConstants.TEST_FAILED
-					+ "<li>返回值應包含會員資料，但目前不存在</li>", 
+					+ ApiDocConstants.TEST_PASS,
 			method = "POST",
 			parameters = {
-					@Parameter(name = "account", description = "指定要刪除的帳號")
+					@Parameter(name = "account", description = "指定要搜尋的帳號")
 					}
 			)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST)
 	})
-	
 	public UserResponse getUser(@RequestParam("account") String account) {
-
 		return service.getUser(account);
 	}
-	// 測試成功
+	
 	@PostMapping(value = "getFamilyByAccount")
+	@Operation(
+			summary = "取得查詢會員在哪個家庭群組資料", 
+			description = "查詢會員是哪個家庭群組的成員或者是家庭群組的owner。<br>"
+					+ ApiDocConstants.TEST_PASS,
+			method = "POST",
+			parameters = {
+					@Parameter(name = "account", description = "指定要搜尋的帳號")
+					}
+			)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST)
+	})
 	public FamilyListResponse getFamilyByAccount(@RequestParam("account") String account) throws JsonProcessingException {
 		return service.getFamilyByAccount(account);
 	}
-	// 測試成功
+	
 	@PostMapping(value = "login")
+	@Operation(
+			summary = "會員登入", 
+			description = "會員登入確認是否有此帳號，並檢查密碼是否有誤。<br>"
+					+ ApiDocConstants.TEST_PASS, 
+			method = "POST",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "登入請求資料，規則：<br>"
+					+ ApiDocConstants.USER_REQUEST_BODY_RULE)
+			)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST)
+	})
 	public BasicResponse login(@Valid @RequestBody loginRequest req) {
 		return service.login(req);
 	}

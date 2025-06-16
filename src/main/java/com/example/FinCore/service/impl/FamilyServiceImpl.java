@@ -17,6 +17,7 @@ import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.FamilyVO;
+import com.example.FinCore.vo.request.AcceptInviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
@@ -441,5 +442,73 @@ public class FamilyServiceImpl implements FamilyService {
 		familyDao.save(family);
 
 		return new BasicResponse(ResponseMessages.SUCCESS);
+	}
+
+	@Override
+	@Transactional
+	public BasicResponse acceptInvite(AcceptInviteRequest req) throws JsonProcessingException {
+		// 檢查參數
+        if (req.getAccount() == null || req.getAccount().isEmpty()) {
+            return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+        }
+
+        // 查詢家族資料
+        Optional<Family> familyOptional = familyDao.findById(req.getFamilyId());
+        if (!familyOptional.isPresent()) {
+            return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
+        }
+
+        Family family = familyOptional.get();
+
+        // 將邀請名單字串轉成 List
+        List<String> invitorList = mapper.readValue(family.getInvitor(), new TypeReference<List<String>>() {});
+
+        // 確認帳號在邀請名單內
+        if (invitorList == null || !invitorList.contains(req.getAccount())) {
+            return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+        }
+
+        // 從名單中移除該帳號
+        invitorList.remove(req.getAccount());
+
+        // 更新家族資料
+        family.setInvitor(mapper.writeValueAsString(invitorList));
+        familyDao.save(family);
+
+        return new BasicResponse(ResponseMessages.SUCCESS);
+	}
+
+	@Override
+	@Transactional
+	public BasicResponse rejectInvite(AcceptInviteRequest req) throws JsonProcessingException {
+		// 檢查參數
+        if (req.getAccount() == null || req.getAccount().isEmpty()) {
+            return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+        }
+
+        // 查詢家族資料
+        Optional<Family> familyOptional = familyDao.findById(req.getFamilyId());
+        if (!familyOptional.isPresent()) {
+            return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
+        }
+
+        Family family = familyOptional.get();
+
+        // 將邀請名單字串轉成 List
+        List<String> invitorList = mapper.readValue(family.getInvitor(), new TypeReference<List<String>>() {});
+
+        // 確認帳號在邀請名單內
+        if (invitorList == null || !invitorList.contains(req.getAccount())) {
+            return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+        }
+
+        // 從名單中移除該帳號
+        invitorList.remove(req.getAccount());
+
+        // 更新家族資料
+        family.setInvitor(mapper.writeValueAsString(invitorList));
+        familyDao.save(family);
+
+        return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 }

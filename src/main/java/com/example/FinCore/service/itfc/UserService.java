@@ -33,7 +33,7 @@ public interface UserService {
 	public BasicResponse cancel(String account);
 	
 	/**
-	 * 會員更新密碼
+	 * 會員修該密碼
 	 * @param req
 	 * @return
 	 */

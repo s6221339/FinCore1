@@ -34,6 +34,9 @@ public class TransfersServiceImpl implements TransfersService
 	@Override
 	public BasicResponse create(CreateTransfersRequest req) 
 	{
+		if(req.fromBalance() == req.toBalance())
+			return new BasicResponse(ResponseMessages.SAME_BALANCE_OPERATION);
+		
 		if(!balanceDao.existsById(req.fromBalance()) || !balanceDao.existsById(req.toBalance()))
 			return new BasicResponse(ResponseMessages.BALANCE_NOT_FOUND);
 		
@@ -68,6 +71,9 @@ public class TransfersServiceImpl implements TransfersService
 	@Override
 	public BasicResponse deleteByBalanceId(int from, int to) 
 	{
+		if(from == to)
+			return new BasicResponse(ResponseMessages.SAME_BALANCE_OPERATION);
+		
 		if(balanceDao.existsById(from) || balanceDao.existsById(to))
 			return new BasicResponse(ResponseMessages.BALANCE_ACTIVATION);
 		

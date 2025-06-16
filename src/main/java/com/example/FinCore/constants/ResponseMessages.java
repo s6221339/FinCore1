@@ -24,7 +24,7 @@ public enum ResponseMessages
     FAMILY_NOT_FOUND(404,"家族群組不存在"),
 	UPDATE_FAMILY_FAIL(400,"更新家族群組失敗"),
 	DELETE_FAMILY_FAIL(400, "刪除家庭群組失敗"),
-	NO_PERMISSION(400, "沒有 owner 權限"),
+	NO_PERMISSION(403, "沒有 owner 權限"),
 	MEMBER_NOT_FOUND(404,"家族成員不存在"),
 	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料。"),
 	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
@@ -34,7 +34,8 @@ public enum ResponseMessages
 	DUPLICATE_FAMILY_MEMBERS(400, "家庭成員重複"),
 	PASSWORD_NOT_MATCH(400, "密碼不一致"),
 	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定"),
-	BALANCE_ACTIVATION(400, "帳戶未停用，無法刪除");
+	BALANCE_ACTIVATION(400, "帳戶未停用，無法刪除"),
+	SAME_BALANCE_OPERATION(400, "無法對同一個帳戶進行操作");
 	
 	private int code;
 	

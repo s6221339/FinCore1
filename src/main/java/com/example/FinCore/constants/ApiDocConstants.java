@@ -3,6 +3,8 @@ package com.example.FinCore.constants;
 public final class ApiDocConstants 
 {
 	
+	/* === 請求資料規則 === */
+	
 	public final static String USER_REQUEST_BODY_RULE = "<ul>"
 			+ "<li>帳號、密碼、名稱不可為空</li>"
 			+ "<li>【未套用】帳號須符合標準信箱格式（regexp：^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$）</li>"
@@ -17,6 +19,11 @@ public final class ApiDocConstants
 			+ "<li>帳戶編號不得小於1</li>"
 			+ "<li>轉帳金額不得為負數</li>"
 			+ "</ul>";
+	
+	public final static String PAYMENT_TYPE_CREATE_REQUEST_BODY_RULE = 
+			"<li>類型、項目、新增者均不得為空值</li>";
+	
+	/* === 各種錯誤訊息 === */
 	
 	public final static String ACCOUNT_NOT_EXIST = "帳號不存在";
 	
@@ -37,6 +44,10 @@ public final class ApiDocConstants
 			  "<li>" + BALANCE_ACTIVATION + "（任一存在皆會觸發）</li>"
 			+ "<li>" + SAME_BALANCE_OPERATION + "</li>";
 	
+	public final static String ITEM_EXISTED = "已存在相同類型／項目";
+	
+	/* === 成功訊息 === */
+	
 	public final static String CREATE_SUCCESS = "新增成功";
 	
 	public final static String DELETE_SUCCESS = "刪除成功";
@@ -44,6 +55,8 @@ public final class ApiDocConstants
 	public final static String UPDATE_SUCCESS = "更新成功";
 	
 	public final static String SEARCH_SUCCESS = "搜尋成功";
+	
+	/* === 測試狀態 === */
 	
 	public final static String NOT_TEST = "⚠️尚未進行任何測試";
 	

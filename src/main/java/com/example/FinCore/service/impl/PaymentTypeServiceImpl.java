@@ -29,11 +29,10 @@ public class PaymentTypeServiceImpl implements PaymentTypeService
 	public BasicResponse createType(CreatePaymentTypeRequest req) 
 	{
 //		System.out.println(req.toString());
-		int count = userDao.selectCountByAccount(req.account());
-		if(!req.account().equals("default") && count != 1)
+		if(!req.account().equals("default") && userDao.existsById(req.account()))
 			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		count = paymentTypeDao.selectCount(req.type(), req.item(), req.account());
+		int count = paymentTypeDao.selectCount(req.type(), req.item(), req.account());
 		if(count > 0)
 			return new BasicResponse(ResponseMessages.ITEM_EXISTED);
 		

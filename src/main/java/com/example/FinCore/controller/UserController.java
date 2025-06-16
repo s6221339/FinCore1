@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 @CrossOrigin
 @RestController
 @RequestMapping(value = "finbook/user/")
-@Tag(name = "")
+@Tag(name = "會員 API", description = "提供註冊、註銷、更新等操作的API。")
 public class UserController {
 
 	@Autowired

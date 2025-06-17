@@ -32,15 +32,31 @@ public final class ApiDocConstants
 	
 	/* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
-	
-	public final static String USER_REQUEST_BODY_RULE = "<ul>"
+
+	public final static String USER_REGISTER_REQUEST_BODY_RULE = "<ul>"
 			+ "<li>帳號、密碼、名稱不可為空</li>"
 			+ "<li>【未套用】帳號須符合標準信箱格式（regexp：^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$）</li>"
 			+ "<li>【未套用】密碼長度為 8 ~ 16 碼</li>"
 			+ "</ul>";
 	
+	public final static String USER_UPDATE_REQUEST_BODY_RULE = "<ul>"
+			+ "<li></li>"
+			+ "</ul>";
+	
+	public final static String USER_LOGIN_REQUEST_BODY_RULE = "<ul>"
+			+ "<li></li>"
+			+ "</ul>";
+	
 	public final static String USER_UPDATE_PW_REQUEST_BODY_RULE = "<ul>"
 			+ "<li>帳號、新舊密碼不可為空</li>"
+			+ "</ul>";
+	
+	public final static String FAMILY_CREATE_REQUEST_BODY_RULE = "<ul>"
+			+ "<li></li>"
+			+ "</ul>";
+	
+	public final static String FAMILY_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>至少需要一位owner</li>"
 			+ "</ul>";
 	
 	public final static String TRANSFERS_CREATE_REQUEST_BODY_RULE = "<ul>"
@@ -50,10 +66,6 @@ public final class ApiDocConstants
 	
 	public final static String PAYMENT_TYPE_CREATE_REQUEST_BODY_RULE = 
 			"<li>類型、項目、新增者均不得為空值</li>";
-	
-	public final static String FAMILY_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>至少需要一位owner</li>"
-			+ "</ul>";
 	
 	/* === 各種錯誤訊息，多條同代碼訊息使用<li>或<ol>包覆 === 
 	 * === 同代碼訊息命名格式：「API名稱_方法_RESPONSE_代碼」格式 ===
@@ -85,6 +97,8 @@ public final class ApiDocConstants
 			+ "<li>" + SAME_BALANCE_OPERATION + "</li>";
 	
 	public final static String ITEM_EXISTED = "已存在相同類型／項目";
+	
+	public final static String UPDATE_USER_FAIL = "更新會員失敗";
 	
 	/* === 成功訊息 === */
 	

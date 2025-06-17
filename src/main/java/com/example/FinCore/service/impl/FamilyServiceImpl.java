@@ -65,7 +65,7 @@ public class FamilyServiceImpl implements FamilyService {
 				String itemA = req.getInvitor().get(i);
 				String itemB = req.getInvitor().get(j);
 				if (itemA.equals(itemB)) {
-					return new BasicResponse(ResponseMessages.INVITOR_NOT_FOUND);
+					return new BasicResponse(ResponseMessages.DUPLICATE_FAMILY_MEMBERS);
 				}
 			}
 		}
@@ -106,8 +106,6 @@ public class FamilyServiceImpl implements FamilyService {
 
 		// 2. 更新資料（這裡假設 family 只有 owner、invitor 只能放一個）
 		family.setName(req.name());
-		// family.setInvitor(...) // 若有這一欄，請依你實際結構設定
-		family.setCreateDate(LocalDate.now());
 
 		try {
 			familyDao.save(family);
@@ -292,27 +290,55 @@ public class FamilyServiceImpl implements FamilyService {
 		// 7. 回傳成功
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
-
+	
+	//再寫一個方法是owner指派新owner
+	
 	@Override
 	@Transactional
-	public BasicResponse ownerResignAndAssign(OwnerResignAndAssignRequest req) {
-		// 1. 查詢家族
+	public BasicResponse ownerQuit(OwnerResignAndAssignRequest req) {
+		// 1. 檢查帳號是否存在於資料庫
+	    if (!userDao.existsById(req.getOldOwner())) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
+
+	    // 2. 查詢家族
 	    Optional<Family> familyOpt = familyDao.findById(req.getFamilyId());
 	    if (familyOpt.isEmpty()) {
 	        return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
 	    }
 	    Family family = familyOpt.get();
 
-	    // 2. 權限驗證
+	    // 3. 檢查此帳號是否存在於這個家族（owner 或 invitor）
+	    boolean inFamily = false;
+	    // 3-1. owner
+	    if (family.getOwner().equals(req.getOldOwner())) {
+	        inFamily = true;
+	    }
+	    // 3-2. invitor（多成員的情境，需要把 JSON 轉 List 來比對）
+	    String invitorStr = family.getInvitor();
+	    if (!inFamily && invitorStr != null && !invitorStr.isEmpty()) {
+	        try {
+	            List<String> invitorList = mapper.readValue(invitorStr, new TypeReference<List<String>>() {});
+	            if (invitorList.contains(req.getOldOwner())) {
+	                inFamily = true;
+	            }
+	        } catch (Exception e) {
+	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	        }
+	    }
+	    if (!inFamily) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_IN_FAMILY);
+	    }
+
+	    // 4. 權限驗證（必須是 owner）
 	    if (!family.getOwner().equals(req.getOldOwner())) {
 	        return new BasicResponse(ResponseMessages.NO_PERMISSION);
 	    }
 
-	    // 3. 決定新 owner
+	    // 5. 決定新 owner
 	    String newOwner = req.getNewOwner();
 	    if (newOwner == null || newOwner.isEmpty()) {
-	        // 如果沒指定新 owner，預設用 invitor 裡的第一人
-	        String invitorStr = family.getInvitor();
+	        // 沒指定新 owner，預設用 invitor 的第一人
 	        if (invitorStr != null && !invitorStr.isEmpty()) {
 	            List<String> invitorList;
 	            try {
@@ -323,9 +349,8 @@ public class FamilyServiceImpl implements FamilyService {
 	            if (invitorList.isEmpty()) {
 	                return new BasicResponse(ResponseMessages.NO_PERMISSION); // 或自定義訊息「無可指派成員」
 	            }
-	            newOwner = invitorList.get(0); // 取第一個成員當新 owner
-	            invitorList.remove(0); // 移除被指派的人
-	            // 更新家族的 invitor 名單
+	            newOwner = invitorList.get(0);
+	            invitorList.remove(0);
 	            if (invitorList.isEmpty()) {
 	                family.setInvitor(null);
 	            } else {
@@ -339,18 +364,16 @@ public class FamilyServiceImpl implements FamilyService {
 	            return new BasicResponse(ResponseMessages.NO_PERMISSION);
 	        }
 	    } else {
-	        // 如果指定新 owner，且他在 invitor 名單內也要移除
-	        String invitorStr = family.getInvitor();
+	        // 有指定新 owner，且他在 invitor 名單內也要移除
 	        if (invitorStr != null && !invitorStr.isEmpty()) {
 	            List<String> invitorList;
 	            try {
-	                invitorList = mapper.readValue(invitorStr, new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
+	                invitorList = mapper.readValue(invitorStr, new TypeReference<List<String>>() {});
 	            } catch (Exception e) {
 	                return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	            }
 	            boolean removed = invitorList.remove(newOwner);
 	            if (removed) {
-	                // 更新 invitor
 	                try {
 	                    if (invitorList.isEmpty()) {
 	                        family.setInvitor(null);
@@ -364,7 +387,7 @@ public class FamilyServiceImpl implements FamilyService {
 	        }
 	    }
 
-	    // 4. 更新 owner
+	    // 6. 更新 owner
 	    family.setOwner(newOwner);
 	    familyDao.save(family);
 	    return new BasicResponse(ResponseMessages.SUCCESS);
@@ -384,33 +407,29 @@ public class FamilyServiceImpl implements FamilyService {
 	    if (family.getOwner().equals(req.getMemberAccount())) {
 	        return new BasicResponse(ResponseMessages.FORBIDDEN);
 	    }
-
+	    
 	    // 3. 取得現有成員名單
 	    String invitorStr = family.getInvitor();
 	    if (invitorStr == null || invitorStr.isEmpty()) {
-	        return new BasicResponse(ResponseMessages.INVITOR_NOT_FOUND);
+	        return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
 	    }
 
 	    // 4. JSON字串轉回List，移除要退出的成員
 	    ObjectMapper mapper = new ObjectMapper();
 	    List<String> invitorList;
 	    try {
-	        invitorList = mapper.readValue(invitorStr, new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
+	        invitorList = mapper.readValue(invitorStr, new TypeReference<List<String>>() {});
 	    } catch (Exception e) {
 	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	    }
 	    boolean removed = invitorList.remove(req.getMemberAccount());
 	    if (!removed) {
-	        return new BasicResponse(ResponseMessages.INVITOR_NOT_FOUND);
+	        return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
 	    }
 
 	    // 5. 處理剩下成員
 	    try {
-	        if (invitorList.isEmpty()) {
-	            family.setInvitor(null);
-	        } else {
-	            family.setInvitor(mapper.writeValueAsString(invitorList));
-	        }
+	    	 family.setInvitor(mapper.writeValueAsString(invitorList));
 	    } catch (Exception e) {
 	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	    }

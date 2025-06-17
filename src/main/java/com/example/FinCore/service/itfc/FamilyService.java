@@ -87,7 +87,7 @@ public interface FamilyService {
 	 * @param newOwner 指派的新 owner，若沒傳則預設用成員的第一人
 	 * @return 回應物件
 	 */
-	public BasicResponse ownerResignAndAssign(OwnerResignAndAssignRequest req);
+	public BasicResponse ownerQuit(OwnerResignAndAssignRequest req);
 	
 	/**
 	 * 成員自行退出家族

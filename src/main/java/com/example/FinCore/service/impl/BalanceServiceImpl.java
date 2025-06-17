@@ -18,6 +18,7 @@ import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Balance;
+import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.Payment;
 import com.example.FinCore.entity.Savings;
 import com.example.FinCore.entity.SavingsPK;
@@ -398,13 +399,56 @@ public class BalanceServiceImpl implements BalanceService
 	}
 
 	@Override
-	public BalanceListResponse getAllBalance(String account) 
+	public BalanceListResponse getPersonalBalance(String account) 
 	{
 		if(!userDao.existsById(account))
 			return new BalanceListResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
 		List<Balance> balanceList = balanceDao.getAllBalanceByAccount(account);
 		return new BalanceListResponse(ResponseMessages.SUCCESS, balanceList);
+	}
+	
+	@Override
+	public BalanceListResponse getFamilyBalance(String account) 
+	{
+		if(!userDao.existsById(account))
+			return new BalanceListResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		var familyIdList = getFamilyContainsAccount(account);
+		List<Balance> balanceList = balanceDao.getAllBalanceByFamilyIdList(familyIdList);
+		return new BalanceListResponse(ResponseMessages.SUCCESS, balanceList);
+	}
+
+	/**
+	 * 取得指定帳號所在的群組編號。
+	 * @param account 帳號
+	 * @return 該帳號所在的群組編號，是一個列表
+	 */
+	private List<Integer> getFamilyContainsAccount(String account)
+	{
+		List<Family> familyList = familyDao.selectAll();
+		List<Integer> idList = new ArrayList<>();
+		var copy = new ArrayList<>(familyList);
+//		過濾不需要的群組，僅留下存在該帳號的群組
+		copy.forEach(family -> {
+//			標記是否找到目標
+			boolean flag = false;
+//			檢查群組持有者是否為指定帳號
+			if(family.getOwner().equals(account))
+				flag = true;
+			
+//			檢查群組成員名單是否包含指定帳號
+			if(!flag)
+				if(family.getMemberList().contains(account))
+					flag = true;
+//			如果最後結果找不到則移除該群組
+			if(!flag)
+				familyList.remove(family);
+		});
+		familyList.forEach(family -> {
+			idList.add(family.getId());
+		});
+		return idList;
 	}
 	
 	

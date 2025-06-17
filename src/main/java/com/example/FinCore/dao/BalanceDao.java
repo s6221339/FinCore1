@@ -82,5 +82,8 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	 */
 	@Query(value = "select * from balance where account = ?1", nativeQuery = true)
 	public List<Balance> getAllBalanceByAccount(String account);
+	
+	@Query(value = "select * from balance where family_id in (?1)", nativeQuery = true)
+	public List<Balance> getAllBalanceByFamilyIdList(List<Integer> familyIdList);
 
 }

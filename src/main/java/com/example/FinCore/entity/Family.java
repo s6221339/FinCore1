@@ -3,6 +3,10 @@ package com.example.FinCore.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -32,6 +36,8 @@ public class Family {
     
     @Column(name = "create_date")
     private LocalDate createDate;
+    
+    private final transient ObjectMapper mapper = new ObjectMapper(); 
 
     public int getId() {
         return id;
@@ -72,7 +78,28 @@ public class Family {
     public void setCreateDate(LocalDate createDate) {
         this.createDate = createDate;
     }
-    
-    
+
+	@Override
+	public String toString() {
+		return "Family [id=" + id + ", name=" + name + ", owner=" + owner + ", invitor=" + invitor + ", createDate="
+				+ createDate + "]";
+	}
+	
+	/**
+	 * 將 invitor 屬性轉回成員列表並返回。
+	 * @return 成員列表
+	 */
+	public List<String> getMemberList()
+	{
+		try 
+		{
+			return mapper.readValue(invitor, new TypeReference<List<String>>() {});
+		} 
+		catch (JsonProcessingException e) 
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 }

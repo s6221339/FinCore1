@@ -6,6 +6,10 @@ public final class ApiDocConstants
 	/* === API 簡介（@Operation#summary） === 
 	 * === 命名格式：「API名稱_方法_SUMMARY」 === */
 	
+	public final static String PAYMENT_TYPE_CREATE_SUMMARY = "建立新項目";
+	
+	public final static String PAYMENT_TYPE_GET_TYPE_SUMMARY = "取得帳號創建的所有類型與項目資料";
+	
 	public final static String TRANSFERS_CREATE_SUMMARY = "建立新紀錄";
 	
 	public final static String TRANSFERS_DELETE_SUMMARY = "刪除紀錄";
@@ -18,6 +22,10 @@ public final class ApiDocConstants
 	
 	/* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
+	
+	public final static String PAYMENT_TYPE_CREATE_DESC = "建立一筆新的分類與細項，不允許使用者新增完全重複的類型與項目。<br>";
+	
+	public final static String PAYMENT_TYPE_GET_TYPE_DESC = "取得帳號創建的所有類型與項目資料，其中包含了預設的資料。該操作必定成功<del>（大不了就沒自己ㄉ東東）</del><br>";
 	
 	public final static String TRANSFERS_CREATE_DESC = "建立一筆轉帳紀錄。如果設定轉出或匯入的帳戶不存在時建立失敗。<br>";
 	

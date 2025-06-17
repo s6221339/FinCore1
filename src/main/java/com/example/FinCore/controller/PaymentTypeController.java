@@ -33,8 +33,8 @@ public class PaymentTypeController
 	
 	@PostMapping(value = "create")
 	@Operation(
-			summary = "建立新項目", 
-			description = "建立一筆新的分類與細項，不允許使用者新增完全重複的類型與項目。<br>"
+			summary = ApiDocConstants.PAYMENT_TYPE_CREATE_SUMMARY, 
+			description = ApiDocConstants.PAYMENT_TYPE_CREATE_DESC
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "建立資料請求，規則："
@@ -52,8 +52,8 @@ public class PaymentTypeController
 	
 	@PostMapping(value = "getByAccount")
 	@Operation(
-			summary = "取得帳號創建的所有類型與項目資料", 
-			description = "取得帳號創建的所有類型與項目資料，其中包含了預設的資料。該操作必定成功<del>（大不了就沒自己ㄉ東東）</del><br>"
+			summary = ApiDocConstants.PAYMENT_TYPE_GET_TYPE_SUMMARY, 
+			description = ApiDocConstants.PAYMENT_TYPE_GET_TYPE_DESC
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			parameters = {@Parameter(name = "account", description = "帳號")}

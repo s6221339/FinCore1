@@ -49,10 +49,17 @@ public interface BalanceService
 	public BudgetListResponse getBudgetByAccount(AccountWithDateFilterRequest req);
 	
 	/**
-	 * 使用帳號取得所有關聯帳戶
+	 * 使用帳號取得所有關聯個人帳戶
 	 * @param account 指定帳號
 	 * @return 包括了所有帳戶資料的回應資料
 	 */
-	public BalanceListResponse getAllBalance(String account);
+	public BalanceListResponse getPersonalBalance(String account);
+	
+	/**
+	 * 使用帳號取得所有關聯個人帳戶
+	 * @param account 指定帳號
+	 * @return 包括了所有帳戶資料的回應資料
+	 */
+	public BalanceListResponse getFamilyBalance(String account);
 	
 }

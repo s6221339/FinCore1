@@ -68,7 +68,13 @@ public class BalanceController
 	@PostMapping(value = "getAllByAccount")
 	public BalanceListResponse getAllBalance(@RequestParam("account") String account) 
 	{
-		return service.getAllBalance(account);
+		return service.getPersonalBalance(account);
+	}
+	
+	@PostMapping(value = "getAllByFamily")
+	public BalanceListResponse getFamilyBalance(@RequestParam("account") String account) 
+	{
+		return service.getFamilyBalance(account);
 	}
 	
 }

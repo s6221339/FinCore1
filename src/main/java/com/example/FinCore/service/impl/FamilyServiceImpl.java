@@ -54,7 +54,7 @@ public class FamilyServiceImpl implements FamilyService {
 	@Override
 	@Transactional
 	public BasicResponse create(CreateFamilyRequest req) throws Exception {
-		System.out.println(req);
+//		System.out.println(req);
 		// 1. 檢查必要欄位
 		if (req.getOwner() == null || req.getOwner().isEmpty()) {
 			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);

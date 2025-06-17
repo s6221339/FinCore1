@@ -66,7 +66,7 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	 * @return 帳戶編號列表
 	 */
 	@Query(value = "select balance_id from balance where account = ?1", nativeQuery = true)
-	public List<Integer> selectBalanceIdListByAccount(String account);
+	public List<Integer> getBalanceIdListByAccount(String account);
 	
 	/**
 	 * 取得資料表中當前最新一筆資料編號。

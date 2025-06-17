@@ -14,6 +14,8 @@ public final class ApiDocConstants
 	
 	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_SUMMARY = "取得帳戶的轉帳紀錄資料";
 	
+	public final static String SAVINGS_GET_ALL_SUMMARY = "取得帳號的所有儲蓄設定";
+	
 	/* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
 	
@@ -25,6 +27,8 @@ public final class ApiDocConstants
 			+ "該操作必須在兩個帳戶均不存在才可執行，否則操作失敗。<br>";
 	
 	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_DESC = "取得指定帳戶的所有轉帳紀錄資料。<br>";
+	
+	public final static String SAVINGS_GET_ALL_DESC = "取得帳號的所有儲蓄設定<br>";
 	
 	/* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */

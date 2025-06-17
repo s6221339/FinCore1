@@ -22,7 +22,8 @@ public class PaymentController
 	private PaymentService service;
 	
 	@PostMapping(value = "create")
-	public BasicResponse create(@Valid @RequestBody CreatePaymentRequest req)
+	public BasicResponse create(@Valid @RequestBody CreatePaymentRequest req) 
+			throws Exception
 	{
 		return service.create(req);
 	}
@@ -35,6 +36,7 @@ public class PaymentController
 	
 	@PostMapping(value = "update")
 	public BasicResponse update(@Valid @RequestBody UpdatePaymentRequest req) 
+			throws Exception 
 	{
 		return service.update(req);
 	}

@@ -22,9 +22,9 @@ import com.example.FinCore.entity.Payment;
 import com.example.FinCore.entity.Savings;
 import com.example.FinCore.entity.SavingsPK;
 import com.example.FinCore.service.itfc.BalanceService;
-import com.example.FinCore.service.itfc.CreateBalanceRequest;
 import com.example.FinCore.vo.BudgetVO;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
+import com.example.FinCore.vo.request.CreateBalanceRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BalanceListResponse;
@@ -151,7 +151,7 @@ public class BalanceServiceImpl implements BalanceService
 		if(!userDao.existsById(account))
 			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(account);
 		return deleteOpration(balanceIdList);
 	}
 	
@@ -275,7 +275,7 @@ public class BalanceServiceImpl implements BalanceService
 		if(!userDao.existsById(req.account()))
 			return new BudgetListResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(req.account());
+		List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(req.account());
 		if(balanceIdList.isEmpty())
 			return new BudgetListResponse(ResponseMessages.BALANCE_NOT_FOUND);
 		

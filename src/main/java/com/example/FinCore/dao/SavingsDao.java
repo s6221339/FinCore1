@@ -77,4 +77,22 @@ public interface SavingsDao extends JpaRepository<Savings, SavingsPK>
 	@Query(value = "select * from savings where balance_id in (?1) and year = ?2 and month = ?3", nativeQuery = true)
 	public List<Savings> getSavingsListByBalanceIdList(List<Integer> idList, int year, int month);
 	
+	/**
+	 * 取得一系列帳戶的所有儲蓄設定
+	 * @param idList 帳戶編號列表
+	 * @return 儲蓄設定列表
+	 */
+	@Query(value = "select * from savings where balance_id in (?1)", nativeQuery = true)
+	public List<Savings> getAllByBalanceIdList(List<Integer> idList);
+	
+	/**
+	 * 取得主鍵映射的資料筆數
+	 * @param balanceId 帳戶編號
+	 * @param year 指定年
+	 * @param month 指定月
+	 * @return 資料筆數，必定為 1 或 0
+	 */
+	@Query(value = "select COUNT(*) from savings where balance_id = ?1 and year = ?2 and month = ?3", nativeQuery = true)
+	public int getCountById(int balanceId, int year, int month);
+	
 }

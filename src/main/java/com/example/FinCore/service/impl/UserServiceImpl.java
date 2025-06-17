@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 3. 執行刪除
-		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(account);
 		List<Integer> paymentIdList = paymentDao.getPaymentIdListByBalanceIdList(balanceIdList);
 		try
 		{

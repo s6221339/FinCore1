@@ -14,7 +14,7 @@ public interface PaymentService
 	 * @param req 創建請求資料
 	 * @return 基本回應資料
 	 */
-	public BasicResponse create(CreatePaymentRequest req);
+	public BasicResponse create(CreatePaymentRequest req) throws Exception;
 	
 	/**
 	 * 刪除指定帳款服務。值得一提的是，該服務並非直接刪除資料，而是將資料的
@@ -29,7 +29,7 @@ public interface PaymentService
 	 * @param req 更新請求資料
 	 * @return 基本回應資料
 	 */
-	public BasicResponse update(UpdatePaymentRequest req);
+	public BasicResponse update(UpdatePaymentRequest req) throws Exception;
 	
 	/**
 	 * 取得和帳號相關聯的所有款項。

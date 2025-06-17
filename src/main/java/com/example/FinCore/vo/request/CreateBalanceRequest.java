@@ -1,4 +1,4 @@
-package com.example.FinCore.service.itfc;
+package com.example.FinCore.vo.request;
 
 import com.example.FinCore.constants.ConstantsMessage;
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.PaymentDao;
+import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Payment;
 import com.example.FinCore.service.itfc.PaymentService;
@@ -24,6 +25,8 @@ import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService 
@@ -37,9 +40,13 @@ public class PaymentServiceImpl implements PaymentService
 	
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private SavingsDao savingsDao;
 
 	@Override
-	public BasicResponse create(CreatePaymentRequest req) 
+	@Transactional(rollbackOn = Exception.class)
+	public BasicResponse create(CreatePaymentRequest req) throws Exception
 	{
 		if(!balanceDao.existsById(req.balanceId()))
 			return new BasicResponse(ResponseMessages.BALANCE_NOT_FOUND);
@@ -55,6 +62,8 @@ public class PaymentServiceImpl implements PaymentService
 		int year = generatedRecordDate.getYear();
 		int month = generatedRecordDate.getMonthValue();
 		int day = generatedRecordDate.getDayOfMonth();
+		if(savingsDao.getCountById(req.balanceId(), year, month) == 0)
+			savingsDao.create(req.balanceId(), year, month, 0);
 		
 		paymentDao.create(
 				req.balanceId(), 
@@ -82,7 +91,7 @@ public class PaymentServiceImpl implements PaymentService
 	}
 	
 	@Override
-	public BasicResponse update(UpdatePaymentRequest req) 
+	public BasicResponse update(UpdatePaymentRequest req) throws Exception 
 	{
 		Payment entity = paymentDao.getEntity(req.paymentId());
 		if(entity == null)
@@ -100,6 +109,9 @@ public class PaymentServiceImpl implements PaymentService
 		int year = recordDate.getYear();
 		int month = recordDate.getMonthValue();
 		int day = recordDate.getDayOfMonth();
+		int balanceId = paymentDao.getBalanceId(req.paymentId());
+		if(savingsDao.getCountById(balanceId, year, month) == 0)
+			savingsDao.create(balanceId, year, month, 0);
 		
 		paymentDao.update(
 				req.paymentId(), 
@@ -161,7 +173,7 @@ public class PaymentServiceImpl implements PaymentService
 	
 	private List<BalanceWithPaymentVO> getPaymentInfoOpration(String account, int year, int month)
 	{
-		List<Integer> balanceIdList = balanceDao.selectBalanceIdListByAccount(account);
+		List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(account);
 		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
 		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
 		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();

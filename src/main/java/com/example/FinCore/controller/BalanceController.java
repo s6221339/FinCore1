@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.service.itfc.BalanceService;
-import com.example.FinCore.service.itfc.CreateBalanceRequest;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
+import com.example.FinCore.vo.request.CreateBalanceRequest;
 import com.example.FinCore.vo.request.GetBudgetByBalanceIdRequest;
 import com.example.FinCore.vo.request.UpdateBalanceRequest;
 import com.example.FinCore.vo.response.BalanceListResponse;

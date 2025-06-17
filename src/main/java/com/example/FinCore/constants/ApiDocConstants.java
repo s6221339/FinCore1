@@ -3,7 +3,8 @@ package com.example.FinCore.constants;
 public final class ApiDocConstants 
 {
 	
-	/* === API 簡介（@Operation#summary） === */
+	/* === API 簡介（@Operation#summary） === 
+	 * === 命名格式：「API名稱_方法_SUMMARY」 === */
 	
 	public final static String TRANSFERS_CREATE_SUMMARY = "建立新紀錄";
 	
@@ -13,7 +14,8 @@ public final class ApiDocConstants
 	
 	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_SUMMARY = "取得帳戶的轉帳紀錄資料";
 	
-	/* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === */
+	/* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
+	 * === 命名格式：「API名稱_方法_DESC」 === */
 	
 	public final static String TRANSFERS_CREATE_DESC = "建立一筆轉帳紀錄。如果設定轉出或匯入的帳戶不存在時建立失敗。<br>";
 	
@@ -25,7 +27,7 @@ public final class ApiDocConstants
 	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_DESC = "取得指定帳戶的所有轉帳紀錄資料。<br>";
 	
 	/* === 請求資料規則，多條規則使用<ul>標籤 === 
-	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 ===*/
+	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
 	
 	public final static String USER_REQUEST_BODY_RULE = "<ul>"
 			+ "<li>帳號、密碼、名稱不可為空</li>"
@@ -50,7 +52,8 @@ public final class ApiDocConstants
 			+ "</ul>";
 	
 	/* === 各種錯誤訊息，多條同代碼訊息使用<li>或<ol>包覆 === 
-	 * === 對於同代碼訊息變數命名遵照「API名稱_方法_RESPONSE_代碼」格式 === */
+	 * === 同代碼訊息命名格式：「API名稱_方法_RESPONSE_代碼」格式 ===
+	 * === 其他訊息格式：「任意，建議與 ResponseMessages 的變數名稱一致」 === */
 	
 	public final static String ACCOUNT_NOT_EXIST = "帳號不存在";
 	

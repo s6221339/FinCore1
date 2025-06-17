@@ -50,7 +50,7 @@ public class FamilyController {
 		        method = "POST",
 		        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
 		        (description = "建立請求資料，規則："
-						+ ApiDocConstants.USER_REQUEST_BODY_RULE)
+						+ ApiDocConstants.FAMILY_CREATE_REQUEST_BODY_RULE)
 				)
 		    @ApiResponses({
 		        @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
@@ -156,10 +156,10 @@ public class FamilyController {
 		return service.kickMember(req);
 	}
 	
-	@PostMapping(value = "ownerResignAndAssign")
+	@PostMapping(value = "ownerQuit")
 	@Operation(
 			summary = "轉讓家族管理者",
-			description = "原本的 owner 將管理權轉交給指定新帳號，如沒有指定將由群組第一人為新 owner <br>"
+			description = "原本的 owner 退出，將管理權轉交給指定新帳號，如沒有指定將由群組第一人為新 owner <br>"
 					+ ApiDocConstants.TEST_PASS,
 					method = "POST",
 					requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
@@ -169,8 +169,8 @@ public class FamilyController {
 	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
 	    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION)
 	})
-	public BasicResponse ownerResignAndAssign(@Valid @RequestBody OwnerResignAndAssignRequest req) {
-		return service.ownerResignAndAssign(req);
+	public BasicResponse ownerQuit(@Valid @RequestBody OwnerResignAndAssignRequest req) {
+		return service.ownerQuit(req);
 	}
 	
 	@PostMapping(value = "quit")
@@ -208,37 +208,37 @@ public class FamilyController {
 	}
 	
 	//尚未測試，不一定會用到
-	@PostMapping(value = "acceptInvite")
-	@Operation(
-		    summary = "接受加入家族邀請",
-		    description = "被邀請人接受邀請後，將從邀請名單中移除並正式加入家族。",
-		    method = "POST",
-		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
-		)
-		@ApiResponses({
-		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
-		})
-	public BasicResponse acceptInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
-	    return service.acceptInvite(req);
-	}
+//	@PostMapping(value = "acceptInvite")
+//	@Operation(
+//		    summary = "接受加入家族邀請",
+//		    description = "被邀請人接受邀請後，將從邀請名單中移除並正式加入家族。",
+//		    method = "POST",
+//		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
+//		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+//		)
+//		@ApiResponses({
+//		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+//		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
+//		})
+//	public BasicResponse acceptInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
+//	    return service.acceptInvite(req);
+//	}
 
 	//尚未測試，不一定會用到
-	@PostMapping(value = "rejectInvite")
-	@Operation(
-		    summary = "拒絕加入家族邀請",
-		    description = "被邀請人拒絕邀請，將從邀請名單中移除。",
-		    method = "POST",
-		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
-		)
-		@ApiResponses({
-		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
-		})
-	public BasicResponse rejectInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
-	    return service.rejectInvite(req);
-	}
+//	@PostMapping(value = "rejectInvite")
+//	@Operation(
+//		    summary = "拒絕加入家族邀請",
+//		    description = "被邀請人拒絕邀請，將從邀請名單中移除。",
+//		    method = "POST",
+//		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
+//		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+//		)
+//		@ApiResponses({
+//		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+//		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
+//		})
+//	public BasicResponse rejectInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
+//	    return service.rejectInvite(req);
+//	}
 
 }

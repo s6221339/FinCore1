@@ -42,7 +42,7 @@ public class UserController {
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "註冊請求資料，規則："
-					+ ApiDocConstants.USER_REQUEST_BODY_RULE)
+					+ ApiDocConstants.USER_REGISTER_REQUEST_BODY_RULE)
 			)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
@@ -59,10 +59,11 @@ public class UserController {
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "更新請求資料，規則：<br>"
-					+ ApiDocConstants.USER_REQUEST_BODY_RULE)
+					+ ApiDocConstants.USER_UPDATE_REQUEST_BODY_RULE)
 			)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		@ApiResponse(responseCode = "400", description = ApiDocConstants.UPDATE_USER_FAIL),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST)
 	})
     public BasicResponse update(@Valid @RequestBody UpdateUserRequest req) {
@@ -148,7 +149,7 @@ public class UserController {
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "登入請求資料，規則：<br>"
-					+ ApiDocConstants.USER_REQUEST_BODY_RULE)
+					+ ApiDocConstants.USER_LOGIN_REQUEST_BODY_RULE)
 			)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),

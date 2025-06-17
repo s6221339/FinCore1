@@ -35,7 +35,8 @@ public enum ResponseMessages
 	PASSWORD_NOT_MATCH(400, "密碼不一致"),
 	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定"),
 	BALANCE_ACTIVATION(400, "帳戶未停用，無法刪除"),
-	SAME_BALANCE_OPERATION(400, "無法對同一個帳戶進行操作");
+	SAME_BALANCE_OPERATION(400, "無法對同一個帳戶進行操作"),
+	ACCOUNT_NOT_IN_FAMILY(400, "帳號不存在於此家庭群組");
 	
 	private int code;
 	

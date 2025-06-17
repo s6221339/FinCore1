@@ -2,8 +2,30 @@ package com.example.FinCore.constants;
 
 public final class ApiDocConstants 
 {
-	//測試
-	/* === 請求資料規則 === */
+	
+	/* === API 簡介（@Operation#summary） === */
+	
+	public final static String TRANSFERS_CREATE_SUMMARY = "建立新紀錄";
+	
+	public final static String TRANSFERS_DELETE_SUMMARY = "刪除紀錄";
+	
+	public final static String TRANSFERS_DELETE_BY_BALANCE_ID_SUMMARY = "刪除帳戶的轉帳紀錄";
+	
+	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_SUMMARY = "取得帳戶的轉帳紀錄資料";
+	
+	/* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === */
+	
+	public final static String TRANSFERS_CREATE_DESC = "建立一筆轉帳紀錄。如果設定轉出或匯入的帳戶不存在時建立失敗。<br>";
+	
+	public final static String TRANSFERS_DELETE_DESC = "刪除一筆轉帳紀錄，注意只有超級管理員能執行。<br>";
+	
+	public final static String TRANSFERS_DELETE_BY_BALANCE_ID_DESC = "刪除所有關聯兩個帳戶的轉帳紀錄，注意該操作會永久刪除資料。"
+			+ "該操作必須在兩個帳戶均不存在才可執行，否則操作失敗。<br>";
+	
+	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_DESC = "取得指定帳戶的所有轉帳紀錄資料。<br>";
+	
+	/* === 請求資料規則，多條規則使用<ul>標籤 === 
+	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 ===*/
 	
 	public final static String USER_REQUEST_BODY_RULE = "<ul>"
 			+ "<li>帳號、密碼、名稱不可為空</li>"
@@ -27,7 +49,8 @@ public final class ApiDocConstants
 			+ "<li>至少需要一位owner</li>"
 			+ "</ul>";
 	
-	/* === 各種錯誤訊息 === */
+	/* === 各種錯誤訊息，多條同代碼訊息使用<li>或<ol>包覆 === 
+	 * === 對於同代碼訊息變數命名遵照「API名稱_方法_RESPONSE_代碼」格式 === */
 	
 	public final static String ACCOUNT_NOT_EXIST = "帳號不存在";
 	

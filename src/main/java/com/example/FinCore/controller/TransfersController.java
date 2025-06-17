@@ -28,8 +28,8 @@ public class TransfersController
 	
 	@PostMapping(value = "create")
 	@Operation(
-			summary = "建立新紀錄", 
-			description = "建立一筆轉帳紀錄。如果設定轉出或匯入的帳戶不存在時建立失敗。<br>"
+			summary = ApiDocConstants.TRANSFERS_CREATE_SUMMARY, 
+			description = ApiDocConstants.TRANSFERS_CREATE_DESC
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "建立資料請求，規則："
@@ -47,8 +47,8 @@ public class TransfersController
 	
 	@PostMapping(value = "delete")
 	@Operation(
-			summary = "刪除紀錄", 
-			description = "刪除一筆轉帳紀錄，注意只有超級管理員能執行。<br>"
+			summary = ApiDocConstants.TRANSFERS_DELETE_SUMMARY, 
+			description = ApiDocConstants.TRANSFERS_DELETE_DESC
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			parameters = {
@@ -70,9 +70,8 @@ public class TransfersController
 	
 	@PostMapping(value = "deleteByBalanceId")
 	@Operation(
-			summary = "刪除帳戶的轉帳紀錄", 
-			description = "刪除所有關聯兩個帳戶的轉帳紀錄，注意該操作會永久刪除資料。"
-					+ "該操作必須在兩個帳戶均不存在才可執行，否則操作失敗。<br>"
+			summary = ApiDocConstants.TRANSFERS_DELETE_BY_BALANCE_ID_SUMMARY, 
+			description = ApiDocConstants.TRANSFERS_DELETE_BY_BALANCE_ID_SUMMARY
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			parameters = {
@@ -93,8 +92,8 @@ public class TransfersController
 	
 	@PostMapping(value = "getAll")
 	@Operation(
-			summary = "取得帳戶的轉帳紀錄資料", 
-			description = "取得指定帳戶的所有轉帳紀錄資料。<br>"
+			summary = ApiDocConstants.TRANSFERS_GET_ALL_BY_BALANCE_ID_SUMMARY, 
+			description = ApiDocConstants.TRANSFERS_GET_ALL_BY_BALANCE_ID_DESC
 					+ ApiDocConstants.TEST_PASS, 
 			method = "POST",
 			parameters = {@Parameter(name = "balanceId", description = "帳戶編號")}

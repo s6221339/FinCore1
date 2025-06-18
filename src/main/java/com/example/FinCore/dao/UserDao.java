@@ -1,6 +1,7 @@
 package com.example.FinCore.dao;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -62,8 +63,22 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Transactional
 	@Query(value = "update user set name = :name, phone = :phone,"
 			+ " avatar = :avatar, birthday = :birthday where account = :account", nativeQuery = true)
-	public int update(@Param("account") String account, @Param("name") String name, @Param("phone") String phone,
-			@Param("birthday") LocalDate birthday, @Param("avatar") byte[] avatar);
+	public int update(
+			@Param("account") String account, //
+			@Param("name") String name, //
+			@Param("phone") String phone, //
+			@Param("birthday") LocalDate birthday, //
+			@Param("avatar") byte[] avatar);
+	
+	 @Modifying
+	 @Transactional
+	 @Query(value = "update user set code = ?1, expire_at = ?2 where account = ?3", nativeQuery = true)
+	 public void insertOrUpdateVerified(String code, LocalDateTime expireAt, String account);
+	 
+	 @Modifying
+	 @Transactional
+	 @Query(value = "update user set verified = true where account = ?1", nativeQuery = true)
+	 public void updateVerified(String account);
 
 	/**
 	 * 註銷會員
@@ -132,6 +147,7 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Transactional
 	@Query(value = "update user set password = :password where account = :account", nativeQuery = true)
 	public int updatePassword(@Param("account") String account, @Param("password") String password);
+	
 	
 	
 }

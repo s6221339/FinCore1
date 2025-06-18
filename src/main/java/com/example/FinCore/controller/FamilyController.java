@@ -22,6 +22,7 @@ import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -171,6 +172,23 @@ public class FamilyController {
 	})
 	public BasicResponse ownerQuit(@Valid @RequestBody OwnerResignAndAssignRequest req) {
 		return service.ownerQuit(req);
+	}
+	
+	@PostMapping(value = "transferOwner")
+	@Operation(
+	        summary = "家庭owner轉讓",
+	        description = "現任 owner 將家庭擁有權轉讓給現有家庭成員，原 owner 變成一般成員。",
+	        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+	            description = "轉讓 owner 請求資料，需包含 familyId、oldOwner、newOwner"
+	        )
+	    )
+	    @ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "owner 轉讓成功"),
+	        @ApiResponse(responseCode = "400", description = "參數格式錯誤或權限不足"),
+	        @ApiResponse(responseCode = "404", description = "查無此家族")
+	    })
+	public BasicResponse transferOwner(@Valid @RequestBody OwnerResignAndAssignRequest req) {
+		return service.transferOwner(req);
 	}
 	
 	@PostMapping(value = "quit")

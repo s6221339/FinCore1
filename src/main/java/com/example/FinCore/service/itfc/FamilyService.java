@@ -1,5 +1,7 @@
 package com.example.FinCore.service.itfc;
 
+import java.util.prefs.BackingStoreException;
+
 import com.example.FinCore.vo.request.AcceptInviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
@@ -88,6 +90,16 @@ public interface FamilyService {
 	 * @return 回應物件
 	 */
 	public BasicResponse ownerQuit(OwnerResignAndAssignRequest req);
+	
+	
+	/**
+	 * owner 指派新 owner ，舊 owner 變成家庭成員
+	 * @param familyId 家族ID
+	 * @param oldOwner 現任 owner 帳號
+	 * @param newOwner 指派的新 owner
+	 * @return 回應物件
+	 */
+	public BasicResponse transferOwner(OwnerResignAndAssignRequest req);
 	
 	/**
 	 * 成員自行退出家族

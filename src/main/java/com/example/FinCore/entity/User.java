@@ -1,6 +1,7 @@
 package com.example.FinCore.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,7 +41,16 @@ public class User {
     
     @Column(name = "create_date")
     private LocalDate createDate;
-
+    
+    @Column(name = "code")
+    private String code;
+    
+    @Column(name = "expire_at")
+    private LocalDateTime expireAt;
+    
+    @Column(name = "verified")
+    private boolean verified;
+    
     public String getAccount() {
         return account;
     }
@@ -103,6 +113,30 @@ public class User {
 
 	public void setBirthday(LocalDate birthday) {
 		this.birthday = birthday;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public LocalDateTime getExpireAt() {
+		return expireAt;
+	}
+
+	public void setExpireAt(LocalDateTime expireAt) {
+		this.expireAt = expireAt;
+	}
+
+	public boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
 	}
     
     

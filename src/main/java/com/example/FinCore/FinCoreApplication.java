@@ -13,5 +13,10 @@ public class FinCoreApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FinCoreApplication.class, args);
 	}
+	
+	//Transfer 建立紀錄時要自動寫入帳款
+	//Payment API 解除刪除帳款（recovery）
+	//Family Entity 新增將成員轉為 String 的方法
+
 
 }

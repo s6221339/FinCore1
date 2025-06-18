@@ -101,5 +101,21 @@ public class Family {
 			return null;
 		}
 	}
+	
+	/**
+	 * 將成員列表轉換並回存 invitor 屬性。
+	 * @param memberList 成員列表
+	 */
+	public void toInvitor(List<String> memberList)
+	{
+		try 
+		{
+			invitor = mapper.writeValueAsString(memberList);
+		} 
+		catch (JsonProcessingException e) 
+		{
+			e.printStackTrace();
+		}
+	}
 
 }

@@ -27,7 +27,8 @@ public final class ApiDocConstants
 	
 	public final static String PAYMENT_TYPE_GET_TYPE_DESC = "取得帳號創建的所有類型與項目資料，其中包含了預設的資料。該操作必定成功<del>（大不了就沒自己ㄉ東東）</del><br>";
 	
-	public final static String TRANSFERS_CREATE_DESC = "建立一筆轉帳紀錄。如果設定轉出或匯入的帳戶不存在時建立失敗。<br>";
+	public final static String TRANSFERS_CREATE_DESC = "建立一筆轉帳紀錄。如果設定轉出或匯入的帳戶不存在時建立失敗。"
+			+ "在建立轉帳紀錄的同時，會自動在雙方帳戶新增轉帳帳款<br>";
 	
 	public final static String TRANSFERS_DELETE_DESC = "刪除一筆轉帳紀錄，注意只有超級管理員能執行。<br>";
 	

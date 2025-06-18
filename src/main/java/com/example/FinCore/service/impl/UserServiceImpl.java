@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
-import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.UserVO;
@@ -28,12 +26,10 @@ import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
-import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;

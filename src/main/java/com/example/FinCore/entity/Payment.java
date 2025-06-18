@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.util.Assert;
 
+import com.example.FinCore.constants.ConstantsMessage;
 import com.example.FinCore.vo.RecurringPeriodVO;
 
 import jakarta.annotation.Nullable;
@@ -66,7 +67,38 @@ public class Payment
 	@Column(name = "day")
 	private int day;
 	
-	private final static String INCOME = "收入";
+	private final static String TYPE_INCOME = "收入";
+	
+	private final static String TYPE_OTHER = "其他";
+	
+	private final static String TRANSFERS_IN = "（轉帳）轉入";
+	
+	private final static String TRANSFERS_OUT = "（轉帳）轉出";
+
+	public Payment() {
+		super();
+	}
+
+	public Payment(int paymentId, int balanceId, String description, String type, String item, int amount, int recurringPeriodYear,
+			int recurringPeriodMonth, int recurringPeriodDay, LocalDate createDate, LocalDate recordDate,
+			LocalDate deleteDate, int year, int month, int day) {
+		super();
+		this.paymentId = paymentId;
+		this.balanceId = balanceId;
+		this.description = description;
+		this.type = type;
+		this.item = item;
+		this.amount = amount;
+		this.recurringPeriodYear = recurringPeriodYear;
+		this.recurringPeriodMonth = recurringPeriodMonth;
+		this.recurringPeriodDay = recurringPeriodDay;
+		this.createDate = createDate;
+		this.recordDate = recordDate;
+		this.deleteDate = deleteDate;
+		this.year = year;
+		this.month = month;
+		this.day = day;
+	}
 
 	public int getPaymentId() {
 		return paymentId;
@@ -194,7 +226,7 @@ public class Payment
 	 */
 	public boolean isIncome()
 	{
-		return this.type.equals(INCOME);
+		return this.type.equals(TYPE_INCOME);
 	}
 	
 	/**
@@ -298,7 +330,7 @@ public class Payment
 	 * @param date 要判斷的日期
 	 * @return 如果前置檢查通過、且下次循環日期在檢查日期之後時返回 {@code TRUE}
 	 */
-	public boolean isClose(LocalDate date)
+	public boolean isCloseDate(LocalDate date)
 	{
 		Assert.notNull(date, "檢查日期不得為空值");
 		return getRecurringTimes(date) == 1;
@@ -312,6 +344,82 @@ public class Payment
 	{
 		LocalDate today = LocalDate.now();
 		return recordDate.isAfter(today);
+	}
+	
+	/**
+	 * 快速建構一個轉帳轉入的帳款。<br>
+	 * 注意下列事項：
+	 * <li>款項類型與項目都已固定為「收入／（轉帳）轉入」</li>
+	 * <li>該帳款必不為循環帳款，因此循環週期必為 0</li>
+	 * <li>建立日期與記帳日期鎖定在建構當下的日期</li>
+	 * <li>paymentId 預設為 0</li>
+	 * @param balanceId 依附的帳戶
+	 * @param description 該款項的敘述
+	 * @param amount 轉入金額
+	 * @return 建構完成的 Payment 實體
+	 */
+	public static Payment ofTransfersIn(
+			int balanceId,
+			String description,
+			int amount
+			)
+	{
+		if(balanceId < 1)
+			throw new IllegalArgumentException(ConstantsMessage.BALANCE_ID_VALUE_ERROR);
+		
+		if(amount < 0)
+			throw new IllegalArgumentException(ConstantsMessage.AMOUNT_NEGATIVE_ERROR);
+		
+		LocalDate now = LocalDate.now();
+		return new Payment(
+				0,
+				balanceId, 
+				description, 
+				TYPE_INCOME, TRANSFERS_IN,
+				amount,
+				0, 0, 0,
+				now,
+				now,
+				null,
+				now.getYear(), now.getMonthValue(), now.getDayOfMonth());
+	}
+	
+	/**
+	 * 快速建構一個轉帳轉出的帳款。<br>
+	 * 注意下列事項：
+	 * <li>款項類型與項目都已固定為「其他／（轉帳）轉出」</li>
+	 * <li>該帳款必不為循環帳款，因此循環週期必為 0</li>
+	 * <li>建立日期與記帳日期鎖定在建構當下的日期</li>
+	 * <li>不存在 paymentId</li>
+	 * @param balanceId 依附的帳戶
+	 * @param description 該款項的敘述
+	 * @param amount 轉出金額
+	 * @return 建構完成的 Payment 實體
+	 */
+	public static Payment ofTransfersOut(
+			int balanceId,
+			String description,
+			int amount
+			)
+	{
+		if(balanceId < 1)
+			throw new IllegalArgumentException(ConstantsMessage.BALANCE_ID_VALUE_ERROR);
+		
+		if(amount < 0)
+			throw new IllegalArgumentException(ConstantsMessage.AMOUNT_NEGATIVE_ERROR);
+		
+		LocalDate now = LocalDate.now();
+		return new Payment(
+				0, 
+				balanceId, 
+				description, 
+				TYPE_OTHER, TRANSFERS_OUT,
+				amount,
+				0, 0, 0,
+				now,
+				now,
+				null,
+				now.getYear(), now.getMonthValue(), now.getDayOfMonth());
 	}
 	
 }

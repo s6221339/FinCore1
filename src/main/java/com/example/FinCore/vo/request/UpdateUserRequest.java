@@ -2,11 +2,6 @@ package com.example.FinCore.vo.request;
 
 import java.time.LocalDate;
 
-import com.example.FinCore.constants.ConstantsMessage;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-
 public class UpdateUserRequest extends CreateUserRequest {
 	
 	private LocalDate birthday;

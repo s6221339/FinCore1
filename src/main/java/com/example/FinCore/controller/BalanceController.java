@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.FinCore.annotation.TODO;
+import com.example.FinCore.constants.TodoPriority;
 import com.example.FinCore.service.itfc.BalanceService;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreateBalanceRequest;
@@ -23,6 +25,7 @@ import jakarta.validation.Valid;
 @RestController
 @CrossOrigin(allowedHeaders = "*")
 @RequestMapping(value = "finbook/balance/")
+@TODO(value = "撰寫 API 文件", priority = TodoPriority.NOT_REQUIRED)
 public class BalanceController 
 {
 	

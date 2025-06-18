@@ -26,7 +26,7 @@ public enum ResponseMessages
 	DELETE_FAMILY_FAIL(400, "刪除家庭群組失敗"),
 	NO_PERMISSION(403, "沒有 owner 權限"),
 	MEMBER_NOT_FOUND(404,"家族成員不存在"),
-	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料。"),
+	DELETED_PAYMENT_CANNOT_UPDATE(400, "無法更新已刪除的款項資料。"),
 	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
 	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。"),
 	UPDATE_USER_FAIL(400, "更新會員失敗"),
@@ -37,7 +37,8 @@ public enum ResponseMessages
 	BALANCE_ACTIVATION(400, "帳戶未停用，無法刪除"),
 	SAME_BALANCE_OPERATION(400, "無法對同一個帳戶進行操作"),
 	ACCOUNT_NOT_IN_FAMILY(400, "帳號不存在於此家庭群組"),
-	EMPTY_LIST(400, "不得為空陣列！");
+	EMPTY_LIST(400, "不得為空陣列！"),
+	PAYMENT_HAS_BEEN_DELETED(400, "該帳款已刪除");
 	
 	private int code;
 	

@@ -22,6 +22,7 @@ import com.example.FinCore.vo.PaymentInfoVO;
 import com.example.FinCore.vo.RecurringPeriodVO;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
+import com.example.FinCore.vo.request.RecoveryPaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
@@ -218,6 +219,20 @@ public class PaymentServiceImpl implements PaymentService
 			voList.add(paymentInfo);
 			map.put(payment.getBalanceId(), voList);
 		}
+	}
+
+	@Override
+	public BasicResponse recovery(RecoveryPaymentRequest req) 
+	{
+		for(int id : req.paymentIdList())
+			if(!paymentDao.existsById(id))
+				return new BasicResponse(
+						ResponseMessages.PAYMENT_NOT_FOUND.getCode(), 
+						ResponseMessages.PAYMENT_NOT_FOUND.getMessage() + "：" + id
+						);
+		
+		paymentDao.undoDeleted(req.paymentIdList());
+		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 }

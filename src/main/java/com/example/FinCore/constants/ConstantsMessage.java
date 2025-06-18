@@ -40,6 +40,8 @@ public class ConstantsMessage {
 	
 	public final static String INVALID_DATE_ERROR = "無效的日期索引";
 	
+	public final static String EMPTY_COLLECTION_ERROR = "列表不可為空！";
+	
 	private ConstantsMessage() {}
 
 }

@@ -1,7 +1,10 @@
 package com.example.FinCore.service.itfc;
 
+import java.util.List;
+
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
+import com.example.FinCore.vo.request.RecoveryPaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
@@ -45,5 +48,12 @@ public interface PaymentService
 	 * @return 存放款項資料的回應資料
 	 */
 	public SearchPaymentResponse getPaymentInfoWithDateFilter(AccountWithDateFilterRequest req);
+	
+	/**
+	 * 可以復原被刪除的款項資料（僅在款項被真正刪除前可用）。
+	 * @param req 要恢復的款項編號列表請求資料
+	 * @return 基本回應資料
+	 */
+	public BasicResponse recovery(RecoveryPaymentRequest req);
 	
 }

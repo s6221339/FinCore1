@@ -3,9 +3,12 @@ package com.example.FinCore.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.FinCore.annotation.TODO;
+import com.example.FinCore.constants.TodoPriority;
 import com.example.FinCore.service.itfc.PaymentService;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
+import com.example.FinCore.vo.request.RecoveryPaymentRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
@@ -15,6 +18,7 @@ import jakarta.validation.Valid;
 @RestController
 @CrossOrigin(allowedHeaders = "*")
 @RequestMapping(value = "finbook/payment/")
+@TODO(value = "添加API文件說明", priority = TodoPriority.NOT_REQUIRED)
 public class PaymentController 
 {
 	
@@ -51,6 +55,12 @@ public class PaymentController
 	public SearchPaymentResponse getPaymentInfoWithDateFilter(@Valid @RequestBody AccountWithDateFilterRequest req) 
 	{
 		return service.getPaymentInfoWithDateFilter(req);
+	}
+	
+	@PostMapping(value = "recovery")
+	public BasicResponse recovery(@Valid @RequestBody RecoveryPaymentRequest req) 
+	{
+		return service.recovery(req);
 	}
 	
 }

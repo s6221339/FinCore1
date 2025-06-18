@@ -10,6 +10,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.example.FinCore.constants.TodoPriority;
+
 /**
  * 羊羊的開發註解，咩咩提醒專用！<p>
  *
@@ -23,10 +25,22 @@ import java.lang.annotation.Target;
 public @interface TODO 
 {
 	
-	String value() default "";
+	/**
+	 * 代辦事項主敘述，必填
+	 * @return 代辦事項主敘述
+	 */
+	String value();
 	
-	String priority() default "";
+	/**
+	 * 該代辦事項的優先級，預設為中優先級
+	 * @return 該代辦事項的優先級
+	 */
+	TodoPriority priority() default TodoPriority.MEDIUM;
 	
+	/**
+	 * 到期期限
+	 * @return 到期期限
+	 */
 	String dueDate() default "";
 	
 }

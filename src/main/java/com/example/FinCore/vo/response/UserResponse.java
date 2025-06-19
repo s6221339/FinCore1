@@ -1,7 +1,5 @@
 package com.example.FinCore.vo.response;
 
-import java.util.List;
-
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.vo.UserVO;
 

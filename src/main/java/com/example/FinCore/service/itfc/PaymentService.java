@@ -1,7 +1,5 @@
 package com.example.FinCore.service.itfc;
 
-import java.util.List;
-
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.RecoveryPaymentRequest;

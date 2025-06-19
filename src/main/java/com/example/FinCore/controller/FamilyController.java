@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.constants.ApiDocConstants;
 import com.example.FinCore.service.itfc.FamilyService;
-import com.example.FinCore.vo.request.AcceptInviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
 import com.example.FinCore.vo.request.InviteMemberRequest;
@@ -18,11 +17,9 @@ import com.example.FinCore.vo.request.KickMemberRequest;
 import com.example.FinCore.vo.request.OwnerResignAndAssignRequest;
 import com.example.FinCore.vo.request.QuitFamilyRequest;
 import com.example.FinCore.vo.request.RenameFamilyRequest;
-import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

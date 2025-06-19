@@ -1,7 +1,5 @@
 package com.example.FinCore.service.itfc;
 
-import java.util.List;
-
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.RecoveryPaymentRequest;
@@ -55,5 +53,12 @@ public interface PaymentService
 	 * @return 基本回應資料
 	 */
 	public BasicResponse recovery(RecoveryPaymentRequest req);
+	
+	/**
+	 * 查看該帳號所有被刪除的款項
+	 * @param account 帳號
+	 * @return 存放款項資料的回應資料
+	 */
+	public SearchPaymentResponse getDeletedPayment(String account);
 	
 }

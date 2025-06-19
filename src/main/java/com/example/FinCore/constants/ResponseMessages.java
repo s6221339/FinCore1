@@ -26,10 +26,11 @@ public enum ResponseMessages
 	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
 	ACCOUNT_NOT_IN_FAMILY(400, "帳號不存在於此家庭群組"),
 	SAME_BALANCE_OPERATION(400, "無法對同一個帳戶進行操作"),
-	PAYMENT_HAS_BEEN_DELETED(400, "無法更新已刪除的款項資料。"),
+	DELETED_PAYMENT_CANNOT_UPDATE(400, "無法更新已刪除的款項資料。"),
 	BALANCE_WITH_MULTIPLE_OWNER(400, "帳戶所屬對象只能是唯一。"),
 	SAME_OWNER_TRANSFER_INVALID(400, "新舊 owner 相同，無法進行轉讓"),
 	VERIFICATION_FAILED(400, "驗證失敗：驗證碼錯誤或已過期"),
+	PAYMENT_HAS_BEEN_DELETED(400, "該帳款已刪除"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),
@@ -44,9 +45,8 @@ public enum ResponseMessages
 	INVITOR_NOT_FOUND(404, "邀請人帳號不存在"),
 	FAMLIY_NOT_FOUND(404, "查無此群組（家庭）！"),
 	TRANSFERS_NOT_FOUND(404, "查無此轉帳紀錄！"),
-	
-	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定");
 
+	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定");
 	
 	private int code;
 	

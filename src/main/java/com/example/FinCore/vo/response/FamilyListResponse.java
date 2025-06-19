@@ -3,7 +3,6 @@ package com.example.FinCore.vo.response;
 import java.util.List;
 
 import com.example.FinCore.constants.ResponseMessages;
-import com.example.FinCore.entity.Family;
 import com.example.FinCore.vo.FamilyVO;
 
 public class FamilyListResponse extends BasicResponse{

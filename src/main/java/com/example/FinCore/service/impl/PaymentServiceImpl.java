@@ -1,6 +1,7 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,8 +85,12 @@ public class PaymentServiceImpl implements PaymentService
 	@Override
 	public BasicResponse delete(int paymentId) 
 	{
-		if(!paymentDao.existsById(paymentId))
+		var payment = paymentDao.getEntity(paymentId);
+		if(payment == null)
 			return new BasicResponse(ResponseMessages.PAYMENT_NOT_FOUND);
+		
+		if(payment.isDeleted())
+			return new BasicResponse(ResponseMessages.PAYMENT_HAS_BEEN_DELETED);
 		
 		paymentDao.updateDeleteDate(paymentId, LocalDate.now());
 		return new BasicResponse(ResponseMessages.SUCCESS);
@@ -99,7 +104,7 @@ public class PaymentServiceImpl implements PaymentService
 			return new BasicResponse(ResponseMessages.PAYMENT_NOT_FOUND);
 		
 		if(entity.isDeleted())
-			return new BasicResponse(ResponseMessages.PAYMENT_HAS_BEEN_DELETED);
+			return new BasicResponse(ResponseMessages.DELETED_PAYMENT_CANNOT_UPDATE);
 		
 		var period = req.recurringPeriod();
 		LocalDate recordDate = req.recordDate();
@@ -156,7 +161,7 @@ public class PaymentServiceImpl implements PaymentService
 		if(!userDao.existsById(account))
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		var resultList = getPaymentInfoOpration(account, -1, 0);
+		var resultList = getPaymentInfoOpration(account, -1, 0, true);
 		
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
 	}
@@ -167,58 +172,104 @@ public class PaymentServiceImpl implements PaymentService
 		if(!userDao.existsById(req.account()))
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		var resultList = getPaymentInfoOpration(req.account(), req.year(), req.month());
+		var resultList = getPaymentInfoOpration(req.account(), req.year(), req.month(), true);
 		
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
 	}
 	
-	private List<BalanceWithPaymentVO> getPaymentInfoOpration(String account, int year, int month)
+	/**
+	 * 生成 BalanceWithPaymentVO 列表
+	 * @param account 帳號
+	 * @param year 指定年
+	 * @param month 指定月
+	 * @param deletedFilter 是否啟用刪除過濾器
+	 * @return BalanceWithPaymentVO 列表
+	 */
+	private List<BalanceWithPaymentVO> getPaymentInfoOpration(String account, int year, int month, boolean deletedFilter)
 	{
 		List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(account);
 		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
 		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
 		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();
-		generateBalanceWithPaymentMap(map, paymentList, year, month);
+		generateBalanceWithPaymentMap(map, paymentList, year, month, deletedFilter);
 		for(Entry<Integer, List<PaymentInfoVO>> entry : map.entrySet())
 			resultList.add(new BalanceWithPaymentVO(entry.getKey(), entry.getValue()));
 		return resultList;
 	}
 	
 	/**
-	 * 設定 BalanceWithPaymentMap，會將同一個帳戶的款項設定在一起
+	 * 設定 BalanceWithPaymentMap，首先會將取得的款項使用過濾器篩選，再將同一個帳戶的
+	 * 款項綁定在一起。
 	 * @param map 要設定的 Map
 	 * @param paymentList 款項列表
+	 * @param yearFilter 年過濾器，不為 -1 時將啟動，會過濾不在該年的款項
+	 * @param monthFilter 月過濾器，不為 0 時將啟動，會過濾不在該月的款項；年過濾器
+	 * 		未啟動時會忽略該過濾器
+	 * @param deleteFilter 刪除過濾器，為 true 時將啟動，會過濾已標記刪除的款項；若不啟動將會反向
+	 * 		過濾，意即會過濾未刪除的款項
 	 */
-	private void generateBalanceWithPaymentMap(Map<Integer, List<PaymentInfoVO>> map, List<Payment> paymentList, int yearFilter, int monthFilter)
+	private void generateBalanceWithPaymentMap(Map<Integer, List<PaymentInfoVO>> map, List<Payment> paymentList, int yearFilter, int monthFilter, boolean deleteFilter)
 	{
 		for(Payment payment : paymentList)
 		{
-//			DeleteDate 存在代表該款項已標記刪除，不進行設定
-			if(payment.isDeleted())
+//			如果 deleteFilter 啟動，且 DeleteDate 存在，代表該款項已標記刪除，不進行設定
+			if(deleteFilter && payment.isDeleted())
 				continue;
 			
-			if((yearFilter == -1 && monthFilter == 0) || !payment.isOnTime(yearFilter, monthFilter))
+			if(!deleteFilter && !payment.isDeleted())
 				continue;
 			
-			var period = new RecurringPeriodVO(
-					payment.getRecurringPeriodYear(), 
-					payment.getRecurringPeriodMonth(), 
-					payment.getRecurringPeriodDay()
-					);
-			var paymentInfo = new PaymentInfoVO(
-					payment.getPaymentId(),
-					payment.getDescription(), 
-					payment.getType(), 
-					payment.getItem(), 
-					payment.getAmount(), 
-					period, 
-					payment.getRecordDate()
-					);
+//			如果 yearFilter 啟動，再判斷 monthFilter 是否啟動，篩除不符合時段的款項
+//			yearFilter 未啟動則不過濾年月
+			if(yearFilter != -1)
+				if(monthFilter != 0)
+					if(!payment.isOnTime(yearFilter, monthFilter))
+						continue;
+				else
+					if(!payment.isOnTime(yearFilter))
+						continue;
+			
+//			if((yearFilter == -1 && monthFilter == 0) || !payment.isOnTime(yearFilter, monthFilter))
+//				continue;
+			
+			var paymentInfo = setPaymentInfoVO(payment);
 			List<PaymentInfoVO> voList = 
 					map.containsKey(payment.getBalanceId()) ? map.get(payment.getBalanceId()) : new ArrayList<>();
 			voList.add(paymentInfo);
 			map.put(payment.getBalanceId(), voList);
 		}
+	}
+	
+	/**
+	 * 將 payment 實體轉為 PaymentInfoVO
+	 * @param payment 款項
+	 * @return 轉換完成的 VO
+	 */
+	private PaymentInfoVO setPaymentInfoVO(Payment payment)
+	{
+		var period = new RecurringPeriodVO(
+				payment.getRecurringPeriodYear(), 
+				payment.getRecurringPeriodMonth(), 
+				payment.getRecurringPeriodDay()
+				);
+		int lifeTime = -1;
+		if(payment.isDeleted())
+		{
+			LocalDate deleteDate = payment.getDeleteDate();
+			LocalDate now = LocalDate.now();
+			lifeTime = (int) (deleteDate.toEpochDay() - now.toEpochDay()) + 10 - 1;
+		}
+		var paymentInfo = new PaymentInfoVO(
+				payment.getPaymentId(),
+				payment.getDescription(), 
+				payment.getType(), 
+				payment.getItem(), 
+				payment.getAmount(), 
+				period, 
+				payment.getRecordDate(),
+				lifeTime
+				);
+		return paymentInfo;
 	}
 
 	@Override
@@ -234,5 +285,18 @@ public class PaymentServiceImpl implements PaymentService
 		paymentDao.undoDeleted(req.paymentIdList());
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
+
+	@Override
+	public SearchPaymentResponse getDeletedPayment(String account) 
+	{
+		if(!userDao.existsById(account))
+			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		var result = getPaymentInfoOpration(account, -1, 0, false);
+		
+		return new SearchPaymentResponse(ResponseMessages.SUCCESS, result);
+	}
+	
+	
 
 }

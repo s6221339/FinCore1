@@ -41,6 +41,7 @@ public class TransfersController
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.BALANCE_NOT_FOUND + "（任一不存在皆會觸發）")
 	})
 	public BasicResponse create(@Valid @RequestBody CreateTransfersRequest req)
+			throws Exception
 	{
 		return service.create(req);
 	}

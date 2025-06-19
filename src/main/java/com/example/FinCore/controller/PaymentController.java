@@ -63,4 +63,10 @@ public class PaymentController
 		return service.recovery(req);
 	}
 	
+	@PostMapping(value = "trashCan")
+	public SearchPaymentResponse getDeletedPayment(@RequestParam("account") String account) 
+	{
+		return service.getDeletedPayment(account);
+	}
+	
 }

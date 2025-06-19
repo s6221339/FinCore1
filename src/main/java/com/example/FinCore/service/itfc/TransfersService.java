@@ -12,7 +12,7 @@ public interface TransfersService
 	 * @param req 建立請求資料
 	 * @return 基本回應資料
 	 */
-	public BasicResponse create(CreateTransfersRequest req);
+	public BasicResponse create(CreateTransfersRequest req) throws Exception;
 	
 	/**
 	 * 刪除指定編號的轉帳紀錄（僅超級管理員可用）

@@ -9,14 +9,18 @@ import org.springframework.stereotype.Service;
 
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
+import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.TransfersDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.entity.Payment;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.TransfersService;
 import com.example.FinCore.vo.TransfersVO;
 import com.example.FinCore.vo.request.CreateTransfersRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.TransfersListResponse;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class TransfersServiceImpl implements TransfersService 
@@ -30,9 +34,13 @@ public class TransfersServiceImpl implements TransfersService
 	
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private PaymentDao paymentDao;
 
+	@Transactional(rollbackOn = Exception.class)
 	@Override
-	public BasicResponse create(CreateTransfersRequest req) 
+	public BasicResponse create(CreateTransfersRequest req) throws Exception
 	{
 		if(req.fromBalance() == req.toBalance())
 			return new BasicResponse(ResponseMessages.SAME_BALANCE_OPERATION);
@@ -48,6 +56,15 @@ public class TransfersServiceImpl implements TransfersService
 				req.description(), 
 				today, today.getYear(), today.getMonthValue()
 				);
+		
+		Payment p_in = Payment.ofTransfersIn(req.toBalance(), req.description(), req.amount());
+		paymentDao.save(p_in);
+		
+		Payment p_out = Payment.ofTransfersOut(req.fromBalance(), req.description(), req.amount());
+//		必須要手動設定 PaymentId，否則會併發「NonUniqueObjectException」
+//		參照：https://www.cnblogs.com/xiaotiaosi/p/6489573.html
+		p_out.setPaymentId(paymentDao.getLastedId() + 1);
+		paymentDao.save(p_out);
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 

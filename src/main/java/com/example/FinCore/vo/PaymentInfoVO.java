@@ -12,7 +12,8 @@ public record PaymentInfoVO(
 		String item, 
 		int amount, 
 		RecurringPeriodVO recurringPeriod, 
-		LocalDate recordDate 
+		LocalDate recordDate,
+		int lifeTime
 		) 
 {
 	

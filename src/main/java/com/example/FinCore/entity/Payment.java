@@ -240,6 +240,16 @@ public class Payment
 	}
 	
 	/**
+	 * 檢查該款項的週期性是否有效，如果檢查為非週期款項判定不通過。
+	 * @return 檢查通過時傳回 {@code TRUE}
+	 */
+	public boolean isPeriodValid()
+	{
+		var period = getPeriod();
+		return period.isPeriodValid();
+	}
+	
+	/**
 	 * 檢查該款項是否被標記刪除。
 	 * @return 如果存在刪除日期，表示被標記為刪除，返回 {@code TRUE}，若不存在則返回 {@code FALSE}
 	 */
@@ -249,7 +259,7 @@ public class Payment
 	}
 	
 	/**
-	 * 檢查該款項與傳入的「年月日」是否一致。
+	 * 檢查該款項記帳日期與傳入的「年月日」是否一致。
 	 * @see Payment#isOnTime(int, int)
 	 * @see Payment#isOnTime(int)
 	 */
@@ -259,7 +269,7 @@ public class Payment
 	}
 	
 	/**
-	 * 檢查該款項與傳入的「年月」是否一致。
+	 * 檢查該款項記帳日期與傳入的「年月」是否一致。
 	 * @see Payment#isOnTime(int, int, int)
 	 * @see Payment#isOnTime(int)
 	 */
@@ -269,7 +279,7 @@ public class Payment
 	}
 	
 	/**
-	 * 檢查該款項與傳入的「年」是否一致。
+	 * 檢查該款項記帳日期與傳入的「年」是否一致。
 	 * @see Payment#isOnTime(int, int, int)
 	 * @see Payment#isOnTime(int, int)
 	 */
@@ -292,58 +302,126 @@ public class Payment
 	}
 	
 	/**
-	 * 從該款項的記帳日期開始，計算到結束日期之間（不包含）的循環次數。<p>
-	 * 
-	 * 如果結束日期設定於記帳日期之前，或者該款項為「非循環」，皆返回 0。
+	 * 從該款項的記帳日期開始（不包含），計算到結束日期之間（包含）的循環次數。
 	 * @param end 結束日期，如果值為 {@code NULL} 將預設為執行的日期
 	 * @return 循環次數
 	 */
-	public int getRecurringTimes(@Nullable LocalDate end)
+	public int getRecurringCount(@Nullable LocalDate end)
 	{
 		if(end == null)
 			end = LocalDate.now();
 		
-		if(recordDate.isAfter(end))
+		return getRecurringCount(recordDate, end, getPeriod());
+	}
+	
+	/**
+	 * 計算從開始日期（不包含）到結束日期（包含）的循環次數，未滿足一次週期
+	 * 的次數將會視為一次週期。<p>
+	 * 如果結束日期設定於開始日期之前，或者不存在循環週期，皆返回 0。
+	 * <pre>
+	 * LocalDate start = LocalDate.of(2025, 1, 1);
+	 * LocalDate end = LocalDate.of(2025, 1, 10);
+	 * RecurringPeriodVO period_1 = new RecurringPeriodVO(0, 0, 1);
+	 * RecurringPeriodVO period_2 = new RecurringPeriodVO(0, 0, 5);
+	 * RecurringPeriodVO period_3 = new RecurringPeriodVO(0, 0, 10);
+	 * Payment.getRecurringCount(start, end, period_1) == 10
+	 * Payment.getRecurringCount(start, end, period_2) == 2
+	 * Payment.getRecurringCount(start, end, period_3) == 1
+	 * </pre>
+	 * @param start 開始日期
+	 * @param end 結束日期
+	 * @param period 循環週期
+	 * @return 循環次數
+	 */
+	public static int getRecurringCount(LocalDate start, LocalDate end, RecurringPeriodVO period)
+	{
+		if(start.isAfter(end))
 			return 0;
 		
-		var temp = recordDate;
+		var temp = start;
 		int result = 0;
-		var period = getPeriod();
 		if(!period.hasPeriod())
 			return 0;
 		
-		while(temp.isAfter(end))
+		while(true)
 		{
+			temp = plusPeriod(temp, period);
 			result++;
-			temp.plusDays(period.day());
-			temp.plusMonths(period.month());
-			temp.plusYears(period.year());
+			if(temp.isAfter(end)) break;
 		}
 		return result;
 	}
 	
 	/**
-	 * 判斷該循環款項是否「最靠近」設定的日期。最靠近的意思是該款項進入下次循環
-	 * 之前沒有其他的循環週期。<p>
-	 * 
-	 * 如果在計算前就已經超過設定日期、或該款項不為循環款項時檢查不通過。
-	 * @param date 要判斷的日期
-	 * @return 如果前置檢查通過、且下次循環日期在檢查日期之後時返回 {@code TRUE}
+	 * 判斷指定日期是否為這筆款項記錄日的「第一個週期位置」。
+	 * <p>
+	 * 根據款項是否為未來款項（{@link #isFuture()}），會以 {@code recordDate}
+	 * 為起點或終點，計算與指定日期 {@code date} 間的週期次數。若剛好為第 1 次週期，則返回 {@code true}。
+	 * <p>
+	 * 例如：若款項記錄日為 2025/01/01，週期為每 10 天，則：
+	 * <ul>
+	 *   <li>{@code 2025/01/01} 為第一個週期位置，返回 {@code true}</li>
+	 *   <li>{@code 2025/01/11} 為第一個週期位置，返回 {@code true}</li>
+	 *   <li>{@code 2025/01/21} 為第二個週期位置，返回 {@code false}</li>
+	 * </ul>
+	 *
+	 * @param date 欲檢查的日期，不能為 {@code null}
+	 * @return 若該日期為第一個週期位置則返回 {@code true}，否則為 {@code false}
+	 * @throws IllegalArgumentException 若 {@code date} 為 {@code null}
 	 */
 	public boolean isCloseDate(LocalDate date)
 	{
 		Assert.notNull(date, "檢查日期不得為空值");
-		return getRecurringTimes(date) == 1;
+		if(isFuture())
+			return getRecurringCount(date, recordDate, getPeriod()) == 1;
+		else
+			return getRecurringCount(recordDate, date, getPeriod()) == 1;
 	}
 	
 	/**
-	 * 檢查該款項是否為記錄在未來的款項。
+	 * 檢查該款項是否為記錄在相對於現在時間的未來款項（不包括現在）。
 	 * @return 
 	 */
 	public boolean isFuture()
 	{
 		LocalDate today = LocalDate.now();
 		return recordDate.isAfter(today);
+	}
+	
+	/**
+	 * 取得該筆款項的下一次循環款項實體。除了時間類屬性與款項編號，其他屬性
+	 * 都將繼承給該款項；款項編號將重設為0、創建時間為執行時間、記帳時間為
+	 * 歷經一次循環週期的時間。
+	 * @return 款項實體
+	 */
+	public Payment nextRecurrence()
+	{
+		var period = getPeriod();
+		if(!period.isPeriodValid())
+			return this;
+		
+		LocalDate nextRecordDate = recordDate;
+		nextRecordDate = plusPeriod(nextRecordDate, period);
+		return new Payment(
+				0, 
+				balanceId, 
+				description, 
+				type, item, 
+				amount, 
+				period.year(), period.month(), period.day(), 
+				LocalDate.now(), 
+				nextRecordDate, 
+				null, 
+				nextRecordDate.getYear(), nextRecordDate.getMonthValue(), nextRecordDate.getDayOfMonth()
+				);
+	}
+	
+	private static LocalDate plusPeriod(LocalDate date, RecurringPeriodVO period)
+	{
+		date = date.plusDays(period.day());
+		date = date.plusMonths(period.month());
+		date = date.plusYears(period.year());
+		return date;
 	}
 	
 	/**
@@ -390,7 +468,7 @@ public class Payment
 	 * <li>款項類型與項目都已固定為「其他／（轉帳）轉出」</li>
 	 * <li>該帳款必不為循環帳款，因此循環週期必為 0</li>
 	 * <li>建立日期與記帳日期鎖定在建構當下的日期</li>
-	 * <li>不存在 paymentId</li>
+	 * <li>paymentId 預設為 0</li>
 	 * @param balanceId 依附的帳戶
 	 * @param description 該款項的敘述
 	 * @param amount 轉出金額
@@ -420,6 +498,34 @@ public class Payment
 				now,
 				null,
 				now.getYear(), now.getMonthValue(), now.getDayOfMonth());
+	}
+
+	/**
+	 * 檢查該帳款的自訂屬性是否與另一筆帳款相同。
+	 * @param obj 任意物件
+	 * @return 如果內容相同時返回 {@code TRUE}
+	 */
+	public boolean contentEquals(Object obj) 
+	{
+		if(!(obj instanceof Payment payment))
+			return false;
+		
+		return balanceId == payment.getBalanceId() &&
+				description == payment.getDescription() &&
+				type == payment.getType() && 
+				item == payment.getItem() && 
+				amount == payment.getAmount() && 
+				getPeriod() == payment.getPeriod() &&
+				recordDate == payment.getRecordDate();
+	}
+
+	@Override
+	public String toString() {
+		return "Payment [paymentId=" + paymentId + ", balanceId=" + balanceId + ", description=" + description
+				+ ", type=" + type + ", item=" + item + ", amount=" + amount + ", recurringPeriodYear="
+				+ recurringPeriodYear + ", recurringPeriodMonth=" + recurringPeriodMonth + ", recurringPeriodDay="
+				+ recurringPeriodDay + ", createDate=" + createDate + ", recordDate=" + recordDate + ", deleteDate="
+				+ deleteDate + ", year=" + year + ", month=" + month + ", day=" + day + "]";
 	}
 	
 }

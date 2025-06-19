@@ -221,7 +221,7 @@ public class BalanceServiceImpl implements BalanceService
 				if(payment.hasPeriod())
 				{
 					if(payment.isCloseDate(LocalDate.now()))
-						amount = amount * payment.getRecurringTimes(endDate);
+						amount = amount * payment.getRecurringCount(endDate);
 					
 					totalBalance += amount;
 					recurIncome += amount;
@@ -236,7 +236,7 @@ public class BalanceServiceImpl implements BalanceService
 				if(payment.hasPeriod())
 				{
 					if(payment.isCloseDate(LocalDate.now()))
-						amount = amount * payment.getRecurringTimes(endDate);
+						amount = amount * payment.getRecurringCount(endDate);
 					
 					totalBalance -= amount;
 					recurExpenditure += amount;
@@ -338,7 +338,7 @@ public class BalanceServiceImpl implements BalanceService
 				if(payment.hasPeriod())
 				{
 					if(payment.isCloseDate(LocalDate.now()))
-						amount = amount * payment.getRecurringTimes(endDate);
+						amount = amount * payment.getRecurringCount(endDate);
 					
 					totalBalance += amount;
 					recurIncome += amount;
@@ -353,7 +353,7 @@ public class BalanceServiceImpl implements BalanceService
 				if(payment.hasPeriod())
 				{
 					if(payment.isCloseDate(LocalDate.now()))
-						amount = amount * payment.getRecurringTimes(endDate);
+						amount = amount * payment.getRecurringCount(endDate);
 					
 					totalBalance -= amount;
 					recurExpenditure += amount;

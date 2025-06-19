@@ -1,10 +1,8 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,7 +23,6 @@ import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.CreateUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
-import com.example.FinCore.vo.request.UpdatePwdByEmailRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
@@ -57,11 +54,6 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private PaymentTypeDao paymentTypeDao;
-	
-	@Autowired
-	private EmailServiceImpl emailServiceImpl;
-	 
-	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -235,75 +227,5 @@ public class UserServiceImpl implements UserService {
 	    // 3. 登入成功（你可以選擇只回傳成功，不帶 user，或帶 user 資料給前端）
 	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
-	
-	
-	//updatePwdByEmail: 忘記密碼。
-	@Override
-	public BasicResponse updatePwdByEmail(UpdatePwdByEmailRequest req) {
-		  User user = userDao.selectById(req.getAccount());
-
-		  // 檢查資料，若是驗證狀態還是 false 代表尚未驗證，調用錯 API
-		  if (!user.isVerified()) {
-		   return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
-		  }
-
-		  userDao.updatePassword(req.getAccount(), encoder.encode(req.getNewPassword()));
-		  return new BasicResponse(ResponseMessages.SUCCESS);
-
-		 }
-		 
-	//sendVerificationLetter: 發送驗證信
-	@Override
-	public BasicResponse sendVerificationLetter(String account) {
-		  if (userDao.selectById(account) == null) {
-			   return new BasicResponse(ResponseMessages.NOT_FOUND);
-			  }
-
-			  String code = randomCodeGenerator();
-			  userDao.insertOrUpdateVerified(code, LocalDateTime.now().plusMinutes(10), account);
-
-			  emailServiceImpl.sendVerificationCode(//
-			    account, //
-			    "【User系統】更改密碼驗證碼通知", //
-			    "您的驗證碼是： " + code + " ，請在10分鐘內完成驗證");
-			  return new BasicResponse(ResponseMessages.SUCCESS);
-			 }
-	 
-	//checkVerification: 認證驗證碼
-	@Override
-	public BasicResponse checkVerification(String code, String account) {
-		  User user = userDao.selectById(account);
-		  // 若沒有紀錄代表調用錯 API ，會拋錯
-		  if (user == null) {
-		   return new BasicResponse(ResponseMessages.FAILED);
-		  }
-
-		  // 認證驗證碼，若不符合會拋錯
-		  if (!user.getCode().equals(code)) {
-		   return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
-		  }
-
-		  // 若超過寄信後10分鐘也會報錯
-		  if (LocalDateTime.now().isAfter(user.getExpireAt())) {
-		   return new BasicResponse(ResponseMessages.VERIFICATION_CODE_VALID);
-		  }
-
-		  userDao.updateVerified(account);
-
-		  return new BasicResponse(ResponseMessages.SUCCESS);
-		 }
-	 
-	 private String randomCodeGenerator() {
-		  String charPool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		  Random random = new Random();
-
-		  String code = "";
-		  for (int i = 0; i < 8; i++) {
-		   int index = random.nextInt(charPool.length());
-		   code += charPool.charAt(index);
-		  }
-		  return code;
-		 }
-	 
 	
 }

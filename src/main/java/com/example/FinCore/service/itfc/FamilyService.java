@@ -1,7 +1,5 @@
 package com.example.FinCore.service.itfc;
 
-import java.util.prefs.BackingStoreException;
-
 import com.example.FinCore.vo.request.AcceptInviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;

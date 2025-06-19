@@ -1,10 +1,7 @@
 package com.example.FinCore.service.itfc;
 
-import java.time.LocalDateTime;
-
 import com.example.FinCore.vo.request.CreateUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
-import com.example.FinCore.vo.request.UpdatePwdByEmailRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
@@ -62,11 +59,5 @@ public interface UserService {
 	 * @return
 	 */
 	public BasicResponse login(loginRequest req);
-	
-	public BasicResponse updatePwdByEmail(UpdatePwdByEmailRequest req);
-	
-	public BasicResponse sendVerificationLetter(String account);
-
-	public BasicResponse checkVerification(String code, String account);
 	
 }

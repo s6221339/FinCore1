@@ -1,7 +1,6 @@
 package com.example.FinCore.dao;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -69,11 +68,12 @@ public interface UserDao extends JpaRepository<User, String> {
 			@Param("birthday") LocalDate birthday, //
 			@Param("avatar") byte[] avatar);
 	
-	 @Modifying
-	 @Transactional
-	 @Query(value = "update user set code = ?1, expire_at = ?2 where account = ?3", nativeQuery = true)
-	 public void insertOrUpdateVerified(String code, LocalDateTime expireAt, String account);
-	 
+	/**
+     * 設定帳號為已驗證
+     * 
+     * 用於使用者驗證信箱成功時，將 user 表中的 verified 欄位設為 true。
+     * @param account 會員帳號(Email)
+     */
 	 @Modifying
 	 @Transactional
 	 @Query(value = "update user set verified = true where account = ?1", nativeQuery = true)
@@ -147,6 +147,12 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Query(value = "update user set password = :password where account = :account", nativeQuery = true)
 	public int updatePassword(@Param("account") String account, @Param("password") String password);
 	
-	
+	/**
+	 * 重設所有會員的 verified 狀態為未驗證（false/0）
+	 */
+	@Modifying
+	@Transactional
+	@Query(value = "update user set verified = 0 where verified = 1", nativeQuery = true)
+	void resetAllVerified();
 	
 }

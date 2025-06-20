@@ -1,7 +1,6 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.example.FinCore.constants.ResponseMessages;
@@ -30,6 +31,7 @@ import com.example.FinCore.vo.response.SearchPaymentResponse;
 
 import jakarta.transaction.Transactional;
 
+@EnableScheduling
 @Service
 public class PaymentServiceImpl implements PaymentService 
 {
@@ -297,6 +299,70 @@ public class PaymentServiceImpl implements PaymentService
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, result);
 	}
 	
-	
+	/**
+	 * 每日凌晨 3 點執行的排程任務，用於自動建立下一筆尚未記錄的循環帳款。
+	 * <p>
+	 * 任務會依據以下條件篩選出有效的循環款項：
+	 * <ul>
+	 *   <li>尚未被標記為刪除</li>
+	 *   <li>週期設定為有效</li>
+	 *   <li>記錄日為未來</li>
+	 *   <li>與當前日期 {@link LocalDate#now()} 為第一個週期位置（{@link Payment#isCloseDate(LocalDate)}）</li>
+	 * </ul>
+	 * 符合條件者若其循環時間已到（{@link Payment#isOnTime(int, int, int)}），
+	 * 則會依據該筆款項產生下一筆循環款項並寫入資料庫。
+	 * <p>
+	 * 本方法具備交易控制，若處理過程中任一筆操作失敗將觸發回滾。
+	 *
+	 * @throws Exception 若建立過程中發生例外
+	 */
+	@Scheduled(cron = "0 0 3 * * ?")
+	@Transactional(rollbackOn = Exception.class)
+	public void scheduledCreate() throws Exception
+	{
+//		System.out.println("循環");
+//		蒐集所有資料庫中的循環帳款
+		List<Payment> paymentList = paymentDao.getAllRecurringPayment();
+		for(Payment payment : paymentList)
+		{
+//			System.out.println(payment);
+//			過濾刪除的款項
+			if(payment.isDeleted())
+				continue;
+			
+//			過濾具有無效周期的款項（防患未然）
+			if(!payment.isPeriodValid())
+				continue;
+			
+//			只蒐集距離執行時間最近一個週期的款項
+			LocalDate now = LocalDate.now();
+			if(!payment.isCloseDate(now))
+				continue;
+			
+			int year = now.getYear();
+			int month = now.getMonthValue();
+			int day = now.getDayOfMonth();
+//			只要偵測到循環結束，就建立下一筆未來循環款項
+			if(payment.isOnTime(year, month, day))
+			{
+				Payment next = payment.nextRecurrence();
+				int nextYear = next.getRecordDate().getYear();
+				int nextMonth = next.getRecordDate().getMonthValue();
+				int nextDay = next.getRecordDate().getDayOfMonth();
+				var period = next.getPeriod();
+				paymentDao.create(
+						next.getBalanceId(), 
+						next.getDescription(), 
+						next.getType(), 
+						next.getItem(), 
+						next.getAmount(), 
+						period.year(), period.month(), period.day(), 
+						now, 
+						next.getRecordDate(), 
+						nextYear, nextMonth, nextDay
+						);
+			}
+		}
+	}
 
 }

@@ -28,4 +28,13 @@ public record RecurringPeriodVO(
 		return year != 0 || month != 0 || day != 0;
 	}
 	
+	/**
+	 * 檢查該週期設定是否有效。
+	 * @return 如果有效則傳回 {@code TRUE}
+	 */
+	public boolean isPeriodValid()
+	{
+		return year > 0 || month > 0 || day > 0;
+	}
+	
 }

@@ -218,4 +218,14 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	@Query(value = "select MAX(payment_id) from payment", nativeQuery = true)
 	public int getLastedId();
 	
+	/**
+	 * 取回所有循環款項資料。
+	 * @return 所有循環款項
+	 */
+	@Query(value = "select * from payment where "
+			+ "recurring_period_year != 0 or "
+			+ "recurring_period_month != 0 or "
+			+ "recurring_period_day != 0", nativeQuery = true)
+	public List<Payment> getAllRecurringPayment();
+	
 }

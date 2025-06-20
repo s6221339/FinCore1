@@ -81,7 +81,8 @@ public interface FamilyService {
 	public BasicResponse kickMember(KickMemberRequest req);
 
 	/**
-	 * owner 退出並指派新 owner
+	 * owner 退出家庭群組
+	 * 
 	 * @param familyId 家族ID
 	 * @param oldOwner 現任 owner 帳號
 	 * @param newOwner 指派的新 owner，若沒傳則預設用成員的第一人

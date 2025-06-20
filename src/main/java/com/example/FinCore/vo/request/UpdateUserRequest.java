@@ -2,7 +2,7 @@ package com.example.FinCore.vo.request;
 
 import java.time.LocalDate;
 
-public class UpdateUserRequest extends CreateUserRequest {
+public class UpdateUserRequest extends RregisterUserRequest {
 	
 	private LocalDate birthday;
 	

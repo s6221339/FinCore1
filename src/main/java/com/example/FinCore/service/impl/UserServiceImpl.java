@@ -21,7 +21,7 @@ import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.UserVO;
-import com.example.FinCore.vo.request.CreateUserRequest;
+import com.example.FinCore.vo.request.RregisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public BasicResponse register(CreateUserRequest req) {
+	public BasicResponse register(RregisterUserRequest req) {
 		// 1. 帳號不可重複
 		int exists = userDao.selectCountByAccount(req.getAccount());
 		if (exists > 0) {

@@ -59,7 +59,7 @@ public class UserController {
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),//
 					@ApiResponse(responseCode = "400", description = ApiDocConstants.UPDATE_USER_FAIL),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST) })
+					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
 	public BasicResponse update(@Valid @RequestBody UpdateUserRequest req) {
 		return service.update(req);
 	}
@@ -71,7 +71,7 @@ public class UserController {
 					@Parameter(name = "account", description = "指定要刪除的帳號") })//
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST) })
+					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
 	public BasicResponse cancel(@RequestParam("account") String account) throws Exception {
 		return service.cancel(account);
 	}
@@ -85,7 +85,7 @@ public class UserController {
 					+ ApiDocConstants.USER_UPDATE_PW_REQUEST_BODY_RULE))//
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST) })
+					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
 	public BasicResponse updatePasswordUser(@Valid @RequestBody UpdatePasswordUserRequest req) {
 		return service.updatePasswordUser(req);
 	}
@@ -99,7 +99,7 @@ public class UserController {
 					@Parameter(name = "account", description = "指定要搜尋的帳號") })//
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST) })
+					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
 	public UserResponse getUser(@RequestParam("account") String account) {
 		return service.getUser(account);
 	}
@@ -112,7 +112,7 @@ public class UserController {
 			parameters = {@Parameter(name = "account", description = "指定要搜尋的帳號") })//
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST) })
+					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
 	public FamilyListResponse getFamilyByAccount(@RequestParam("account") String account)
 			throws JsonProcessingException {
 		return service.getFamilyByAccount(account);
@@ -127,7 +127,7 @@ public class UserController {
 					+ ApiDocConstants.USER_LOGIN_REQUEST_BODY_RULE))//
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST) })
+					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
 	public BasicResponse login(@Valid @RequestBody loginRequest req) {
 		return service.login(req);
 	}

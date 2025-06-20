@@ -501,7 +501,7 @@ public class Payment
 	}
 
 	/**
-	 * 檢查該帳款的自訂屬性是否與另一筆帳款相同。
+	 * 檢查該帳款的屬性內容是否與另一筆帳款相同。
 	 * @param obj 任意物件
 	 * @return 如果內容相同時返回 {@code TRUE}
 	 */

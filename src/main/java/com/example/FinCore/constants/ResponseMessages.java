@@ -31,6 +31,7 @@ public enum ResponseMessages
 	SAME_OWNER_TRANSFER_INVALID(400, "新舊 owner 相同，無法進行轉讓"),
 	VERIFICATION_FAILED(400, "驗證失敗：驗證碼錯誤或已過期"),
 	PAYMENT_HAS_BEEN_DELETED(400, "該帳款已刪除"),
+	PAYMENT_PERIOD_UNABLE_MODIFYING(400, "無法變更該款項的週期"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),

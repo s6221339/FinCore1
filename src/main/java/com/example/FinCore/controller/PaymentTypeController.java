@@ -43,7 +43,7 @@ public class PaymentTypeController
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
 		@ApiResponse(responseCode = "400", description = ApiDocConstants.ITEM_EXISTED),
-		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST)
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 	})
 	public BasicResponse createType(@Valid @RequestBody CreatePaymentTypeRequest req)
 	{

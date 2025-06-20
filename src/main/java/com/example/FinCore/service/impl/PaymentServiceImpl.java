@@ -101,11 +101,11 @@ public class PaymentServiceImpl implements PaymentService
 	@Override
 	public BasicResponse update(UpdatePaymentRequest req) throws Exception 
 	{
-		Payment entity = paymentDao.getEntity(req.paymentId());
-		if(entity == null)
+		Payment payment = paymentDao.getEntity(req.paymentId());
+		if(payment == null)
 			return new BasicResponse(ResponseMessages.PAYMENT_NOT_FOUND);
 		
-		if(entity.isDeleted())
+		if(payment.isDeleted())
 			return new BasicResponse(ResponseMessages.DELETED_PAYMENT_CANNOT_UPDATE);
 		
 		var period = req.recurringPeriod();
@@ -113,6 +113,9 @@ public class PaymentServiceImpl implements PaymentService
 		var res = checkDate(recordDate, period);
 		if(res != null)
 			return res;
+		
+		if(!payment.isFuture() && !period.equals(payment.getPeriod()))
+			return new BasicResponse(ResponseMessages.PAYMENT_PERIOD_UNABLE_MODIFYING);
 		
 		int year = recordDate.getYear();
 		int month = recordDate.getMonthValue();
@@ -230,9 +233,6 @@ public class PaymentServiceImpl implements PaymentService
 				else
 					if(!payment.isOnTime(yearFilter))
 						continue;
-			
-//			if((yearFilter == -1 && monthFilter == 0) || !payment.isOnTime(yearFilter, monthFilter))
-//				continue;
 			
 			var paymentInfo = setPaymentInfoVO(payment);
 			List<PaymentInfoVO> voList = 

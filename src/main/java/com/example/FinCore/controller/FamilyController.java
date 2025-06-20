@@ -82,7 +82,7 @@ public class FamilyController {
 	    )
 	    @ApiResponses({
 	        @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-	        @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST),
+	        @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
 	    })
 	public BasicResponse getFamilyById(@RequestParam("familyId") int familyId) {
 		return service.getFamilyById(familyId);
@@ -113,7 +113,7 @@ public class FamilyController {
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
 		})
 	public BasicResponse inviteMember(@Valid @RequestBody InviteMemberRequest req) //
 	throws JsonProcessingException{
@@ -148,7 +148,7 @@ public class FamilyController {
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
 		})
 	public BasicResponse kickMember(@Valid @RequestBody KickMemberRequest req) {
 		return service.kickMember(req);
@@ -199,7 +199,7 @@ public class FamilyController {
 			)
 	@ApiResponses({
 	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-	    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
+	    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
 	})
 	public BasicResponse quitFamily(@Valid @RequestBody QuitFamilyRequest req) {
 		return service.quitFamily(req);

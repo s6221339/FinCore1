@@ -37,7 +37,7 @@ public class SavingsController
 			)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS + "：取得所有項目"),
-		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 	})
 	public SavingsListResponse getAll(@RequestParam("account") String account) 
 	{

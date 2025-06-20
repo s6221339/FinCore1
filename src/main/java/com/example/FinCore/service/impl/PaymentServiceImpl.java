@@ -320,7 +320,7 @@ public class PaymentServiceImpl implements PaymentService
 	@Transactional(rollbackOn = Exception.class)
 	public void scheduledCreate() throws Exception
 	{
-		System.out.println("循環");
+//		System.out.println("循環");
 //		蒐集所有資料庫中的循環帳款
 		List<Payment> paymentList = paymentDao.getAllRecurringPayment();
 		for(Payment payment : paymentList)

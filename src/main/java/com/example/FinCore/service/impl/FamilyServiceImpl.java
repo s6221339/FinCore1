@@ -17,6 +17,7 @@ import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.FamilyVO;
+import com.example.FinCore.vo.SimpleUserVO;
 import com.example.FinCore.vo.request.AcceptInviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
@@ -30,6 +31,7 @@ import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.InviteMemberResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -131,7 +133,7 @@ public class FamilyServiceImpl implements FamilyService {
 		}
 	}
 
-	public FamilyIdResponse getFamilyById(int familyId) {
+	public FamilyIdResponse getById(int familyId) {
 		if (familyId < 1) {
 			return new FamilyIdResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 		}
@@ -151,7 +153,7 @@ public class FamilyServiceImpl implements FamilyService {
 		List<FamilyVO> voList = new ArrayList<>();
 		for(Family family : familyList)
 		{
-			List<String> invitorList = family.getMemberList();
+			List<String> invitorList = family.toMemberList();
 			
 			FamilyVO vo = new FamilyVO(family.getId(), family.getName(), family.getOwner(), invitorList);
 			voList.add(vo);
@@ -189,31 +191,39 @@ public class FamilyServiceImpl implements FamilyService {
 		if (found < invitorSet.size()) {
 			return new BasicResponse(ResponseMessages.INVITOR_NOT_FOUND);
 		}
-		// 6. 更新 family 成員（合併）
-		String invitorStr = family.getInvitor();
-		List<String> currentList = new ArrayList<>();
-		if (StringUtils.hasText(invitorStr)) {
-		    try {
-		        currentList = family.getMemberList();
-		    } catch (Exception e) {
-		        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
-		    }
-		}
-		// 檢查舊成員與新成員有無重複
-		Set<String> allSet = new HashSet<>(currentList);
-		for (String invitee : req.invitor()) {
-		    if (invitee.equals(req.owner()) || !allSet.add(invitee)) {
-		        return new BasicResponse(ResponseMessages.DUPLICATE_FAMILY_MEMBERS);
-		    }
-		}
-		// 將舊成員與新成員合併在一起
-		currentList.addAll(req.invitor());
+		// 6. 取得目前成員清單（如果有）
+	    String invitorStr = family.getInvitor();
+	    List<String> currentList = new ArrayList<>();
+	    if (StringUtils.hasText(invitorStr)) {
+	        try {
+	            currentList = family.toMemberList();
+	        } catch (Exception e) {
+	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	        }
+	    }
 
-		family.setInvitor(mapper.writeValueAsString(currentList));
+	    Set<String> allSet = new HashSet<>(currentList);
+	    for (String invitee : req.invitor()) {
+	        if (invitee.equals(req.owner()) || !allSet.add(invitee)) {
+	            return new BasicResponse(ResponseMessages.DUPLICATE_FAMILY_MEMBERS);
+	        }
+	    }
+	    currentList.addAll(req.invitor());
 
-		// 7. 儲存資料
-		familyDao.save(family);
-		return new BasicResponse(ResponseMessages.SUCCESS);
+	    // 查詢所有新被邀請人的名稱
+	    List<SimpleUserVO> inviteeInfoList = new ArrayList<>();
+	    for (String account : req.invitor()) {
+	        // 假設有 userDao.findNameByAccount(account)
+	        String name = userDao.findNameByAccount(account);
+	        inviteeInfoList.add(new SimpleUserVO(account, name));
+	    }
+
+	    // 存回家族成員
+	    family.setInvitor(mapper.writeValueAsString(currentList));
+	    familyDao.save(family);
+
+	    // 封裝回傳
+	    return new InviteMemberResponse(ResponseMessages.SUCCESS.getCode(), ResponseMessages.SUCCESS.getMessage(), inviteeInfoList);
 	}
 
 	@Override
@@ -259,7 +269,7 @@ public class FamilyServiceImpl implements FamilyService {
 		ObjectMapper mapper = new ObjectMapper();
 		List<String> invitorList;
 		try {
-			invitorList = family.getMemberList();
+			invitorList = family.toMemberList();
 		} catch (Exception e) {
 			return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 		}
@@ -315,7 +325,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    String invitorStr = family.getInvitor();
 	    if (!inFamily && invitorStr != null && !invitorStr.isEmpty()) {
 	        try {
-	            List<String> invitorList = family.getMemberList();
+	            List<String> invitorList = family.toMemberList();
 	            if (invitorList.contains(req.getOldOwner())) {
 	                inFamily = true;
 	            }
@@ -339,7 +349,7 @@ public class FamilyServiceImpl implements FamilyService {
 	        if (invitorStr != null && !invitorStr.isEmpty()) {
 	            List<String> invitorList;
 	            try {
-	                invitorList = family.getMemberList();
+	                invitorList = family.toMemberList();
 	            } catch (Exception e) {
 	                return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	            }
@@ -365,7 +375,7 @@ public class FamilyServiceImpl implements FamilyService {
 	        if (invitorStr != null && !invitorStr.isEmpty()) {
 	            List<String> invitorList;
 	            try {
-	                invitorList = family.getMemberList();
+	                invitorList = family.toMemberList();
 
 	            } catch (Exception e) {
 	                return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
@@ -417,7 +427,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    List<String> invitorList = null;
 	    if (!inFamily && invitorStr != null && !invitorStr.isEmpty()) {
 	        try {
-	            invitorList = family.getMemberList();
+	            invitorList = family.toMemberList();
 	            if (invitorList.contains(req.getOldOwner())) {
 	                inFamily = true;
 	            }
@@ -446,7 +456,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    // 取得 invitorList，如果沒取過就初始化
 	    if (invitorList == null) {
 	        try {
-	            invitorList = family.getMemberList();
+	            invitorList = family.toMemberList();
 	        } catch (Exception e) {
 	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	        }
@@ -514,7 +524,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    ObjectMapper mapper = new ObjectMapper();
 	    List<String> invitorList;
 	    try {
-	        invitorList = family.getMemberList();
+	        invitorList = family.toMemberList();
 	    } catch (Exception e) {
 	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	    }
@@ -574,7 +584,7 @@ public class FamilyServiceImpl implements FamilyService {
         Family family = familyOptional.get();
 
         // 將邀請名單字串轉成 List
-        List<String> invitorList = family.getMemberList();
+        List<String> invitorList = family.toMemberList();
 
         // 確認帳號在邀請名單內
         if (invitorList == null || !invitorList.contains(req.getAccount())) {
@@ -608,7 +618,7 @@ public class FamilyServiceImpl implements FamilyService {
         Family family = familyOptional.get();
 
         // 將邀請名單字串轉成 List
-        List<String> invitorList = family.getMemberList();
+        List<String> invitorList = family.toMemberList();
 
         // 確認帳號在邀請名單內
         if (invitorList == null || !invitorList.contains(req.getAccount())) {

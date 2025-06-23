@@ -4,7 +4,7 @@ import com.example.FinCore.constants.ConstantsMessage;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class CreateUserRequest {
+public class RregisterUserRequest {
 
 	@NotBlank(message = ConstantsMessage.PARAM_ACCOUNT_ERROR)
 	private String account;

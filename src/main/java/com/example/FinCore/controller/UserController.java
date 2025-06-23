@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.constants.ApiDocConstants;
 import com.example.FinCore.service.itfc.UserService;
-import com.example.FinCore.vo.request.CreateUserRequest;
+import com.example.FinCore.vo.request.RregisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.MemberNameResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -36,23 +37,21 @@ public class UserController {
 	private UserService service;
 
 	@PostMapping(value = "register")
-	@Operation(summary = "註冊新會員",//
-			description = "建立一個會員資料，註冊的會員帳號不可重複<br>"//
-					+ ApiDocConstants.TEST_PASS,//
+	@Operation(summary = ApiDocConstants.USER_REGISTER_SUMMARY,
+			description = ApiDocConstants.USER_REGISTER_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST",//
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "註冊請求資料，規則："//
 					+ ApiDocConstants.USER_REGISTER_REQUEST_BODY_RULE))//
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),//
 					@ApiResponse(responseCode = "400", description = ApiDocConstants.ACCOUNT_EXIST) })
-	public BasicResponse register(@Valid @RequestBody CreateUserRequest req) {
+	public BasicResponse register(@Valid @RequestBody RregisterUserRequest req) {
 		return service.register(req);
 	}
 
 	@PostMapping(value = "update")
-	@Operation(summary = "更新會員資料",//
-			description = "更新已存在的會員資料<br>"//
-					+ ApiDocConstants.TEST_PASS,//
+	@Operation(summary = ApiDocConstants.USER_UPDATE_SUMMARY,
+		    description = ApiDocConstants.USER_UPDATE_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST",//
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "更新請求資料，規則：<br>"//
 					+ ApiDocConstants.USER_UPDATE_REQUEST_BODY_RULE))//
@@ -65,9 +64,10 @@ public class UserController {
 	}
 
 	@PostMapping(value = "cancel")
-	@Operation(summary = "註銷會員資料",//
-			description = "刪除會員資料，該操作會將所有關聯資料－包含帳戶、設定等等全數刪除且無法復原，須謹慎操作。<br>"//
-					+ ApiDocConstants.TEST_PASS, method = "POST", parameters = {//
+	@Operation(summary = ApiDocConstants.USER_CANCEL_SUMMARY,
+		    		description = ApiDocConstants.USER_CANCEL_DESC
+		    		+ ApiDocConstants.TEST_PASS,
+					method = "POST", parameters = {//
 					@Parameter(name = "account", description = "指定要刪除的帳號") })//
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),//
@@ -77,9 +77,8 @@ public class UserController {
 	}
 
 	@PostMapping(value = "updatePasswordUser")
-	@Operation(summary = "更新會員密碼",//
-			description = "更新會員密碼，在會員更新之前要求要給入原本的密碼並檢查，若不通過時操作失敗。<br>"//
-					+ ApiDocConstants.TEST_PASS,//
+	@Operation(summary = ApiDocConstants.USER_UPDATE_PW_SUMMARY,
+		    description = ApiDocConstants.USER_UPDATE_PW_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST",//
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "更新請求資料，規則：<br>"//
 					+ ApiDocConstants.USER_UPDATE_PW_REQUEST_BODY_RULE))//
@@ -91,9 +90,8 @@ public class UserController {
 	}
 
 	@PostMapping(value = "getUser")
-	@Operation(summary = "取得會員資料",//
-			description = "取得單一筆會員資料。<br>"//
-					+ ApiDocConstants.TEST_PASS,//
+	@Operation(summary = ApiDocConstants.USER_GET_USER_SUMMARY,
+		    description = ApiDocConstants.USER_GET_USER_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST",//
 			parameters = {//
 					@Parameter(name = "account", description = "指定要搜尋的帳號") })//
@@ -105,9 +103,8 @@ public class UserController {
 	}
 
 	@PostMapping(value = "getFamilyByAccount")
-	@Operation(summary = "取得查詢會員在哪個家庭群組資料",//
-			description = "查詢會員是哪個家庭群組的成員或者是家庭群組的owner。<br>"//
-					+ ApiDocConstants.TEST_PASS,//
+	@Operation(summary = ApiDocConstants.USER_GET_FAMILY_BY_ACCOUNT_SUMMARY,
+		    description = ApiDocConstants.USER_GET_FAMILY_BY_ACCOUNT_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST",//
 			parameters = {@Parameter(name = "account", description = "指定要搜尋的帳號") })//
 	
@@ -119,9 +116,8 @@ public class UserController {
 	}
 
 	@PostMapping(value = "login")
-	@Operation(summary = "會員登入",//
-		description = "會員登入確認是否有此帳號，並檢查密碼是否有誤。<br>"//
-			+ ApiDocConstants.TEST_PASS, //
+	@Operation(summary = ApiDocConstants.USER_LOGIN_SUMMARY,
+		    description = ApiDocConstants.USER_LOGIN_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST", //
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "登入請求資料，規則：<br>"//
 					+ ApiDocConstants.USER_LOGIN_REQUEST_BODY_RULE))//
@@ -130,5 +126,47 @@ public class UserController {
 					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
 	public BasicResponse login(@Valid @RequestBody loginRequest req) {
 		return service.login(req);
+	}
+	
+	@PostMapping(value = "getNameByAccount")
+	@Operation(
+		    summary = ApiDocConstants.USER_GET_NAME_BY_ACCOUNT_SUMMARY,
+		    description = ApiDocConstants.USER_GET_NAME_BY_ACCOUNT_DESC,
+		    method = "GET",
+		    parameters = {
+		        @Parameter(
+		            name = "account",
+		            description = "會員帳號（必填）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
+	public MemberNameResponse getNameByAccount(@RequestParam("account") String account) {
+		return service.getNameByAccount(account);
+	}
+	
+	@PostMapping(value = "logout")
+	@Operation(
+		    summary = ApiDocConstants.USER_LOGOUT_SUMMARY,
+		    description = ApiDocConstants.USER_LOGOUT_DESC,
+		    method = "POST",
+		    parameters = {
+		        @Parameter(
+		            name = "account",
+		            description = "會員帳號（必填）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.LOGOUT_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
+	public BasicResponse logout(@RequestParam String account) {
+	    return service.logout(account);
 	}
 }

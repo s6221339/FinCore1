@@ -47,7 +47,7 @@ public interface FamilyService {
      * @param familyId 家族ID
      * @return 查詢結果，成功時 data 欄位可攜帶查詢結果
      */
-	public FamilyIdResponse getFamilyById(int familyId);
+	public FamilyIdResponse getById(int familyId);
 	
 	/**
 	 * 查詢所有家族群組
@@ -81,7 +81,8 @@ public interface FamilyService {
 	public BasicResponse kickMember(KickMemberRequest req);
 
 	/**
-	 * owner 退出並指派新 owner
+	 * owner 退出家庭群組
+	 * 
 	 * @param familyId 家族ID
 	 * @param oldOwner 現任 owner 帳號
 	 * @param newOwner 指派的新 owner，若沒傳則預設用成員的第一人

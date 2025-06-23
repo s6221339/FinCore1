@@ -34,7 +34,7 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 	 * 發送驗證信
 	 */
 	@Override
-	public BasicResponse sendVerificationLetter(String account) {
+	public BasicResponse sendVerifyCode(String account) {
 		User user = userDao.selectById(account);
 		if (user == null) {
 			return new BasicResponse(ResponseMessages.NOT_FOUND);
@@ -55,7 +55,7 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 	 * 認證驗證碼
 	 */
 	@Override
-	public BasicResponse checkVerification(String code, String account) {
+	public BasicResponse checkVerifyCode(String code, String account) {
 		UserVerifyCode userVerifyCode = userVerifyCodeDao.selectById(account);
 		// 沒有驗證碼紀錄代表調用錯 API
 		if (userVerifyCode == null) {

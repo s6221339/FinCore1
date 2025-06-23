@@ -19,7 +19,7 @@ public interface UserVerifyCodeService {
      * @param account 會員帳號（Email）
      * @return BasicResponse 執行結果（驗證信發送成功/查無此帳號）
      */
-	public BasicResponse sendVerificationLetter(String account);
+	public BasicResponse sendVerifyCode(String account);
 
 	/**
      * 認證驗證碼
@@ -28,5 +28,5 @@ public interface UserVerifyCodeService {
      * @param account 會員帳號（Email）
      * @return BasicResponse 執行結果（驗證成功/驗證失敗/驗證碼過期/查無資料）
      */
-	public BasicResponse checkVerification(String code, String account);
+	public BasicResponse checkVerifyCode(String code, String account);
 }

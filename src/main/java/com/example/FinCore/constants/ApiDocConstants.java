@@ -40,6 +40,54 @@ public final class ApiDocConstants
 
 	public static final String BALANCE_DELETE_SUMMARY = "刪除帳戶資料";
 
+	public final static String FAMILY_CREATE_SUMMARY = "建立家族";
+
+	public static final String FAMILY_GET_BY_ID_SUMMARY = "查詢家族群組資訊";
+	
+	public final static String FAMILY_LIST_ALL_FAMILY_SUMMARY = "查詢所有家族";
+	
+	public final static String FAMILY_DISSMISS_SUMMARY = "解散家族";
+	
+	public final static String FAMILY_KICK_SUMMARY = "踢出家族成員";
+	
+	public final static String FAMILY_QUIT_SUMMARY = "退出家族";
+	
+    public final static String FAMILY_RENAME_SUMMARY = "更改家族名稱";
+    
+    public final static String FAMILY_ACCEPT_INVITE_SUMMARY = "接受家族邀請";
+    
+    public final static String FAMILY_REJECT_INVITE_SUMMARY = "拒絕家族邀請";
+    
+    public final static String FAMILY_OWNER_QUIT_SUMMARY = "owner 退出家庭群組";
+    
+    public final static String FAMILY_TRANSFER_OWNER_SUMMARY = "owner 轉讓家族權限";
+    
+    public final static String FAMILY_INVITE_SUMMARY = "邀請新成員加入家族";
+    
+    public final static String USER_REGISTER_SUMMARY = "註冊新會員";
+    
+    public final static String USER_UPDATE_SUMMARY = "更新會員資料";
+    
+    public final static String USER_CANCEL_SUMMARY = "註銷會員資料";
+    
+    public final static String USER_UPDATE_PW_SUMMARY = "更新會員密碼";
+    
+    public final static String USER_GET_USER_SUMMARY = "取得會員資料";
+    
+    public final static String USER_GET_FAMILY_BY_ACCOUNT_SUMMARY = "取得查詢會員在哪個家庭群組";
+    
+    public final static String USER_LOGIN_SUMMARY = "會員登入";
+    
+    public final static String USER_VERIFY_CODE_SEND_VERIFY_CODE_SUMMARY = "發送驗證信";
+    
+    public final static String USER_VERIFY_CODE_CHECK_VERIFY_CODE_SUMMARY = "認證驗證碼";
+    
+    public final static String USER_VERIFY_CODE_UPDATE_PWD_BY_EMAIL_SUMMARY = "忘記密碼－重設密碼";
+    
+    public static final String USER_GET_NAME_BY_ACCOUNT_SUMMARY = "查詢會員名稱";
+    
+    public static final String USER_LOGOUT_SUMMARY = "會員登出";
+	
 	/* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
 	
@@ -98,6 +146,54 @@ public final class ApiDocConstants
 	public static final String BALANCE_DELETE_DESC =
 			"依帳戶 ID 刪除該筆帳戶資料，包含關聯的儲蓄紀錄與款項。<br>";
 
+	public final static String FAMILY_CREATE_DESC = "由指定 owner 建立新的家族，並可一次邀請多位成員<br>";
+	
+	public static final String FAMILY_GET_BY_ID_DESC = "根據 familyId 查詢家族群組詳細資訊<br>";;
+	
+	public final static String FAMILY_LIST_ALL_FAMILY_DESC = "回傳系統中所有家族的清單（可用於管理後台）<br>";
+	
+	public final static String FAMILY_DISSMISS_DESC = "由家族 owner 解散該家族，所有成員將退出<br>";
+	
+	public final static String FAMILY_KICK_DESC = "由 owner 或管理者將指定帳號從家族中移除<br>";
+	
+	public final static String FAMILY_QUIT_DESC = "一般成員可自行退出已加入的家族，owner 無法使用此功能<br>";
+	
+    public final static String FAMILY_RENAME_DESC = "由家族 owner 更新該家族的名稱，需有權限<br>";
+    
+    public final static String FAMILY_ACCEPT_INVITE_DESC = "被邀請人確認接受邀請，將移出邀請名單並正式加入家族<br>";
+    
+    public final static String FAMILY_REJECT_INVITE_DESC = "被邀請人拒絕邀請，將從家族邀請名單中移除<br>";
+    
+    public final static String FAMILY_OWNER_QUIT_DESC = "owner 退出家庭群組，指派的新 owner，若沒傳則預設用成員的第一人<br>";
+    
+    public final static String FAMILY_TRANSFER_OWNER_DESC = "現任 owner 可將家族擁有權限轉讓給現有成員，原 owner 轉為一般成員<br>";
+    
+    public final static String FAMILY_INVITE_DESC = "由家族 owner 邀請新成員加入家族，會將對方帳號加入家族邀請名單<br>";
+    
+    public final static String USER_REGISTER_DESC = "建立一個會員資料，註冊的會員帳號不可重複<br>";
+    
+    public final static String USER_UPDATE_DESC = "更新已存在的會員資料<br>";
+    
+    public final static String USER_CANCEL_DESC = "刪除會員資料，該操作會將所有關聯資料－包含帳戶、設定等等全數刪除且無法復原，須謹慎操作<br>";
+    
+    public final static String USER_UPDATE_PW_DESC = "更新會員密碼，在會員更新之前要求要給入原本的密碼並檢查，若不通過時操作失敗<br>";
+    
+    public final static String USER_GET_USER_DESC = "取得單一筆會員資料<br>";
+    
+    public final static String USER_GET_FAMILY_BY_ACCOUNT_DESC = "查詢會員是哪個家庭群組的成員或者是家庭群組的owner<br>";
+    
+    public final static String USER_LOGIN_DESC = "會員登入確認是否有此帳號，並檢查密碼是否有誤<br>";
+    
+    public final static String USER_VERIFY_CODE_SEND_VERIFY_CODE_DESC = "發送一組驗證碼到指定會員的 email 信箱，10 分鐘內有效<br>";
+
+    public final static String USER_VERIFY_CODE_CHECK_VERIFY_CODE_DESC = "比對指定會員的驗證碼是否正確且未過期，成功則設帳號為已驗證<br>";
+    
+    public final static String USER_VERIFY_CODE_UPDATE_PWD_BY_EMAIL_DESC = "會員經過信箱驗證成功後，使用此 API 進行新密碼設定<br>";
+    
+    public static final String USER_GET_NAME_BY_ACCOUNT_DESC = "根據會員帳號查詢對應名稱<br>";
+    
+    public static final String USER_LOGOUT_DESC = "會員進行登出動作。RESTful 架構多為前端刪除 token，若需強制登出請配合 session 或 token blacklist。<br>";
+
 	/* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
 
@@ -108,23 +204,21 @@ public final class ApiDocConstants
 			+ "</ul>";
 	
 	public final static String USER_UPDATE_REQUEST_BODY_RULE = "<ul>"
-			+ "<li></li>"
-			+ "</ul>";
-	
-	public final static String USER_LOGIN_REQUEST_BODY_RULE = "<ul>"
-			+ "<li></li>"
+			+ "<li>更新生日、頭像</li>"
 			+ "</ul>";
 	
 	public final static String USER_UPDATE_PW_REQUEST_BODY_RULE = "<ul>"
 			+ "<li>帳號、新舊密碼不可為空</li>"
 			+ "</ul>";
 	
-	public final static String FAMILY_CREATE_REQUEST_BODY_RULE = "<ul>"
-			+ "<li></li>"
+	public final static String USER_LOGIN_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>帳號、密碼不得為空</li>"
 			+ "</ul>";
 	
-	public final static String FAMILY_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>至少需要一位owner</li>"
+	public final static String USER_VERIFY_CODE_UPDATE_PWD_BY_EMAIL_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>帳號、新密碼不得為空</li>"
+			+ "<li>【未套用】帳號須符合標準信箱格式（regexp：^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$）</li>"
+			+ "<li>【未套用】密碼長度為 8 ~ 16 碼</li>"
 			+ "</ul>";
 	
 	public final static String TRANSFERS_CREATE_REQUEST_BODY_RULE = "<ul>"
@@ -176,6 +270,52 @@ public final class ApiDocConstants
 			+ "<li>savings：欲設定的當月儲蓄金額，若為負數則不變更</li>"
 			+ "</ul>";
 
+	public final static String FAMILY_CREATE_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>家族名稱、群組owner、家庭成員</li>"
+			+ "<li>owner不得為空</li>"
+			+ "</ul>";
+	
+	public final static String FAMILY_INVITE_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>家族編號、群組owner、被邀請人(名單)</li>"
+			+ "<li>由群組owner發起邀請</li>"
+			+ "<li>家族編號.owner.被邀請人不得為空</li>"
+			+ "</ul>";
+	
+	public final static String FAMILY_DISMISS_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>家族編號、家庭owner</li>"
+			+ "<li>由家庭owner解散群組</li>"
+			+ "<li>家族編號.家庭owner不得為空</li>"
+			+ "</ul>";
+	
+	public final static String FAMILY_KICK_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>家族編號、家庭owner、家庭成員</li>"
+			+ "<li>由家庭owner踢出成員</li>"
+			+ "<li>家族編號.家庭owner.踢出成員不得為空</li>"
+			+ "</ul>";
+	
+	public final static String FAMILY_OWNER_QUIT_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>familyId：家族編號</li>"
+	        + "<li>oldOwner：現任 owner 帳號</li>"
+	        + "<li>newOwner：被指派的新 owner 帳號，必須已經是家族成員</li>"
+	        + "</ul>";
+	
+	public final static String FAMILY_TRANSFER_OWNER_REQUEST_BODY_RULE = "<ul>"
+	        + "<li>familyId：家族編號</li>"
+	        + "<li>oldOwner：現任 owner 帳號</li>"
+	        + "<li>newOwner：新 owner 帳號，必須已經是家族成員</li>"
+	        + "</ul>";
+	
+	public final static String FAMILY_QUIT_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>家族編號、退出的家庭成員</li>"
+			+ "<li>家庭編號、家庭成員不得為空</li>"
+			+ "</ul>";
+	
+	public final static String FAMILY_RENAME_REQUEST_BODY_RULE = "<ul>"
+			+ "<li>家庭編號、家庭owner、更新的家族名稱</li>"
+			+ "<li>由家庭owner更新家族名稱</li>"
+			+ "<li>家庭編號、家庭owner不得為空</li>"
+			+ "</ul>";
+
 	/* === 各種錯誤訊息，多條同代碼訊息使用<li>或<ol>包覆 === 
 	 * === 同代碼訊息命名格式：「API名稱_方法_RESPONSE_代碼」格式 ===
 	 * === 其他訊息格式：「任意，建議與 ResponseMessages 的變數名稱一致」 === */
@@ -208,7 +348,7 @@ public final class ApiDocConstants
 	public final static String ITEM_EXISTED = "已存在相同類型／項目";
 	
 	public final static String UPDATE_USER_FAIL = "更新會員失敗";
-	
+
 	public final static String PAYMENT_NOT_FOUND = "帳款不存在";
 	
 	public final static String PAYMENT_HAS_BEEN_DELETED = "該帳款已刪除";
@@ -235,6 +375,18 @@ public final class ApiDocConstants
 			+ "<li>查無此群組（家庭）！</li>"
 			+ "<li>查無此帳號！</li>"
 			+ "</ol>";
+
+	public final static String PARAM_FORMAT_ERROR = "參數格式錯誤";
+	
+	public final static String USER_VERIFY_CODE_FAIL = "驗證失敗或驗證碼錯誤";
+	
+	public final static String USER_VERIFY_CODE_NOT_FOUND = "查無此驗證資料";
+	
+	public final static String USER_UPDATE_PWD_NOT_VERIFIED = "尚未驗證，禁止重設密碼";
+	
+	public final static String FAMILY_CREATE_FAIL = "家庭群族新增失敗";
+	
+	public static final String MISSING_REQUIRED_FIELD = "缺少必要欄位";
 	
 	/* === 成功訊息 === */
 	
@@ -245,6 +397,12 @@ public final class ApiDocConstants
 	public final static String UPDATE_SUCCESS = "更新成功";
 	
 	public final static String SEARCH_SUCCESS = "搜尋成功";
+	
+	public final static String SEND_SUCCESS = "驗證信發送成功";
+	
+	public final static String VERIFY_SUCCESS = "驗證成功";
+	
+	public static final String LOGOUT_SUCCESS = "登出成功";
 
 	/* === 測試狀態 === */
 

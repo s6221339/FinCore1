@@ -42,8 +42,8 @@ public class FamilyController {
 //	@Valid：如果 RequestBody 中有資料驗證，則需要使用該註釋來啟動驗證功能
 	@PostMapping(value = "create")
 	@Operation(
-		        summary = "建立家族",
-		        description = "由指定 owner 建立新的家族，並可一次邀請多位成員<br>"
+		        summary = ApiDocConstants.FAMILY_CREATE_SUMMARY,
+		        description = ApiDocConstants.FAMILY_CREATE_DESC
 		        		+ ApiDocConstants.TEST_PASS, 
 		        method = "POST",
 		        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
@@ -52,7 +52,7 @@ public class FamilyController {
 				)
 		    @ApiResponses({
 		        @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
-		        @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+		        @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_CREATE_FAIL)
 		    })
 	public BasicResponse create(@Valid @RequestBody CreateFamilyRequest req) throws Exception {
 		return service.create(req);
@@ -70,28 +70,31 @@ public class FamilyController {
 //		return service.delete(req);
 //	}
 	
-	@PostMapping(value = "getFamilyById")
+	@PostMapping(value = "getById")
 	@Operation(
-	        summary = "查詢家族資訊",
-	        description = "根據 familyId 查詢對應的家族資訊<br>"
-	        		+ ApiDocConstants.TEST_PASS,
-	        method = "POST",
-	        parameters = {
-	            @Parameter(name = "familyId", description = "要查詢的家族 ID")
-	        }
-	    )
-	    @ApiResponses({
-	        @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-	        @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
-	    })
-	public BasicResponse getFamilyById(@RequestParam("familyId") int familyId) {
-		return service.getFamilyById(familyId);
+		    summary = ApiDocConstants.FAMILY_GET_BY_ID_SUMMARY,
+		    description = ApiDocConstants.FAMILY_GET_BY_ID_DESC,
+		    method = "POST",
+		    parameters = {
+		        @Parameter(
+		            name = "familyId",
+		            description = "家族群組 ID（必填，需大於 0）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
+		})
+	public BasicResponse getById(@RequestParam("familyId") int familyId) {
+		return service.getById(familyId);
 	}
 	
 	@PostMapping(value = "listAllFamily")
 	@Operation(
-	        summary = "查詢所有家族",
-	        description = "回傳系統中所有家族的清單（可用於管理後台）<br>"
+	        summary = ApiDocConstants.FAMILY_LIST_ALL_FAMILY_SUMMARY,
+	        description = ApiDocConstants.FAMILY_LIST_ALL_FAMILY_DESC
 	        		+ ApiDocConstants.TEST_PASS,
 	        method = "POST"
 	    )
@@ -104,12 +107,11 @@ public class FamilyController {
 
 	@PostMapping(value = "invite")
 	@Operation(
-		    summary = "邀請新成員加入家族",
-		    description = "由家族 owner 邀請新成員加入家族，會將帳號加入家族的邀請名單 <br>"
-		    		+ ApiDocConstants.TEST_PASS,
+		    summary = ApiDocConstants.FAMILY_INVITE_SUMMARY,
+		    description = ApiDocConstants.FAMILY_INVITE_DESC + ApiDocConstants.TEST_PASS,
 		    method = "POST",
 		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+		    (description = ApiDocConstants.FAMILY_INVITE_REQUEST_BODY_RULE)
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
@@ -122,12 +124,12 @@ public class FamilyController {
 	
 	@PostMapping(value = "dismiss")
 	@Operation(
-		    summary = "解散家族",
-		    description = "由家族 owner 解散該家族，所有成員將退出<br>"
+		    summary = ApiDocConstants.FAMILY_DISSMISS_SUMMARY,
+		    description = ApiDocConstants.FAMILY_DISSMISS_DESC
 		    		+ ApiDocConstants.TEST_PASS,
 		    method = "POST",
 		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+		    (description = ApiDocConstants.FAMILY_DISMISS_REQUEST_BODY_RULE)
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),
@@ -139,12 +141,12 @@ public class FamilyController {
 	
 	@PostMapping(value = "kick")
 	@Operation(
-		    summary = "踢出家族成員",
-		    description = "由 owner 或管理者將指定帳號從家族中移除<br>"
+		    summary = ApiDocConstants.FAMILY_KICK_SUMMARY,
+		    description = ApiDocConstants.FAMILY_KICK_DESC
 		    		+ ApiDocConstants.TEST_PASS,
 		    		method = "POST",
 		    		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    		(description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+		    		(description = ApiDocConstants.FAMILY_KICK_REQUEST_BODY_RULE)
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
@@ -156,12 +158,12 @@ public class FamilyController {
 	
 	@PostMapping(value = "ownerQuit")
 	@Operation(
-			summary = "轉讓家族管理者",
-			description = "原本的 owner 退出，將管理權轉交給指定新帳號，如沒有指定將由群組第一人為新 owner <br>"
+			summary = ApiDocConstants.FAMILY_OWNER_QUIT_SUMMARY,
+				    description = ApiDocConstants.FAMILY_OWNER_QUIT_DESC
 					+ ApiDocConstants.TEST_PASS,
 					method = "POST",
 					requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-					(description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+					(description = ApiDocConstants.FAMILY_OWNER_QUIT_REQUEST_BODY_RULE)
 			)
 	@ApiResponses({
 	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
@@ -173,16 +175,16 @@ public class FamilyController {
 	
 	@PostMapping(value = "transferOwner")
 	@Operation(
-	        summary = "家庭owner轉讓",
-	        description = "現任 owner 將家庭擁有權轉讓給現有家庭成員，原 owner 變成一般成員。",
+	        summary = ApiDocConstants.FAMILY_TRANSFER_OWNER_SUMMARY,
+	        description = ApiDocConstants.FAMILY_TRANSFER_OWNER_DESC + ApiDocConstants.TEST_PASS,
 	        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-	            description = "轉讓 owner 請求資料，需包含 familyId、oldOwner、newOwner"
+	            description = ApiDocConstants.FAMILY_TRANSFER_OWNER_REQUEST_BODY_RULE
 	        )
 	    )
 	    @ApiResponses({
-	        @ApiResponse(responseCode = "200", description = "owner 轉讓成功"),
-	        @ApiResponse(responseCode = "400", description = "參數格式錯誤或權限不足"),
-	        @ApiResponse(responseCode = "404", description = "查無此家族")
+	        @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+	        @ApiResponse(responseCode = "400", description = ApiDocConstants.NO_PERMISSION + ApiDocConstants.PARAM_FORMAT_ERROR),
+	        @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
 	    })
 	public BasicResponse transferOwner(@Valid @RequestBody OwnerResignAndAssignRequest req) {
 		return service.transferOwner(req);
@@ -190,12 +192,12 @@ public class FamilyController {
 	
 	@PostMapping(value = "quit")
 	@Operation(
-			summary = "成員退出家族",
-			description = "非 owner 的一般成員可自行退出家族<br>"
+			summary = ApiDocConstants.FAMILY_QUIT_SUMMARY,
+			description = ApiDocConstants.FAMILY_QUIT_DESC
 					+ ApiDocConstants.TEST_PASS,
 					method = "POST",
 					requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-					(description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+					(description = ApiDocConstants.FAMILY_QUIT_REQUEST_BODY_RULE)
 			)
 	@ApiResponses({
 	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
@@ -207,12 +209,12 @@ public class FamilyController {
 	
 	@PostMapping(value = "rename")
 	@Operation(
-		    summary = "更改家族名稱",
-		    description = "家族 owner 可更新家族的名稱<br>"
+		    summary = ApiDocConstants.FAMILY_RENAME_SUMMARY,
+		    description = ApiDocConstants.FAMILY_RENAME_DESC
 		    		+ ApiDocConstants.TEST_PASS,
 		    method = "POST",
 		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
+		    (description = ApiDocConstants.FAMILY_RENAME_REQUEST_BODY_RULE)
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
@@ -225,8 +227,8 @@ public class FamilyController {
 	//尚未測試，不一定會用到
 //	@PostMapping(value = "acceptInvite")
 //	@Operation(
-//		    summary = "接受加入家族邀請",
-//		    description = "被邀請人接受邀請後，將從邀請名單中移除並正式加入家族。",
+//		    summary = ApiDocConstants.FAMILY_ACCEPT_INVITE_SUMMARY,
+//    		description = ApiDocConstants.FAMILY_RENAME_DESC,
 //		    method = "POST",
 //		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
 //		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
@@ -242,8 +244,8 @@ public class FamilyController {
 	//尚未測試，不一定會用到
 //	@PostMapping(value = "rejectInvite")
 //	@Operation(
-//		    summary = "拒絕加入家族邀請",
-//		    description = "被邀請人拒絕邀請，將從邀請名單中移除。",
+//		    summary = ApiDocConstants.FAMILY_ACCEPT_INVITE_DESC,
+//			description = ApiDocConstants.FAMILY_REJECT_INVITE_DESC,
 //		    method = "POST",
 //		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
 //		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)

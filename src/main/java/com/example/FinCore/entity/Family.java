@@ -89,7 +89,7 @@ public class Family {
 	 * 將 invitor 屬性轉回成員列表並返回。
 	 * @return 成員列表
 	 */
-	public List<String> getMemberList()
+	public List<String> toMemberList()
 	{
 		try 
 		{

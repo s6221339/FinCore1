@@ -155,4 +155,12 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Query(value = "update user set verified = 0 where verified = 1", nativeQuery = true)
 	void resetAllVerified();
 	
+	/**
+	 * 根據帳號查詢成員名稱（使用原生 SQL）
+	 * @param account 使用者帳號
+	 * @return 姓名（如果找不到會回傳 null）
+	 */
+	@Query(value = "select name from user where account = :account", nativeQuery = true)
+	String findNameByAccount(@Param("account") String account);
+	
 }

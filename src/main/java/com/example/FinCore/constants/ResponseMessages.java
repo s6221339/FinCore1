@@ -12,7 +12,7 @@ public enum ResponseMessages
 	ACCOUNT_EXIST(400, "帳號已存在"),
 	ITEM_EXISTED(400, "已存在相同物件。"),
 	UPDATE_USER_FAIL(400, "更新會員失敗"),
-	PASSWORD_NOT_MATCH(400, "密碼不一致"),
+	PASSWORD_NOT_MATCH(400, "密碼錯誤"),
     UPDATE_FAMILY_FAIL(400,"更新家族群組失敗"),
     CREATE_FAMILY_FAIL(400, "新增家族群組失敗"),
 	DELETE_FAMILY_FAIL(400, "刪除家庭群組失敗"),

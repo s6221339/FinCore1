@@ -72,18 +72,21 @@ public class FamilyController {
 	
 	@PostMapping(value = "getFamilyById")
 	@Operation(
-	        summary = ApiDocConstants.FAMILY_GET_FAMILY_BY_ID_SUMMARY, 
-	        description = ApiDocConstants.FAMILY_GET_FAMILY_BY_ID_DESC
-	        		+ ApiDocConstants.TEST_PASS,
-	        method = "POST",
-	        parameters = {
-	            @Parameter(name = "familyId", description = "要查詢的家族 ID")
-	        }
-	    )
-	    @ApiResponses({
-	        @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-	        @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST),
-	    })
+		    summary = ApiDocConstants.FAMILY_GET_BY_ID_SUMMARY,
+		    description = ApiDocConstants.FAMILY_GET_BY_ID_DESC,
+		    method = "POST",
+		    parameters = {
+		        @Parameter(
+		            name = "familyId",
+		            description = "家族群組 ID（必填，需大於 0）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST),
+		})
 	public BasicResponse getFamilyById(@RequestParam("familyId") int familyId) {
 		return service.getFamilyById(familyId);
 	}

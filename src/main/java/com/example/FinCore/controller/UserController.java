@@ -16,6 +16,7 @@ import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.MemberNameResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -125,5 +126,47 @@ public class UserController {
 					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_EXIST) })
 	public BasicResponse login(@Valid @RequestBody loginRequest req) {
 		return service.login(req);
+	}
+	
+	@PostMapping(value = "getNameByAccount")
+	@Operation(
+		    summary = ApiDocConstants.USER_GET_NAME_BY_ACCOUNT_SUMMARY,
+		    description = ApiDocConstants.USER_GET_NAME_BY_ACCOUNT_DESC,
+		    method = "GET",
+		    parameters = {
+		        @Parameter(
+		            name = "account",
+		            description = "會員帳號（必填）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
+	public MemberNameResponse getNameByAccount(@RequestParam("account") String account) {
+		return service.getNameByAccount(account);
+	}
+	
+	@PostMapping(value = "logout")
+	@Operation(
+		    summary = ApiDocConstants.USER_LOGOUT_SUMMARY,
+		    description = ApiDocConstants.USER_LOGOUT_DESC,
+		    method = "POST",
+		    parameters = {
+		        @Parameter(
+		            name = "account",
+		            description = "會員帳號（必填）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.LOGOUT_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
+	public BasicResponse logout(@RequestParam String account) {
+	    return service.logout(account);
 	}
 }

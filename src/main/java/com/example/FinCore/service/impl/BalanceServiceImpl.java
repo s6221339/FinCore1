@@ -439,7 +439,7 @@ public class BalanceServiceImpl implements BalanceService
 			
 //			檢查群組成員名單是否包含指定帳號
 			if(!flag)
-				if(family.getMemberList().contains(account))
+				if(family.toMemberList().contains(account))
 					flag = true;
 //			如果最後結果找不到則移除該群組
 			if(!flag)

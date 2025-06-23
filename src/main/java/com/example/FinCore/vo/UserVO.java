@@ -12,6 +12,8 @@ public record UserVO(
 		
 		LocalDate birthday,
 		
-		byte[] avatar) {
+		byte[] avatar,
+		
+		String role) {
 
 }

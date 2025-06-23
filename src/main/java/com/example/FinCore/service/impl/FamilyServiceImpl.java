@@ -15,6 +15,7 @@ import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
+import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.SimpleUserVO;
@@ -151,14 +152,33 @@ public class FamilyServiceImpl implements FamilyService {
 	public FamilyListResponse listAllFamily() throws JsonProcessingException {
 		List<Family> familyList = familyDao.selectAll();
 		List<FamilyVO> voList = new ArrayList<>();
-		for(Family family : familyList)
-		{
-			List<String> invitorList = family.toMemberList();
-			
-			FamilyVO vo = new FamilyVO(family.getId(), family.getName(), family.getOwner(), invitorList);
-			voList.add(vo);
+		for (Family family : familyList) {
+		    // 1. owner 是帳號，要查名字
+		    User ownerUser = userDao.selectById(family.getOwner());
+		    SimpleUserVO ownerVO = new SimpleUserVO(family.getOwner(), ownerUser != null ? ownerUser.getName() : null);
+
+		    // 2. invitorList: List<String> → List<SimpleUserVO>
+		    List<String> invitorList = family.toMemberList();
+		    List<SimpleUserVO> memberList = new ArrayList<>();
+		    if (invitorList != null) {
+		        for (String memberAccount : invitorList) {
+		            User memberUser = userDao.selectById(memberAccount);
+		            memberList.add(new SimpleUserVO(
+		                    memberAccount,
+		                    memberUser != null ? memberUser.getName() : null
+		            ));
+		        }
+		    }
+
+		    // 3. 用 SimpleUserVO 填入 FamilyVO
+		    FamilyVO vo = new FamilyVO(
+		        family.getId(),
+		        family.getName(),
+		        ownerVO,
+		        memberList // 或 memberdata，看你record定義
+		    );
+		    voList.add(vo);
 		}
-		
 		return new FamilyListResponse(ResponseMessages.SUCCESS, voList);
 	}
 

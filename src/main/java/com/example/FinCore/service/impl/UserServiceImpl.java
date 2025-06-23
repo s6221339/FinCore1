@@ -20,6 +20,7 @@ import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.FamilyVO;
+import com.example.FinCore.vo.SimpleUserVO;
 import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.RregisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
@@ -30,7 +31,6 @@ import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
@@ -163,46 +163,73 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserResponse getUser(String account) {
-		if (account == null || account.isEmpty()) {
-			return new UserResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-		}
-		User user = userDao.selectById(account);
-		if(user == null) {
-			return new UserResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
-		}
-		UserVO vo = new UserVO(user.getAccount(), user.getName(),
-				user.getPhone(), user.getBirthday(), user.getAvatar());
-		
-		return new UserResponse(ResponseMessages.SUCCESS, vo);
+	    if (account == null || account.isEmpty()) {
+	        return new UserResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
+	    User user = userDao.selectById(account);
+	    if (user == null) {
+	        return new UserResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
+
+	    // superAdmin 轉成 role 字串
+	    String role = user.isSuperAdmin() ? "admin" : "user";
+
+	    UserVO vo = new UserVO(
+	        user.getAccount(),
+	        user.getName(),
+	        user.getPhone(),
+	        user.getBirthday(),
+	        user.getAvatar(),
+	        role
+	    );
+	    return new UserResponse(ResponseMessages.SUCCESS, vo);
 	}
 
 	@Override
 	public FamilyListResponse getFamilyByAccount(String account) throws JsonProcessingException {
-		// 1. 檢查帳號有沒有填，沒填就直接回傳錯誤
+	    // 1. 檢查帳號有沒有填，沒填就直接回傳錯誤
 	    if (account == null || account.isEmpty()) {
 	        return new FamilyListResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 	    }
+
 	    // 2. 準備一個結果清單，把有關的家族資料都丟進去
-	    List<FamilyVO> voList = new ArrayList<FamilyVO>();
+	    List<FamilyVO> voList = new ArrayList<>();
 	    // 3. 從資料庫撈出所有家族，之後要一個一個檢查
-	    List<Family> familyList = familyDao.selectAllFamily(); // 取出所有家族
-	    // 4. 逐一檢查每個 family，看這個帳號是不是 owner 或 invitor
+	    List<Family> familyList = familyDao.selectAllFamily();
+
 	    for (Family family : familyList) {
 	        // 4-1. family 的 invitor 欄位是 JSON 字串，要先轉成 List 才能判斷
 	        List<String> invitorList = mapper.readValue(
 	                family.getInvitor(),
-	                new TypeReference<List<String>>() {});
-	        // 4-2. 判斷自己是不是這個家族的 owner
+	                new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
+
+	        // 4-2. 查 owner 的名字（如找不到顯示 null）
+	        User ownerUser = userDao.selectById(family.getOwner());
+	        SimpleUserVO ownerVO = new SimpleUserVO(family.getOwner(),
+	                ownerUser != null ? ownerUser.getName() : null);
+
+	        // 4-3. 組成成員物件清單
+	        List<SimpleUserVO> memberList = new ArrayList<>();
+	        if (invitorList != null) {
+	            for (String memberAccount : invitorList) {
+	                User memberUser = userDao.selectById(memberAccount);
+	                memberList.add(new SimpleUserVO(
+	                        memberAccount,
+	                        memberUser != null ? memberUser.getName() : null
+	                ));
+	            }
+	        }
+
+	        // 4-4. 判斷自己是不是 owner 或 invitor（只要有一項就加入回傳清單）
 	        boolean isOwner = account.equals(family.getOwner());
-	        // 4-3. 判斷自己是不是 invitor（家族成員）
 	        boolean isInvitor = invitorList != null && invitorList.contains(account);
-	        // 4-4. 只要有其中一個符合（是 owner 或是成員），就加進回傳清單
+
 	        if (isOwner || isInvitor) {
 	            FamilyVO vo = new FamilyVO(
-	                family.getId(),         // 家族編號
-	                family.getName(),       // 家族名稱
-	                family.getOwner(),      // 家族負責人
-	                invitorList             // 家族成員帳號清單
+	                    family.getId(),
+	                    family.getName(),
+	                    ownerVO,      // Owner 是物件
+	                    memberList    // 成員清單
 	            );
 	            voList.add(vo);
 	        }

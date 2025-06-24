@@ -32,6 +32,8 @@ public enum ResponseMessages
 	VERIFICATION_FAILED(400, "驗證失敗：驗證碼錯誤或已過期"),
 	PAYMENT_HAS_BEEN_DELETED(400, "該帳款已刪除"),
 	PAYMENT_PERIOD_UNABLE_MODIFYING(400, "無法變更該款項的週期"),
+	INVITATION_ALREADY_SENT(400, "成員已發出邀請，請勿重複邀請："),
+	INVITATION_ALREADY_ACCEPTED(400, "該邀請已被接受，無法重複操作！"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),
@@ -46,6 +48,7 @@ public enum ResponseMessages
 	INVITOR_NOT_FOUND(404, "邀請人帳號不存在"),
 	FAMLIY_NOT_FOUND(404, "查無此群組（家庭）！"),
 	TRANSFERS_NOT_FOUND(404, "查無此轉帳紀錄！"),
+	INVITATION_NOT_FOUND(404, "查無此邀請紀錄！"),
 
 	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定");
 	

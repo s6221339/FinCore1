@@ -13,13 +13,16 @@ import org.springframework.util.StringUtils;
 
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.FamilyDao;
+import com.example.FinCore.dao.FamilyInvitationDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
+import com.example.FinCore.entity.FamilyInvitation;
+import com.example.FinCore.entity.FamilyInvitationPK;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.SimpleUserVO;
-import com.example.FinCore.vo.request.AcceptInviteRequest;
+import com.example.FinCore.vo.request.InviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
@@ -50,49 +53,60 @@ public class FamilyServiceImpl implements FamilyService {
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private FamilyInvitationDao familyInvitationDao;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
 	@Transactional
 	public BasicResponse create(CreateFamilyRequest req) throws Exception {
-//		System.out.println(req);
-		// 1. 檢查必要欄位
-		if (req.getOwner() == null || req.getOwner().isEmpty()) {
-			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-		}
-		// 2. 成員不能重複
-		for (int i = 0; i < req.getInvitor().size(); i++) {
-			for (int j = i + 1; j < req.getInvitor().size(); j++) {
-				String itemA = req.getInvitor().get(i);
-				String itemB = req.getInvitor().get(j);
-				if (itemA.equals(itemB)) {
-					return new BasicResponse(ResponseMessages.DUPLICATE_FAMILY_MEMBERS);
-				}
-			}
-		}
-		// 3. 檢查帳號是否存在
-		if (!userDao.existsById(req.getOwner())) {
-			return new BasicResponse(ResponseMessages.OWNER_NOT_FOUND);
-		}
-		for (String member : req.getInvitor())
-			if (!userDao.existsById(member))
-				return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
+	    // 1. 檢查必要欄位
+	    if (req.getOwner() == null || req.getOwner().isEmpty()) {
+	        return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
+	    // 2. 成員不能重複
+	    for (int i = 0; i < req.getInvitor().size(); i++) {
+	        for (int j = i + 1; j < req.getInvitor().size(); j++) {
+	            String itemA = req.getInvitor().get(i);
+	            String itemB = req.getInvitor().get(j);
+	            if (itemA.equals(itemB)) {
+	                return new BasicResponse(ResponseMessages.DUPLICATE_FAMILY_MEMBERS);
+	            }
+	        }
+	    }
+	    // 3. 檢查帳號是否存在
+	    if (!userDao.existsById(req.getOwner())) {
+	        return new BasicResponse(ResponseMessages.OWNER_NOT_FOUND);
+	    }
+	    for (String member : req.getInvitor())
+	        if (!userDao.existsById(member))
+	            return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
 
-		// List轉String
-		String invitorStr = mapper.writeValueAsString(req.getInvitor());
+	    // List轉String
+	    String invitorStr = mapper.writeValueAsString(req.getInvitor());
+	    
+	    // 建立 Family 物件
+	    Family family = new Family();
+	    family.setOwner(req.getOwner());
+	    family.setName(req.getName());
+	    // 不要直接把受邀人設成 invitor
+	    family.setInvitor(null); // 成員清單先不加人
+	    family.setCreateDate(LocalDate.now());
 
-		// 4. 建立 Family 物件
-		Family family = new Family();
-		family.setOwner(req.getOwner());
-		family.setName(req.getName());
-		family.setInvitor(invitorStr);
-		family.setCreateDate(LocalDate.now());
+	    // 儲存資料庫
+	    familyDao.save(family);
+	    int familyId = family.getId();
 
-		// 5. 儲存資料庫
-		familyDao.save(family);
-		return new BasicResponse(ResponseMessages.SUCCESS);
+	    // 幫所有受邀成員建立 FamilyInvitation（邀請中狀態）
+	    for (String invitee : req.getInvitor()) {
+	        var br = createInvitation(invitee, familyId);
+	        if (br != null)
+	            return br;
+	    }
 
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 	@Override
@@ -185,33 +199,35 @@ public class FamilyServiceImpl implements FamilyService {
 	@Override
 	@Transactional
 	public BasicResponse inviteMember(InviteMemberRequest req) throws JsonProcessingException {
-		// 1. 查詢家族資料
-		Optional<Family> familyOpt = familyDao.findById(req.familyId());
-		if (familyOpt.isEmpty()) {
-			return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
-		}
-		Family family = familyOpt.get();// 取得家族 entity
-		// 2. 權限驗證
-		if (!family.getOwner().equals(req.owner())) {
-			return new BasicResponse(ResponseMessages.NO_PERMISSION);
-		}
+	    // 1. 查詢家族資料
+	    Optional<Family> familyOpt = familyDao.findById(req.familyId());
+	    if (familyOpt.isEmpty()) {
+	        return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
+	    }
+	    Family family = familyOpt.get();
 
-		Set<String> invitorSet = new HashSet<>(req.invitor());
+	    // 2. 權限驗證
+	    if (!family.getOwner().equals(req.owner())) {
+	        return new BasicResponse(ResponseMessages.NO_PERMISSION);
+	    }
 
-		// 3. 檢查 invitor 有沒有重複
-		if (invitorSet.size() != req.invitor().size()) {
-			return new BasicResponse(ResponseMessages.DUPLICATE_MEMBER);
-		}
-		// 4. 檢查 owner 不能出現在 invitor
-		if (invitorSet.contains(req.owner())) {
-			return new BasicResponse(ResponseMessages.DUPLICATE_MEMBER);
-		}
-		// 5. 檢查帳號是否都存在
-		int found = userDao.countByAccountIn(new ArrayList<>(invitorSet));
-		if (found < invitorSet.size()) {
-			return new BasicResponse(ResponseMessages.INVITOR_NOT_FOUND);
-		}
-		// 6. 取得目前成員清單（如果有）
+	    Set<String> invitorSet = new HashSet<>(req.invitor());
+
+	    // 3. 檢查 invitor 有沒有重複
+	    if (invitorSet.size() != req.invitor().size()) {
+	        return new BasicResponse(ResponseMessages.DUPLICATE_MEMBER);
+	    }
+	    // 4. 檢查 owner 不能出現在 invitor
+	    if (invitorSet.contains(req.owner())) {
+	        return new BasicResponse(ResponseMessages.DUPLICATE_MEMBER);
+	    }
+	    // 5. 檢查帳號是否都存在
+	    int found = userDao.countByAccountIn(new ArrayList<>(invitorSet));
+	    if (found < invitorSet.size()) {
+	        return new BasicResponse(ResponseMessages.INVITOR_NOT_FOUND);
+	    }
+
+	    // 6. 取得目前成員清單
 	    String invitorStr = family.getInvitor();
 	    List<String> currentList = new ArrayList<>();
 	    if (StringUtils.hasText(invitorStr)) {
@@ -228,24 +244,41 @@ public class FamilyServiceImpl implements FamilyService {
 	            return new BasicResponse(ResponseMessages.DUPLICATE_FAMILY_MEMBERS);
 	        }
 	    }
-	    currentList.addAll(req.invitor());
-
-	    // 查詢所有新被邀請人的名稱
+	 // 7. 發送邀請流程，只要有一個重複邀請就直接 return，不會做批次
 	    List<SimpleUserVO> inviteeInfoList = new ArrayList<>();
-	    for (String account : req.invitor()) {
-	        // 假設有 userDao.findNameByAccount(account)
-	        String name = userDao.findNameByAccount(account);
-	        inviteeInfoList.add(new SimpleUserVO(account, name));
+	    for (String invitee : req.invitor()) {
+	        BasicResponse br = createInvitation(invitee, req.familyId());
+	        if (br != null) {
+	            return br; // 只要有重複邀請就直接 return
+	        }
+	        String name = userDao.findNameByAccount(invitee);
+	        inviteeInfoList.add(new SimpleUserVO(invitee, name));
 	    }
 
-	    // 存回家族成員
-	    family.setInvitor(mapper.writeValueAsString(currentList));
-	    familyDao.save(family);
-
-	    // 封裝回傳
-	    return new InviteMemberResponse(ResponseMessages.SUCCESS.getCode(), ResponseMessages.SUCCESS.getMessage(), inviteeInfoList);
+	    // 8. 封裝回傳
+	    return new InviteMemberResponse(
+	        ResponseMessages.SUCCESS.getCode(),
+	        ResponseMessages.SUCCESS.getMessage(),
+	        inviteeInfoList
+	    );
 	}
-
+	
+	private BasicResponse createInvitation(String invitee, int familyId)
+    {
+		FamilyInvitationPK pk = new FamilyInvitationPK(invitee, familyId);
+    	if (familyInvitationDao.existsById(pk)) {
+            // 已存在邀請：直接回傳 null 或你可以回傳一個特殊的 Response（也可自訂錯誤訊息）
+            return new BasicResponse(ResponseMessages.INVITATION_ALREADY_SENT);
+        }
+    	FamilyInvitation invitation = new FamilyInvitation();
+    	invitation.setAccount(invitee);
+    	invitation.setFamilyId(familyId);
+    	invitation.setStatus(false);
+    	familyInvitationDao.save(invitation);
+    	return null;
+    }
+	
+	
 	@Override
 	@Transactional
 	public BasicResponse dismissFamily(DismissFamilyRequest req) {
@@ -586,72 +619,81 @@ public class FamilyServiceImpl implements FamilyService {
 
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
-
+	
 	@Override
 	@Transactional
-	public BasicResponse acceptInvite(AcceptInviteRequest req) throws JsonProcessingException {
-		// 檢查參數
-        if (req.getAccount() == null || req.getAccount().isEmpty()) {
-            return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-        }
+	public BasicResponse acceptInvite(InviteRequest req) {
+	    // 檢查參數
+	    if (req.getAccount() == null || req.getAccount().isEmpty()) {
+	        return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
 
-        // 查詢家族資料
-        Optional<Family> familyOptional = familyDao.findById(req.getFamilyId());
-        if (!familyOptional.isPresent()) {
-            return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
-        }
+	    // 查詢邀請紀錄
+	    FamilyInvitationPK pk = new FamilyInvitationPK(req.getAccount(), req.getFamilyId());
+	    Optional<FamilyInvitation> invitationOpt = familyInvitationDao.findById(pk);
+	    if (invitationOpt.isEmpty()) {
+	        return new BasicResponse(ResponseMessages.INVITATION_NOT_FOUND); // 你可以自訂訊息
+	    }
 
-        Family family = familyOptional.get();
+	    FamilyInvitation invitation = invitationOpt.get();
 
-        // 將邀請名單字串轉成 List
-        List<String> invitorList = family.toMemberList();
+	    // 狀態本來就接受過就直接 return
+	    if (invitation.isStatus()) {
+	        return new BasicResponse(ResponseMessages.INVITATION_ALREADY_ACCEPTED);
+	    }
 
-        // 確認帳號在邀請名單內
-        if (invitorList == null || !invitorList.contains(req.getAccount())) {
-            return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
-        }
+	    // 設定為已接受
+	    invitation.setStatus(true);
+	    familyInvitationDao.save(invitation);
 
-        // 從名單中移除該帳號
-        invitorList.remove(req.getAccount());
+	    // 加入 family 的 invitor 名單
+	    Optional<Family> familyOpt = familyDao.findById(req.getFamilyId());
+	    if (familyOpt.isEmpty()) {
+	        return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
+	    }
+	    Family family = familyOpt.get();
 
-        // 更新家族資料
-        family.setInvitor(mapper.writeValueAsString(invitorList));
-        familyDao.save(family);
+	    // 取得成員清單
+	    List<String> invitorList = new ArrayList<>();
+	    String invitorStr = family.getInvitor();
+	    if (StringUtils.hasText(invitorStr)) {
+	        try {
+	            invitorList = family.toMemberList();
+	        } catch (Exception e) {
+	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	        }
+	    }
+	    if (!invitorList.contains(req.getAccount())) {
+	        invitorList.add(req.getAccount());
+	        try {
+	            family.setInvitor(mapper.writeValueAsString(invitorList));
+	            familyDao.save(family);
+	        } catch (Exception e) {
+	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	        }
+	    }
 
-        return new BasicResponse(ResponseMessages.SUCCESS);
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
-
+	
 	@Override
 	@Transactional
-	public BasicResponse rejectInvite(AcceptInviteRequest req) throws JsonProcessingException {
-		// 檢查參數
-        if (req.getAccount() == null || req.getAccount().isEmpty()) {
-            return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-        }
+	public BasicResponse rejectInvite(InviteRequest req) {
+	    // 檢查參數
+	    if (req.getAccount() == null || req.getAccount().isEmpty()) {
+	        return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
 
-        // 查詢家族資料
-        Optional<Family> familyOptional = familyDao.findById(req.getFamilyId());
-        if (!familyOptional.isPresent()) {
-            return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
-        }
+	    // 查詢邀請紀錄
+	    FamilyInvitationPK pk = new FamilyInvitationPK(req.getAccount(), req.getFamilyId());
+	    Optional<FamilyInvitation> invitationOpt = familyInvitationDao.findById(pk);
+	    if (invitationOpt.isEmpty()) {
+	        return new BasicResponse(ResponseMessages.INVITATION_NOT_FOUND); // 你可以自訂訊息
+	    }
 
-        Family family = familyOptional.get();
+	    // 刪除該邀請
+	    familyInvitationDao.deleteById(pk);
 
-        // 將邀請名單字串轉成 List
-        List<String> invitorList = family.toMemberList();
-
-        // 確認帳號在邀請名單內
-        if (invitorList == null || !invitorList.contains(req.getAccount())) {
-            return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
-        }
-
-        // 從名單中移除該帳號
-        invitorList.remove(req.getAccount());
-
-        // 更新家族資料
-        family.setInvitor(mapper.writeValueAsString(invitorList));
-        familyDao.save(family);
-
-        return new BasicResponse(ResponseMessages.SUCCESS);
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 }

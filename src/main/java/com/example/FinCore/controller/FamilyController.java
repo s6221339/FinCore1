@@ -13,6 +13,7 @@ import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
 import com.example.FinCore.vo.request.InviteMemberRequest;
+import com.example.FinCore.vo.request.InviteRequest;
 import com.example.FinCore.vo.request.KickMemberRequest;
 import com.example.FinCore.vo.request.OwnerResignAndAssignRequest;
 import com.example.FinCore.vo.request.QuitFamilyRequest;
@@ -224,38 +225,48 @@ public class FamilyController {
 		return service.renameFamily(req);
 	}
 	
-	//尚未測試，不一定會用到
-//	@PostMapping(value = "acceptInvite")
-//	@Operation(
-//		    summary = ApiDocConstants.FAMILY_ACCEPT_INVITE_SUMMARY,
-//    		description = ApiDocConstants.FAMILY_RENAME_DESC,
-//		    method = "POST",
-//		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-//		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
-//		)
-//		@ApiResponses({
-//		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-//		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
-//		})
-//	public BasicResponse acceptInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
-//	    return service.acceptInvite(req);
-//	}
-
-	//尚未測試，不一定會用到
-//	@PostMapping(value = "rejectInvite")
-//	@Operation(
-//		    summary = ApiDocConstants.FAMILY_ACCEPT_INVITE_DESC,
-//			description = ApiDocConstants.FAMILY_REJECT_INVITE_DESC,
-//		    method = "POST",
-//		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-//		    (description = ApiDocConstants.FAMILY_REQUEST_BODY_RULE)
-//		)
-//		@ApiResponses({
-//		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-//		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_EXIST)
-//		})
-//	public BasicResponse rejectInvite(@Valid @RequestBody AcceptInviteRequest req) throws JsonProcessingException {
-//	    return service.rejectInvite(req);
-//	}
+	 /**
+     * 接受邀請加入家庭群組
+	 * @throws JsonProcessingException 
+     */
+    @PostMapping(value = "acceptInvite")
+    @Operation(
+    	    summary = ApiDocConstants.FAMILY_INVITATION_ACCEPT_SUMMARY,
+    	    description = ApiDocConstants.FAMILY_INVITATION_ACCEPT_DESC,
+    	    method = "POST",
+    	    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+    	        description = "接受邀請請求，規則：" + ApiDocConstants.FAMILY_INVITATION_ACCEPT_REQUEST_BODY_RULE
+    	    )
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITATION_ACCEPT_RESPONSE_400),
+    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITATION_ACCEPT_RESPONSE_404),
+    	})
+    public BasicResponse acceptInvite(@Valid@RequestBody InviteRequest req) throws JsonProcessingException {
+        return service.acceptInvite(req);
+    }
+    
+    /**
+     * 拒絕邀請加入家庭群組
+     * @throws JsonProcessingException 
+     */
+    @PostMapping(value = "rejectInvite")
+    @Operation(
+    	    summary = ApiDocConstants.FAMILY_INVITATION_REJECT_SUMMARY,
+    	    description = ApiDocConstants.FAMILY_INVITATION_REJECT_DESC,
+    	    method = "POST",
+    	    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+    	        description = "拒絕邀請請求，規則：" + ApiDocConstants.FAMILY_INVITATION_REJECT_REQUEST_BODY_RULE
+    	    )
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.INVITATION_NOT_FOUND),
+    	})
+    public BasicResponse rejectInvite(@Valid@RequestBody InviteRequest req) throws JsonProcessingException {
+        return service.rejectInvite(req);
+    }
 
 }

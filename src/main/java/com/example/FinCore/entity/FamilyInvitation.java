@@ -3,6 +3,7 @@ package com.example.FinCore.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 /**
@@ -12,6 +13,7 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "family_invitation")
+@IdClass(FamilyInvitationPK.class)
 public class FamilyInvitation {
 	
 	@Id

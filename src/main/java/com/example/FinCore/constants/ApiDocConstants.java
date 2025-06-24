@@ -62,6 +62,10 @@ public final class ApiDocConstants
     
     public final static String FAMILY_TRANSFER_OWNER_SUMMARY = "owner 轉讓家族權限";
     
+    public static final String FAMILY_INVITATION_ACCEPT_SUMMARY = "接受家族邀請";
+    	
+    public static final String FAMILY_INVITATION_REJECT_SUMMARY = "拒絕家族邀請";
+    
     public final static String FAMILY_INVITE_SUMMARY = "邀請新成員加入家族";
     
     public final static String USER_REGISTER_SUMMARY = "註冊新會員";
@@ -169,6 +173,10 @@ public final class ApiDocConstants
     public final static String FAMILY_TRANSFER_OWNER_DESC = "現任 owner 可將家族擁有權限轉讓給現有成員，原 owner 轉為一般成員<br>";
     
     public final static String FAMILY_INVITE_DESC = "由家族 owner 邀請新成員加入家族，會將對方帳號加入家族邀請名單<br>";
+    
+    public static final String FAMILY_INVITATION_ACCEPT_DESC = "用戶接受家族邀請，將邀請紀錄標記為已接受並加入家族群組。<br>";
+    
+    public static final String FAMILY_INVITATION_REJECT_DESC = "用戶拒絕家族邀請，會直接刪除邀請紀錄。<br>";
     
     public final static String USER_REGISTER_DESC = "建立一個會員資料，註冊的會員帳號不可重複<br>";
     
@@ -315,6 +323,18 @@ public final class ApiDocConstants
 			+ "<li>由家庭owner更新家族名稱</li>"
 			+ "<li>家庭編號、家庭owner不得為空</li>"
 			+ "</ul>";
+	
+	public static final String FAMILY_INVITATION_ACCEPT_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>account：必填，使用者帳號</li>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_INVITATION_REJECT_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>account：必填，使用者帳號</li>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "</ul>";
 
 	/* === 各種錯誤訊息，多條同代碼訊息使用<li>或<ol>包覆 === 
 	 * === 同代碼訊息命名格式：「API名稱_方法_RESPONSE_代碼」格式 ===
@@ -375,6 +395,19 @@ public final class ApiDocConstants
 			+ "<li>查無此群組（家庭）！</li>"
 			+ "<li>查無此帳號！</li>"
 			+ "</ol>";
+	
+	public static final String FAMILY_INVITATION_ACCEPT_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>缺少必要欄位</li>" +
+		    "<li>該邀請已被接受，無法重複操作！</li>" +
+		    "<li>更新家族群組失敗</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_INVITATION_ACCEPT_RESPONSE_404 =
+		    "<ul>" +
+		    "<li>查無此邀請紀錄！</li>" +
+		    "<li>家族群組不存在</li>" +
+		    "</ul>";
 
 	public final static String PARAM_FORMAT_ERROR = "參數格式錯誤";
 	
@@ -387,6 +420,8 @@ public final class ApiDocConstants
 	public final static String FAMILY_CREATE_FAIL = "家庭群族新增失敗";
 	
 	public static final String MISSING_REQUIRED_FIELD = "缺少必要欄位";
+	
+	public static final String INVITATION_NOT_FOUND = "查無此邀請紀錄！";
 	
 	/* === 成功訊息 === */
 	

@@ -3,9 +3,11 @@ package com.example.FinCore.service.itfc;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.RecoveryPaymentRequest;
+import com.example.FinCore.vo.request.StatisticsRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
+import com.example.FinCore.vo.response.StatisticsResponse;
 
 public interface PaymentService 
 {
@@ -60,5 +62,14 @@ public interface PaymentService
 	 * @return 存放款項資料的回應資料
 	 */
 	public SearchPaymentResponse getDeletedPayment(String account);
+	
+	/**
+	 * 查看帳號在指定年月的帳款統計。
+	 * @param account 帳號
+	 * @param year 指定年
+	 * @param month 指定月，若設為 0 將無視月，會傳回一整年的資料
+	 * @return 帳款統計
+	 */
+	public StatisticsResponse statistics(StatisticsRequest req);
 	
 }

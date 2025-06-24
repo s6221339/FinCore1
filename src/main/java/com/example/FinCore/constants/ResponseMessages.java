@@ -46,7 +46,8 @@ public enum ResponseMessages
 	INVITOR_NOT_FOUND(404, "邀請人帳號不存在"),
 	FAMLIY_NOT_FOUND(404, "查無此群組（家庭）！"),
 	TRANSFERS_NOT_FOUND(404, "查無此轉帳紀錄！"),
-
+	
+	NULL_ACCOUNT(500, "account 傳參空白！"),
 	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定");
 	
 	private int code;

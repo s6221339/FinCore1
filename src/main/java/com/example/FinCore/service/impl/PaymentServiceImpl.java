@@ -11,23 +11,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
+import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.entity.Balance;
+import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.Payment;
 import com.example.FinCore.service.itfc.PaymentService;
+import com.example.FinCore.vo.BalanceInfoVO;
 import com.example.FinCore.vo.BalanceWithPaymentVO;
+import com.example.FinCore.vo.FamilyInfoVO;
+import com.example.FinCore.vo.PaymentAmountVO;
 import com.example.FinCore.vo.PaymentInfoVO;
 import com.example.FinCore.vo.RecurringPeriodVO;
+import com.example.FinCore.vo.StatisticsInfoVO;
+import com.example.FinCore.vo.StatisticsVO;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.RecoveryPaymentRequest;
+import com.example.FinCore.vo.request.StatisticsRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
+import com.example.FinCore.vo.response.StatisticsResponse;
 
 import jakarta.transaction.Transactional;
 
@@ -47,6 +58,9 @@ public class PaymentServiceImpl implements PaymentService
 	
 	@Autowired
 	private SavingsDao savingsDao;
+	
+	@Autowired
+	private FamilyDao familyDao;
 
 	@Override
 	@Transactional(rollbackOn = Exception.class)
@@ -299,6 +313,223 @@ public class PaymentServiceImpl implements PaymentService
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, result);
 	}
 	
+	@Override
+	public StatisticsResponse statistics(StatisticsRequest req) 
+	{
+		if(!userDao.existsById(req.account()))
+			return new StatisticsResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		/* 最終統計列表 */
+		List<StatisticsVO> statisticsList = new ArrayList<>();
+		
+//		取得與帳號關聯的所有帳戶
+		List<Balance> balanceFromAccountList = balanceDao.getAllBalanceByAccount(req.account());
+		
+//		取得與群組關聯的所有帳戶
+		List<Family> allFamilyList = familyDao.findAll();
+		List<Family> familyList = new ArrayList<>();
+		List<Integer> familyIdList = new ArrayList<>();
+		allFamilyList.forEach(family -> {
+			if(family.isMember(req.account()))
+				familyList.add(family);
+		});
+		Map<Integer, String> familyMap = new HashMap<>();
+		familyList.forEach(t -> {
+			familyIdList.add(t.getId());
+			familyMap.put(t.getId(), t.getName());
+		});
+		List<Balance> balanceFromFamilyList = balanceDao.getAllBalanceByFamilyIdList(familyIdList);
+		var balanceList = balanceFromAccountList;
+		
+//		合併帳號與群組的帳戶，並依照帳戶編號排序
+		balanceList.addAll(balanceFromFamilyList);
+		balanceList.sort((o1, o2) -> o1.getBalanceId() - o2.getBalanceId());
+		List<Integer> balanceIdList = new ArrayList<>();
+		Map<Integer, String> balanceMap = new HashMap<>();
+		balanceList.forEach(balance -> {
+			balanceIdList.add(balance.getBalanceId());
+			balanceMap.put(balance.getBalanceId(), balance.getName());
+		});
+//		綁定 BalanceInfoVO 和 FamilyInfoVO
+		Map<BalanceInfoVO, FamilyInfoVO> infoMap = new HashMap<>();
+		setInfoMap(infoMap, balanceList, familyList);
+		
+//		取得這些帳戶保存的所有款項
+		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
+		
+//		如果月份指定 1~12 月，就針對該設定進行篩選
+//		如果不指定則僅篩選該年分的所有款項
+		List<Payment> filtedPaymentList = new ArrayList<>();
+		if(req.month() < 1 || req.month() > 12)
+		{
+			paymentList.forEach(payment -> {
+				if(!payment.isDeleted() && payment.isOnTime(req.year()))
+					filtedPaymentList.add(payment);
+			});
+//			只篩選年份的款項須考慮月份排序問題
+			filtedPaymentList.sort((o1, o2) -> o1.getMonth() - o2.getMonth());
+		}
+		else
+		{
+			paymentList.forEach(payment -> {
+				if(!payment.isDeleted() && payment.isOnTime(req.year(), req.month()))
+					filtedPaymentList.add(payment);
+			});
+		}
+		
+		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year());
+		return new StatisticsResponse(ResponseMessages.SUCCESS, statisticsList);
+	}
+	
+	/** 
+	 * 設定 infoMap，藉此綁定 BalanceInfoVO 和 FamilyInfoVO
+	 */
+	private void setInfoMap(
+			Map<BalanceInfoVO, FamilyInfoVO> infoMap, 
+			List<Balance> balanceList,
+			List<Family> familyList
+			)
+	{
+		for(Balance b : balanceList)
+		{
+			BalanceInfoVO bInfo = new BalanceInfoVO(b.getBalanceId(), b.getName());
+			
+			int familyId = b.getFamliyId();
+			String familyName = "";
+//			如果該帳戶源自於一個群組，則該群組編號不為0
+			if(familyId != 0)
+			{
+//				尋找對應的群組資料，通常能保證可找到對應的群組
+				for(Family f : familyList)
+					if(f.getId() == familyId)
+					{
+						familyName = f.getName();
+						break;
+					}
+				FamilyInfoVO fInfo = new FamilyInfoVO(familyId, familyName);
+//				將設定後的 bInfo 和 fInfo 設定至映射表
+//				特別地，如果發生意外－familyList 中找不到對應的群組資料，則不進行設定
+				if(StringUtils.hasText(familyName))
+					infoMap.put(bInfo, fInfo);
+				else
+					infoMap.put(bInfo, null);
+			}
+			else
+//				如果該帳戶不屬於群組，則不存在群組資料
+				infoMap.put(bInfo, null);
+		}
+	}
+	
+	/**
+	 * 處理 statisticsVO 列表的方法
+	 * @param paymentList
+	 * @param infoMap
+	 * @param year
+	 * @return
+	 */
+	private List<StatisticsVO> statisticsVOFactory(
+			List<Payment> paymentList, 
+			Map<BalanceInfoVO, FamilyInfoVO> infoMap,
+			int year)
+	{
+		List<StatisticsVO> result = new ArrayList<>();
+//		該映射表存放月分與分析資料
+		Map<Integer, List<StatisticsInfoVO>> statisticsInfoVOMap = new HashMap<>();
+		Map<String, Integer> paymentAmountMap = new HashMap<>();
+		
+		for(Payment payment : paymentList)
+		{
+			int month = payment.getMonth();
+			List<StatisticsInfoVO> statisticsInfoVOList = 
+					statisticsInfoVOMap.containsKey(month) ? statisticsInfoVOMap.get(month) : new ArrayList<>();
+
+//			設定帳戶資訊與群組資訊
+			BalanceInfoVO bInfo = null;
+			FamilyInfoVO fInfo = null;
+			for(Entry<BalanceInfoVO, FamilyInfoVO> infoEntry : infoMap.entrySet())
+			{
+				var k = infoEntry.getKey();
+				var v = infoEntry.getValue();
+//				通常可保證執行，因為每筆帳款必定源自某個帳戶
+				if(payment.getBalanceId() == k.id())
+				{
+					bInfo = k;
+					fInfo = v;
+					break;
+				}
+			}
+			
+			StatisticsInfoVO sInfo = null;
+//			檢查 statisticsInfoVOList 是否已存在資料
+			for(StatisticsInfoVO sInfoVO : statisticsInfoVOList)
+			{
+				if(sInfoVO.balanceInfo().id() == bInfo.id())
+				{
+//					如果統計資料儲存的帳戶資訊與該帳款的帳戶資訊一致就設值
+					sInfo = sInfoVO;
+					break;
+				}
+			}
+			if(sInfo != null)
+			{
+//				找到資料時執行
+				var paymentAmountVOList = sInfo.paymentAmountList();
+				String type = payment.getType();
+				int amount = payment.getAmount();
+//				檢查是否有相同類型的款項統計資料
+				PaymentAmountVO paymentAmount = null;
+				for(PaymentAmountVO paVO : paymentAmountVOList)
+				{
+					if(paVO.type().equals(type))
+					{
+						paymentAmount = paVO;
+						break;
+					}
+				}
+				if(paymentAmount != null)
+				{
+//					如果發現相同類型：
+//					將統計金額累計，將原本的資料刪除，重新增加新的帳款資料
+					paymentAmountVOList.remove(paymentAmount);
+					paymentAmount = new PaymentAmountVO(type, paymentAmount.totalAmount() + amount);
+				}
+				else
+				{
+//					如果是新的類型：
+//					直接新增新資料
+					paymentAmount = new PaymentAmountVO(type, amount);
+				}
+//				設定款項統計列表與映射表
+				paymentAmountVOList.add(paymentAmount);
+				paymentAmountMap.put(type, amount);
+//				設定統計資料
+				sInfo = new StatisticsInfoVO(bInfo, fInfo, paymentAmountVOList);
+			}
+			else
+			{
+//				找不到對應資料
+//				抽取帳款資料（類型與金額）
+				String type = payment.getType();
+				int amount = payment.getAmount();
+//				初始化資料並加入陣列中
+				var paymentAmount = new PaymentAmountVO(type, amount);
+				List<PaymentAmountVO> paymentAmountVOList = new ArrayList<>();
+				paymentAmountVOList.add(paymentAmount);
+				paymentAmountMap.put(type, amount);
+//				設定帳款資料
+				sInfo = new StatisticsInfoVO(bInfo, fInfo, paymentAmountVOList);
+			}
+			statisticsInfoVOList.add(sInfo);
+			statisticsInfoVOMap.put(month, statisticsInfoVOList);
+		}
+		for(Entry<Integer, List<StatisticsInfoVO>> statisticsInfoVOEntry : statisticsInfoVOMap.entrySet())
+		{
+			StatisticsVO statisticsVO = new StatisticsVO(year, statisticsInfoVOEntry.getKey(), statisticsInfoVOEntry.getValue());
+			result.add(statisticsVO);
+		}
+		return result;
+	}
+
 	/**
 	 * 每日凌晨 3 點執行的排程任務，用於自動建立下一筆尚未記錄的循環帳款。
 	 * <p>

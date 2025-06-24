@@ -13,9 +13,11 @@ import com.example.FinCore.service.itfc.PaymentService;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
 import com.example.FinCore.vo.request.RecoveryPaymentRequest;
+import com.example.FinCore.vo.request.StatisticsRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
+import com.example.FinCore.vo.response.StatisticsResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -161,6 +163,24 @@ public class PaymentController
 	public SearchPaymentResponse getDeletedPayment(@RequestParam("account") String account) 
 	{
 		return service.getDeletedPayment(account);
+	}
+	
+	@PostMapping(value = "statistics")
+	@Operation(
+			summary = ApiDocConstants.PAYMENT_STATISTICS_SUMMARY,
+			description = ApiDocConstants.PAYMENT_STATISTICS_DESC + ApiDocConstants.TEST_PASS,
+			method = "POST",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+				description = "查詢統計資料的請求格式，規則：" + ApiDocConstants.PAYMENT_STATISTICS_REQUEST_BODY_RULE
+			)
+		)
+		@ApiResponses({
+			@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+		})
+	public StatisticsResponse statistics(@Valid @RequestBody StatisticsRequest req) 
+	{
+		return service.statistics(req);
 	}
 	
 }

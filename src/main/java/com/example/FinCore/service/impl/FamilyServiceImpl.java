@@ -151,7 +151,7 @@ public class FamilyServiceImpl implements FamilyService {
 		List<FamilyVO> voList = new ArrayList<>();
 		for(Family family : familyList)
 		{
-			List<String> invitorList = family.getMemberList();
+			List<String> invitorList = family.toMemberList();
 			
 			FamilyVO vo = new FamilyVO(family.getId(), family.getName(), family.getOwner(), invitorList);
 			voList.add(vo);
@@ -194,7 +194,7 @@ public class FamilyServiceImpl implements FamilyService {
 		List<String> currentList = new ArrayList<>();
 		if (StringUtils.hasText(invitorStr)) {
 		    try {
-		        currentList = family.getMemberList();
+		        currentList = family.toMemberList();
 		    } catch (Exception e) {
 		        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 		    }
@@ -259,7 +259,7 @@ public class FamilyServiceImpl implements FamilyService {
 		ObjectMapper mapper = new ObjectMapper();
 		List<String> invitorList;
 		try {
-			invitorList = family.getMemberList();
+			invitorList = family.toMemberList();
 		} catch (Exception e) {
 			return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 		}
@@ -315,7 +315,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    String invitorStr = family.getInvitor();
 	    if (!inFamily && invitorStr != null && !invitorStr.isEmpty()) {
 	        try {
-	            List<String> invitorList = family.getMemberList();
+	            List<String> invitorList = family.toMemberList();
 	            if (invitorList.contains(req.getOldOwner())) {
 	                inFamily = true;
 	            }
@@ -339,7 +339,7 @@ public class FamilyServiceImpl implements FamilyService {
 	        if (invitorStr != null && !invitorStr.isEmpty()) {
 	            List<String> invitorList;
 	            try {
-	                invitorList = family.getMemberList();
+	                invitorList = family.toMemberList();
 	            } catch (Exception e) {
 	                return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	            }
@@ -365,7 +365,7 @@ public class FamilyServiceImpl implements FamilyService {
 	        if (invitorStr != null && !invitorStr.isEmpty()) {
 	            List<String> invitorList;
 	            try {
-	                invitorList = family.getMemberList();
+	                invitorList = family.toMemberList();
 
 	            } catch (Exception e) {
 	                return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
@@ -417,7 +417,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    List<String> invitorList = null;
 	    if (!inFamily && invitorStr != null && !invitorStr.isEmpty()) {
 	        try {
-	            invitorList = family.getMemberList();
+	            invitorList = family.toMemberList();
 	            if (invitorList.contains(req.getOldOwner())) {
 	                inFamily = true;
 	            }
@@ -446,7 +446,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    // 取得 invitorList，如果沒取過就初始化
 	    if (invitorList == null) {
 	        try {
-	            invitorList = family.getMemberList();
+	            invitorList = family.toMemberList();
 	        } catch (Exception e) {
 	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	        }
@@ -514,7 +514,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    ObjectMapper mapper = new ObjectMapper();
 	    List<String> invitorList;
 	    try {
-	        invitorList = family.getMemberList();
+	        invitorList = family.toMemberList();
 	    } catch (Exception e) {
 	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	    }
@@ -574,7 +574,7 @@ public class FamilyServiceImpl implements FamilyService {
         Family family = familyOptional.get();
 
         // 將邀請名單字串轉成 List
-        List<String> invitorList = family.getMemberList();
+        List<String> invitorList = family.toMemberList();
 
         // 確認帳號在邀請名單內
         if (invitorList == null || !invitorList.contains(req.getAccount())) {
@@ -608,7 +608,7 @@ public class FamilyServiceImpl implements FamilyService {
         Family family = familyOptional.get();
 
         // 將邀請名單字串轉成 List
-        List<String> invitorList = family.getMemberList();
+        List<String> invitorList = family.toMemberList();
 
         // 確認帳號在邀請名單內
         if (invitorList == null || !invitorList.contains(req.getAccount())) {

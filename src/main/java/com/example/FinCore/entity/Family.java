@@ -89,7 +89,7 @@ public class Family {
 	 * 將 invitor 屬性轉回成員列表並返回。
 	 * @return 成員列表
 	 */
-	public List<String> getMemberList()
+	public List<String> toMemberList()
 	{
 		try 
 		{
@@ -117,5 +117,20 @@ public class Family {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 檢查指定帳號是否為群組成員的一份子。
+	 * @param account 指定帳號
+	 * @return 如果該帳號為群組管理者或存在於成員名單中就返回 {@code TRUE}
+	 */
+	public boolean isMember(String account)
+	{
+		List<String> memberList = toMemberList();
+		if(owner.equals(account) || memberList.contains(account))
+			return true;
+		
+		return false;
+	}
+	
 
 }

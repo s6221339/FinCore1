@@ -119,8 +119,8 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	 */
 	@Transactional
 	@Modifying
-	@Query(value = "delete from payment where delete_date = ?1", nativeQuery = true)
-	public void deleteByMatchingDeleteDate(int date);
+	@Query(value = "delete from payment where payment_id in (?1)", nativeQuery = true)
+	public void deleteByPaymentIdList(List<Integer> paymentIdList);
 	
 	/**
 	 * 在特定帳戶下，取得指定年的所有款項紀錄。

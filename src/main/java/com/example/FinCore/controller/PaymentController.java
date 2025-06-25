@@ -183,4 +183,28 @@ public class PaymentController
 		return service.statistics(req);
 	}
 	
+	@PostMapping(value = "disable/scheduledCreate")
+	@Operation(
+			summary = ApiDocConstants.PAYMENT_SCHEDULED_CREATE_SUMMARY,
+			description = ApiDocConstants.PAYMENT_SCHEDULED_CREATE_DESC + ApiDocConstants.INTERNAL_ONLY,
+			method = "POST",
+			hidden = true
+		)
+	public final void scheduledCreate() throws Exception
+	{
+		throw new UnsupportedOperationException("此 API 無法被呼叫！");
+	}
+	
+	@PostMapping(value = "disable/scheduledDelete")
+	@Operation(
+			summary = ApiDocConstants.PAYMENT_SCHEDULED_DELETE_SUMMARY,
+			description = ApiDocConstants.PAYMENT_SCHEDULED_DELETE_DESC + ApiDocConstants.INTERNAL_ONLY,
+			method = "POST",
+			hidden = true
+		)
+	public final void scheduledDelete()
+	{
+		throw new UnsupportedOperationException("此 API 無法被呼叫！");
+	}
+	
 }

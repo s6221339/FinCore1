@@ -41,6 +41,10 @@ public final class ApiDocConstants
 	public static final String BALANCE_UPDATE_SUMMARY = "更新帳戶名稱與當月儲蓄";
 
 	public static final String BALANCE_DELETE_SUMMARY = "刪除帳戶資料";
+	
+	public static final String PAYMENT_SCHEDULED_CREATE_SUMMARY = "排程建立下一筆循環帳款（內部任務）";
+	
+	public static final String PAYMENT_SCHEDULED_DELETE_SUMMARY = "排程永久刪除帳款資料（內部任務）";
 
 	public final static String FAMILY_CREATE_SUMMARY = "建立家族";
 
@@ -93,8 +97,8 @@ public final class ApiDocConstants
     public static final String USER_GET_NAME_BY_ACCOUNT_SUMMARY = "查詢會員名稱";
     
     public static final String USER_LOGOUT_SUMMARY = "會員登出";
-	
-	/* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
+    
+    /* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
 	
 	public final static String PAYMENT_TYPE_CREATE_DESC = "建立一筆新的分類與細項，不允許使用者新增完全重複的類型與項目。<br>";
@@ -146,6 +150,18 @@ public final class ApiDocConstants
 	public static final String PAYMENT_STATISTICS_DESC =
 			"根據指定帳號與時間範圍，統計該帳號下所有個人及家庭帳戶的款項資料，依月份與類型分類統計。<br>";
 
+	public static final String PAYMENT_SCHEDULED_CREATE_DESC =
+    		"每天凌晨自動執行的排程任務，根據循環帳款規則建立下一筆尚未記錄的款項。<br>"
+    		+ "篩選條件包括：未刪除、有效週期、當前時間符合周期起點。符合者將自動產生下一筆紀錄。<br>";
+
+	public static final String PAYMENT_SCHEDULED_DELETE_DESC =
+			"每天凌晨執行的清除任務，將資料庫中「已被標記為刪除」且「壽命已歸零」的帳款資料永久移除。<br>"
+			+ "刪除條件如下：<ul>"
+			+ "<li>該帳款已標記刪除</li>"
+			+ "<li>剩餘生命週期少於0</li>"
+			+ "</ul>"
+			+ "完全符合者將由系統自動清除，確保資料庫穩定性與正確性。<br>";
+	
 	public static final String BALANCE_CREATE_DESC = 
 			"可新增個人或家庭帳戶。帳戶需指定所屬對象，且不可同時指定家庭與使用者帳號。<br>";
 
@@ -207,7 +223,7 @@ public final class ApiDocConstants
     
     public static final String USER_LOGOUT_DESC = "會員進行登出動作。RESTful 架構多為前端刪除 token，若需強制登出請配合 session 或 token blacklist。<br>";
 
-	/* === 請求資料規則，多條規則使用<ul>標籤 === 
+    /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
 
 	public final static String USER_REGISTER_REQUEST_BODY_RULE = "<ul>"
@@ -435,6 +451,8 @@ public final class ApiDocConstants
 	
 	public static final String INVITATION_NOT_FOUND = "查無此邀請紀錄！";
 	
+	public static final String INTERNAL_ONLY = "<b>此 API 為系統排程用途，不可由前端或第三方呼叫！</b><br>";
+    
 	/* === 成功訊息 === */
 	
 	public final static String CREATE_SUCCESS = "新增成功";

@@ -260,6 +260,9 @@ public class Payment
 	
 	/**
 	 * 檢查該款項記帳日期與傳入的「年月日」是否一致。
+	 * @param year 指定年
+	 * @param month 指定月
+	 * @param day 指定日
 	 * @see Payment#isOnTime(int, int)
 	 * @see Payment#isOnTime(int)
 	 */
@@ -270,6 +273,8 @@ public class Payment
 	
 	/**
 	 * 檢查該款項記帳日期與傳入的「年月」是否一致。
+	 * @param year 指定年
+	 * @param month 指定月
 	 * @see Payment#isOnTime(int, int, int)
 	 * @see Payment#isOnTime(int)
 	 */
@@ -280,6 +285,7 @@ public class Payment
 	
 	/**
 	 * 檢查該款項記帳日期與傳入的「年」是否一致。
+	 * @param year 指定年
 	 * @see Payment#isOnTime(int, int, int)
 	 * @see Payment#isOnTime(int, int)
 	 */
@@ -526,6 +532,34 @@ public class Payment
 				+ recurringPeriodYear + ", recurringPeriodMonth=" + recurringPeriodMonth + ", recurringPeriodDay="
 				+ recurringPeriodDay + ", createDate=" + createDate + ", recordDate=" + recordDate + ", deleteDate="
 				+ deleteDate + ", year=" + year + ", month=" + month + ", day=" + day + "]";
+	}
+	
+	/**
+	 * 取得該款項的剩餘生命週期。<p>
+	 * 
+	 * 基本上，該屬性只會生效在「已刪除」的款項，對於未被刪除的款項永遠只會
+	 * 返回值 99。對於已刪除的款項，會計算從執行當下到刪除日期屬性的時間差，
+	 * 且為包含當下的生命週期。例如
+	 * <pre>
+	 * （如果已刪除）
+	 * LocalDate deleteDate = 2025-06-15;
+	 * LocalDate dateA = 2025-06-15;
+	 * lifeTime = 9
+	 * （如果未刪除）
+	 * lifeTime = 99
+	 * <pre>
+	 * @return
+	 */
+	public int getLifeTime()
+	{
+		int lifeTime = 99;
+		if(isDeleted())
+		{
+			LocalDate deleteDate = getDeleteDate();
+			LocalDate now = LocalDate.now();
+			lifeTime = (int) (deleteDate.toEpochDay() - now.toEpochDay()) + 10 - 1;
+		}
+		return lifeTime;
 	}
 	
 }

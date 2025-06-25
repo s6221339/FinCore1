@@ -268,13 +268,6 @@ public class PaymentServiceImpl implements PaymentService
 				payment.getRecurringPeriodMonth(), 
 				payment.getRecurringPeriodDay()
 				);
-		int lifeTime = -1;
-		if(payment.isDeleted())
-		{
-			LocalDate deleteDate = payment.getDeleteDate();
-			LocalDate now = LocalDate.now();
-			lifeTime = (int) (deleteDate.toEpochDay() - now.toEpochDay()) + 10 - 1;
-		}
 		var paymentInfo = new PaymentInfoVO(
 				payment.getPaymentId(),
 				payment.getDescription(), 
@@ -283,7 +276,7 @@ public class PaymentServiceImpl implements PaymentService
 				payment.getAmount(), 
 				period, 
 				payment.getRecordDate(),
-				lifeTime
+				payment.getLifeTime()
 				);
 		return paymentInfo;
 	}
@@ -537,7 +530,6 @@ public class PaymentServiceImpl implements PaymentService
 	 * <ul>
 	 *   <li>尚未被標記為刪除</li>
 	 *   <li>週期設定為有效</li>
-	 *   <li>記錄日為未來</li>
 	 *   <li>與當前日期 {@link LocalDate#now()} 為第一個週期位置（{@link Payment#isCloseDate(LocalDate)}）</li>
 	 * </ul>
 	 * 符合條件者若其循環時間已到（{@link Payment#isOnTime(int, int, int)}），
@@ -551,7 +543,6 @@ public class PaymentServiceImpl implements PaymentService
 	@Transactional(rollbackOn = Exception.class)
 	public void scheduledCreate() throws Exception
 	{
-//		System.out.println("循環");
 //		蒐集所有資料庫中的循環帳款
 		List<Payment> paymentList = paymentDao.getAllRecurringPayment();
 		for(Payment payment : paymentList)
@@ -594,6 +585,38 @@ public class PaymentServiceImpl implements PaymentService
 						);
 			}
 		}
+	}
+	
+	/**
+	 * 每日凌晨 3 點執行的排程任務，用於永久刪除符合條件的帳款資料。
+	 * <p>
+	 * 該任務會檢查所有帳款資料，過濾出以下兩種條件皆符合者：
+	 * <ul>
+	 *   <li>已被標記為刪除（{@link Payment#isDeleted()}）</li>
+	 *   <li>生命週期小於 0（{@link Payment#getLifeTime()}）</li>
+	 * </ul>
+	 * 此類資料視為「已刪除且無須保留」的紀錄，將透過 {@link PaymentDao#deleteByPaymentIdList(List)} 從資料庫中完全移除。
+	 * <p>
+	 * 本方法具備交易控制（{@link jakarta.transaction.Transactional}），可確保批次刪除的原子性。
+	 */
+	@Scheduled(cron = "0 0 3 * * ?")
+	@Transactional
+	public void scheduledDelete()
+	{
+		List<Payment> paymentList = paymentDao.findAll();
+		List<Payment> deletedPaymentList = new ArrayList<>();
+		/* 意旨蒐集所有生命週期為零的款項編號，被儲存在此列表的 
+		 * 款項都將永遠從資料庫中移除。 */
+		List<Integer> noLifePaymentIdList = new ArrayList<>();
+		paymentList.forEach(t -> {
+			if(t.isDeleted())
+				deletedPaymentList.add(t);
+		});
+		deletedPaymentList.forEach(t -> {
+			if(t.getLifeTime() < 0)
+				noLifePaymentIdList.add(t.getPaymentId());
+		});
+		paymentDao.deleteByPaymentIdList(noLifePaymentIdList);
 	}
 
 }

@@ -50,45 +50,45 @@ public final class ApiDocConstants
 
 	public static final String FAMILY_GET_BY_ID_SUMMARY = "查詢家族群組資訊";
 	
-	public final static String FAMILY_LIST_ALL_FAMILY_SUMMARY = "查詢所有家族";
+	public final static String FAMILY_LIST_ALL_FAMILY_SUMMARY = "查詢所有家族群組清單";
 	
-	public final static String FAMILY_DISSMISS_SUMMARY = "解散家族";
+	public static final String FAMILY_DISMISS_SUMMARY = "解散家族群組";
 	
-	public final static String FAMILY_KICK_SUMMARY = "踢出家族成員";
+	public static final String FAMILY_KICK_MEMBER_SUMMARY = "踢除家族成員";
 	
-	public final static String FAMILY_QUIT_SUMMARY = "退出家族";
+	public static final String FAMILY_QUIT_MEMBER_SUMMARY = "家族成員退出群組";
 	
-    public final static String FAMILY_RENAME_SUMMARY = "更改家族名稱";
+	public static final String FAMILY_RENAME_SUMMARY = "家族群組改名";
     
     public final static String FAMILY_ACCEPT_INVITE_SUMMARY = "接受家族邀請";
     
     public final static String FAMILY_REJECT_INVITE_SUMMARY = "拒絕家族邀請";
     
-    public final static String FAMILY_OWNER_QUIT_SUMMARY = "owner 退出家庭群組";
+    public static final String FAMILY_OWNER_QUIT_SUMMARY = "群組擁有者退位並指派新擁有者";
     
-    public final static String FAMILY_TRANSFER_OWNER_SUMMARY = "owner 轉讓家族權限";
+    public static final String FAMILY_TRANSFER_OWNER_SUMMARY = "群組擁有者權限轉讓";
     
     public static final String FAMILY_INVITATION_ACCEPT_SUMMARY = "接受家族邀請";
     	
     public static final String FAMILY_INVITATION_REJECT_SUMMARY = "拒絕家族邀請";
     
-    public final static String FAMILY_INVITE_SUMMARY = "邀請新成員加入家族";
+    public static final String FAMILY_INVITE_MEMBER_SUMMARY = "邀請家族新成員";
     
     public static final String FAMILY_INVITATION_LIST_SUMMARY = "查詢家族邀請中成員名單";
     
-    public final static String USER_REGISTER_SUMMARY = "註冊新會員";
+    public static final String USER_REGISTER_SUMMARY = "會員註冊";
     
-    public final static String USER_UPDATE_SUMMARY = "更新會員資料";
+    public static final String USER_UPDATE_SUMMARY = "會員資料更新";
     
-    public final static String USER_CANCEL_SUMMARY = "註銷會員資料";
+    public static final String USER_CANCEL_SUMMARY = "會員註銷";
     
-    public final static String USER_UPDATE_PW_SUMMARY = "更新會員密碼";
+    public static final String USER_UPDATE_PASSWORD_SUMMARY = "會員修改密碼";
     
-    public final static String USER_GET_USER_SUMMARY = "取得會員資料";
+    public static final String USER_GET_SUMMARY = "查詢會員基本資料";
     
-    public final static String USER_GET_FAMILY_BY_ACCOUNT_SUMMARY = "取得查詢會員在哪個家庭群組";
+    public static final String FAMILY_GET_BY_ACCOUNT_SUMMARY = "查詢會員所屬家族清單";
     
-    public final static String USER_LOGIN_SUMMARY = "會員登入";
+    public static final String USER_LOGIN_SUMMARY = "會員登入";
     
     public final static String USER_VERIFY_CODE_SEND_VERIFY_CODE_SUMMARY = "發送驗證信";
     
@@ -177,25 +177,25 @@ public final class ApiDocConstants
 	
 	public static final String FAMILY_GET_BY_ID_DESC = "根據 familyId 查詢家族群組詳細資訊<br>";;
 	
-	public final static String FAMILY_LIST_ALL_FAMILY_DESC = "回傳系統中所有家族的清單（可用於管理後台）<br>";
+	public final static String FAMILY_LIST_ALL_FAMILY_DESC = "查詢系統內所有家族群組，包含群組名稱、擁有者與成員資訊。<br>";
 	
-	public final static String FAMILY_DISSMISS_DESC = "由家族 owner 解散該家族，所有成員將退出<br>";
+	public static final String FAMILY_DISMISS_DESC = "群組擁有者可解散指定的家族群組，並自動刪除所有邀請資料。<br>";
 	
-	public final static String FAMILY_KICK_DESC = "由 owner 或管理者將指定帳號從家族中移除<br>";
+	public static final String FAMILY_KICK_MEMBER_DESC = "群組擁有者可將指定成員移出家族，並同步移除邀請資料。<br>";
 	
-	public final static String FAMILY_QUIT_DESC = "一般成員可自行退出已加入的家族，owner 無法使用此功能<br>";
+	public static final String FAMILY_QUIT_MEMBER_DESC = "成員或擁有者可依規則退出家族群組。若僅剩 owner 一人則群組自動解散。<br>";
 	
-    public final static String FAMILY_RENAME_DESC = "由家族 owner 更新該家族的名稱，需有權限<br>";
+	public static final String FAMILY_RENAME_DESC = "群組擁有者可修改家族群組名稱。<br>";
     
     public final static String FAMILY_ACCEPT_INVITE_DESC = "被邀請人確認接受邀請，將移出邀請名單並正式加入家族<br>";
     
     public final static String FAMILY_REJECT_INVITE_DESC = "被邀請人拒絕邀請，將從家族邀請名單中移除<br>";
     
-    public final static String FAMILY_OWNER_QUIT_DESC = "owner 退出家庭群組，指派的新 owner，若沒傳則預設用成員的第一人<br>";
+    public static final String FAMILY_OWNER_QUIT_DESC = "群組擁有者可退位並指定新 owner，若未指定則預設轉讓給成員第一人。<br>";
     
-    public final static String FAMILY_TRANSFER_OWNER_DESC = "現任 owner 可將家族擁有權限轉讓給現有成員，原 owner 轉為一般成員<br>";
+    public static final String FAMILY_TRANSFER_OWNER_DESC = "群組現任 owner 可將權限轉讓給指定家庭成員，新 owner 必須為現有成員且不可為自己。<br>";
     
-    public final static String FAMILY_INVITE_DESC = "由家族 owner 邀請新成員加入家族，會將對方帳號加入家族邀請名單<br>";
+    public static final String FAMILY_INVITE_MEMBER_DESC = "群組擁有者邀請新成員加入家族群組，支援多帳號同時邀請。<br>";
     
     public static final String FAMILY_INVITATION_ACCEPT_DESC = "用戶接受家族邀請，將邀請紀錄標記為已接受並加入家族群組。<br>";
     
@@ -203,19 +203,19 @@ public final class ApiDocConstants
     
     public static final String FAMILY_INVITATION_LIST_DESC = "依據 familyId 查詢目前發出、尚未接受的邀請成員清單（status=0）。<br>";
     
-    public final static String USER_REGISTER_DESC = "建立一個會員資料，註冊的會員帳號不可重複<br>";
+    public static final String USER_REGISTER_DESC = "建立新會員帳號，帳號需唯一且密碼將自動加密。<br>";
     
-    public final static String USER_UPDATE_DESC = "更新已存在的會員資料<br>";
+    public static final String USER_UPDATE_DESC = "修改會員基本資料，需提供正確帳號，成功後回傳更新狀態。<br>";
     
-    public final static String USER_CANCEL_DESC = "刪除會員資料，該操作會將所有關聯資料－包含帳戶、設定等等全數刪除且無法復原，須謹慎操作<br>";
+    public static final String USER_CANCEL_DESC = "根據指定帳號註銷會員，並同步移除關聯的資產、支付、儲蓄與帳戶類型等資料。<br>";
     
-    public final static String USER_UPDATE_PW_DESC = "更新會員密碼，在會員更新之前要求要給入原本的密碼並檢查，若不通過時操作失敗<br>";
+    public static final String USER_UPDATE_PASSWORD_DESC = "會員可比對舊密碼並修改新密碼。<br>";
     
-    public final static String USER_GET_USER_DESC = "取得單一筆會員資料<br>";
+    public static final String USER_GET_DESC = "根據會員帳號查詢會員基本資訊，包括帳號、名稱、電話、生日、頭像、角色。<br>";
     
-    public final static String USER_GET_FAMILY_BY_ACCOUNT_DESC = "查詢會員是哪個家庭群組的成員或者是家庭群組的owner<br>";
+    public static final String FAMILY_GET_BY_ACCOUNT_DESC = "根據會員帳號查詢其所屬的所有家族群組，包含群組名稱、擁有者與成員資訊。<br>";
     
-    public final static String USER_LOGIN_DESC = "會員登入確認是否有此帳號，並檢查密碼是否有誤<br>";
+    public static final String USER_LOGIN_DESC = "會員輸入帳號與密碼進行登入驗證。<br>";
     
     public final static String USER_VERIFY_CODE_SEND_VERIFY_CODE_DESC = "發送一組驗證碼到指定會員的 email 信箱，10 分鐘內有效<br>";
 
@@ -230,23 +230,35 @@ public final class ApiDocConstants
     /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
 
-	public final static String USER_REGISTER_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>帳號、密碼、名稱不可為空</li>"
-			+ "<li>【未套用】帳號須符合標準信箱格式（regexp：^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$）</li>"
-			+ "<li>【未套用】密碼長度為 8 ~ 16 碼</li>"
-			+ "</ul>";
+    public static final String USER_REGISTER_REQUEST_BODY_RULE =
+    	    "<ul>" +
+    	    "<li>account：必填，會員帳號（不可重複）</li>" +
+    	    "<li>name：必填，會員名稱</li>" +
+    	    "<li>password：必填，會員密碼</li>" +
+    	    "<li>phone：必填，手機號碼</li>" +
+    	    "</ul>";
 	
-	public final static String USER_UPDATE_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>更新生日、頭像</li>"
-			+ "</ul>";
+    public static final String USER_UPDATE_REQUEST_BODY_RULE =
+    	    "<ul>" +
+    	    "<li>account：必填，會員帳號</li>" +
+    	    "<li>name：必填，會員名稱</li>" +
+    	    "<li>phone：必填，手機號碼</li>" +
+    	    "<li>birthday：必填，生日（yyyy-MM-dd）</li>" +
+    	    "<li>avatar：可選，頭像（byte[]）</li>" +
+    	    "</ul>";
 	
-	public final static String USER_UPDATE_PW_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>帳號、新舊密碼不可為空</li>"
-			+ "</ul>";
+    public static final String USER_UPDATE_PASSWORD_REQUEST_BODY_RULE =
+    	    "<ul>" +
+    	    "<li>account：必填，會員帳號</li>" +
+    	    "<li>oldPassword：必填，舊密碼</li>" +
+    	    "<li>newPassword：必填，新密碼</li>" +
+    	    "</ul>";
 	
-	public final static String USER_LOGIN_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>帳號、密碼不得為空</li>"
-			+ "</ul>";
+    public static final String USER_LOGIN_REQUEST_BODY_RULE =
+    	    "<ul>" +
+    	    "<li>account：必填，會員帳號</li>" +
+    	    "<li>password：必填，會員密碼</li>" +
+    	    "</ul>";
 	
 	public final static String USER_VERIFY_CODE_UPDATE_PWD_BY_EMAIL_REQUEST_BODY_RULE = "<ul>"
 			+ "<li>帳號、新密碼不得為空</li>"
@@ -310,51 +322,59 @@ public final class ApiDocConstants
 			+ "<li>savings：欲設定的當月儲蓄金額，若為負數則不變更</li>"
 			+ "</ul>";
 
-	public final static String FAMILY_CREATE_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>家族名稱、群組owner、家庭成員</li>"
-			+ "<li>owner不得為空</li>"
-			+ "</ul>";
+	public static final String FAMILY_CREATE_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>owner：必填，群組擁有者帳號</li>" +
+		    "<li>name：必填，家族名稱</li>" +
+		    "<li>invitor：必填，受邀成員帳號清單（不可重複、不可包含擁有者）</li>" +
+		    "</ul>";
 	
-	public final static String FAMILY_INVITE_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>家族編號、群組owner、被邀請人(名單)</li>"
-			+ "<li>由群組owner發起邀請</li>"
-			+ "<li>家族編號.owner.被邀請人不得為空</li>"
-			+ "</ul>";
+	public static final String FAMILY_INVITE_MEMBER_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "<li>owner：必填，群組擁有者帳號（權限驗證）</li>" +
+		    "<li>invitor：必填，受邀人帳號清單（不可重複、不可包含擁有者）</li>" +
+		    "</ul>";
 	
-	public final static String FAMILY_DISMISS_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>家族編號、家庭owner</li>"
-			+ "<li>由家庭owner解散群組</li>"
-			+ "<li>家族編號.家庭owner不得為空</li>"
-			+ "</ul>";
+	public static final String FAMILY_DISMISS_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "<li>owner：必填，群組擁有者帳號（權限驗證）</li>" +
+		    "</ul>";
 	
-	public final static String FAMILY_KICK_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>家族編號、家庭owner、家庭成員</li>"
-			+ "<li>由家庭owner踢出成員</li>"
-			+ "<li>家族編號.家庭owner.踢出成員不得為空</li>"
-			+ "</ul>";
+	public static final String FAMILY_KICK_MEMBER_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "<li>owner：必填，群組擁有者帳號（權限驗證）</li>" +
+		    "<li>memberAccounts：必填，要被踢除的成員帳號清單（不可包含擁有者本人）</li>" +
+		    "</ul>";
 	
-	public final static String FAMILY_OWNER_QUIT_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>familyId：家族編號</li>"
-	        + "<li>oldOwner：現任 owner 帳號</li>"
-	        + "<li>newOwner：被指派的新 owner 帳號，必須已經是家族成員</li>"
-	        + "</ul>";
+	public static final String FAMILY_OWNER_QUIT_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "<li>oldOwner：必填，現任群組擁有者帳號</li>" +
+		    "<li>newOwner：可選，指定新 owner，若不指定預設轉讓給成員第一人</li>" +
+		    "</ul>";
 	
-	public final static String FAMILY_TRANSFER_OWNER_REQUEST_BODY_RULE = "<ul>"
-	        + "<li>familyId：家族編號</li>"
-	        + "<li>oldOwner：現任 owner 帳號</li>"
-	        + "<li>newOwner：新 owner 帳號，必須已經是家族成員</li>"
-	        + "</ul>";
+	public static final String FAMILY_TRANSFER_OWNER_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "<li>oldOwner：必填，現任 owner 帳號</li>" +
+		    "<li>newOwner：必填，新 owner 帳號（不可為自己，且必須為現有家庭成員）</li>" +
+		    "</ul>";
 	
-	public final static String FAMILY_QUIT_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>家族編號、退出的家庭成員</li>"
-			+ "<li>家庭編號、家庭成員不得為空</li>"
-			+ "</ul>";
+	public static final String FAMILY_QUIT_MEMBER_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "<li>memberAccount：必填，欲退出的帳號</li>" +
+		    "</ul>";
 	
-	public final static String FAMILY_RENAME_REQUEST_BODY_RULE = "<ul>"
-			+ "<li>家庭編號、家庭owner、更新的家族名稱</li>"
-			+ "<li>由家庭owner更新家族名稱</li>"
-			+ "<li>家庭編號、家庭owner不得為空</li>"
-			+ "</ul>";
+	public static final String FAMILY_RENAME_REQUEST_BODY_RULE =
+		    "<ul>" +
+		    "<li>familyId：必填，家族群組ID</li>" +
+		    "<li>owner：必填，群組擁有者帳號（權限驗證）</li>" +
+		    "<li>newName：必填，新名稱</li>" +
+		    "</ul>";
 	
 	public static final String FAMILY_INVITATION_ACCEPT_REQUEST_BODY_RULE =
 		    "<ul>" +
@@ -381,6 +401,8 @@ public final class ApiDocConstants
 	public final static String FAMILY_NOT_FOUND = "群組不存在";
 	
 	public final static String NO_PERMISSION = "無權限";
+	
+	public static final String MEMBER_NOT_FOUND = "家族成員不存在";
 	
 	public final static String TRANSFERS_DELETE_RESPONSE_404 = "<ol>"
 			+ "<li>指定刪除的紀錄不存在</li>"
@@ -440,6 +462,83 @@ public final class ApiDocConstants
 		    "<li>查無此邀請紀錄！</li>" +
 		    "<li>家族群組不存在</li>" +
 		    "</ul>";
+	
+	public static final String FAMILY_CREATE_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>缺少必要欄位</li>" +
+		    "<li>家庭成員重複</li>" +
+		    "<li>群組擁有者與受邀人不能相同</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_CREATE_RESPONSE_404 =
+		    "<ul>" +
+		    "<li>擁有者帳號不存在</li>" +
+		    "<li>家族成員不存在</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_INVITE_MEMBER_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>群組擁有者與受邀人不能相同</li>" +
+		    "<li>家庭成員重複</li>" +
+		    "<li>更新家族群組失敗</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_INVITE_MEMBER_RESPONSE_404 =
+		    "<ul>" +
+		    "<li>家族群組不存在</li>" +
+		    "<li>邀請人帳號不存在</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_KICK_MEMBER_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>更新家族群組失敗</li>" +
+		    "<li>擁有者本人不可被踢除</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_OWNER_QUIT_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>帳號不存在於此家庭群組</li>" +
+		    "<li>更新家族群組失敗</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_OWNER_QUIT_RESPONSE_404 =
+		    "<ul>" +
+		    "<li>查無此帳號！</li>" +
+		    "<li>家族群組不存在</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_TRANSFER_OWNER_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>缺少必要欄位</li>" +
+		    "<li>新舊 owner 相同，無法進行轉讓</li>" +
+		    "<li>帳號不存在於此家庭群組</li>" +
+		    "<li>更新家族群組失敗</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_TRANSFER_OWNER_RESPONSE_404 =
+		    "<ul>" +
+		    "<li>查無此帳號！</li>" +
+		    "<li>家族群組不存在</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_QUIT_MEMBER_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>更新家族群組失敗</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_QUIT_MEMBER_RESPONSE_404 =
+		    "<ul>" +
+		    "<li>家族群組不存在</li>" +
+		    "<li>家族成員不存在</li>" +
+		    "</ul>";
+	
+	public static final String USER_UPDATE_PASSWORD_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>密碼錯誤</li>" +
+		    "<li>更新會員失敗</li>" +
+		    "</ul>";
+	
+	public static final String PASSWORD_NOT_MATCH = "密碼錯誤";
 
 	public final static String PARAM_FORMAT_ERROR = "參數格式錯誤";
 	
@@ -472,6 +571,8 @@ public final class ApiDocConstants
 	public final static String VERIFY_SUCCESS = "驗證成功";
 	
 	public static final String LOGOUT_SUCCESS = "登出成功";
+	
+	public static final String LOGIN_SUCCESS = "登入成功";
 
 	/* === 測試狀態 === */
 

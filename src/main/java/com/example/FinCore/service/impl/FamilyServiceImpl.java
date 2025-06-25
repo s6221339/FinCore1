@@ -573,46 +573,84 @@ public class FamilyServiceImpl implements FamilyService {
 	@Override
 	@Transactional
 	public BasicResponse quitFamily(QuitFamilyRequest req) {
-		// 1. 查詢家族
+	    // 1. 查詢家族
 	    Optional<Family> familyOpt = familyDao.findById(req.getFamilyId());
 	    if (familyOpt.isEmpty()) {
 	        return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
 	    }
 	    Family family = familyOpt.get();
 
-	    // 2. 判斷是否為 owner
-	    if (family.getOwner().equals(req.getMemberAccount())) {
-	        return new BasicResponse(ResponseMessages.FORBIDDEN);
-	    }
-	    
-	    // 3. 取得現有成員名單
+	    String memberAccount = req.getMemberAccount();
+
+	    // 2. 檢查欲退出成員是否在家族中（owner 或 invitor）
+	    boolean inFamily = false;
 	    String invitorStr = family.getInvitor();
-	    if (invitorStr == null || invitorStr.isEmpty()) {
-	        return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
+	    List<String> invitorList = null;
+	    if (family.getOwner().equals(memberAccount)) {
+	        inFamily = true;
+	    }
+	    if (invitorStr != null && !invitorStr.isEmpty()) {
+	        try {
+	            invitorList = family.toMemberList();
+	            if (!inFamily && invitorList.contains(memberAccount)) {
+	                inFamily = true;
+	            }
+	        } catch (Exception e) {
+	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	        }
+	    }
+	    if (!inFamily) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_IN_FAMILY);
 	    }
 
-	    // 4. JSON字串轉回List，移除要退出的成員
-	    ObjectMapper mapper = new ObjectMapper();
-	    List<String> invitorList;
-	    try {
-	        invitorList = family.toMemberList();
-	    } catch (Exception e) {
-	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
-	    }
-	    boolean removed = invitorList.remove(req.getMemberAccount());
-	    if (!removed) {
-	        return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
-	    }
+	    // 3. 判斷是否為 owner
+	    if (family.getOwner().equals(memberAccount)) {
+	        // 檢查是否只有 owner 一人
+	        if (invitorList == null || invitorList.isEmpty()) {
+	            // 只剩 owner，直接解散群組（包含刪除 family_invitation）
+	            familyInvitationDao.deleteAllByFamilyId(req.getFamilyId());
+	            familyDao.delete(family);
+	            return new BasicResponse(ResponseMessages.SUCCESS);
+	        } else {
+	            // 有成員可指派，owner 退出並升級第一位成員為新 owner
+	            String newOwner = invitorList.get(0);
+	            invitorList.remove(0);
 
-	    // 5. 處理剩下成員
-	    try {
-	    	 family.setInvitor(mapper.writeValueAsString(invitorList));
-	    } catch (Exception e) {
-	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
-	    }
+	            try {
+	    	    	family.toInvitor(invitorList);
+//	    	    	family.setInvitor(mapper.writeValueAsString(invitorList));
+	    	    } catch (Exception e) {
+	    	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	    	    }
 
-	    familyDao.save(family);
-	    return new BasicResponse(ResponseMessages.SUCCESS);
+	            family.setOwner(newOwner);
+	            familyDao.save(family);
+
+	            // owner 退出 → 刪除原 owner 在邀請表的紀錄（若有）
+	            familyInvitationDao.deleteByAccountAndFamilyId(memberAccount, req.getFamilyId());
+	            return new BasicResponse(ResponseMessages.SUCCESS);
+	        }
+	    } else {
+	        // 4. 一般成員退出
+	        if (invitorList == null || !invitorList.remove(memberAccount)) {
+	            return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
+	        }
+
+	        try {
+	            if (invitorList.isEmpty()) {
+	                family.setInvitor(null);
+	            } else {
+	                family.setInvitor(new ObjectMapper().writeValueAsString(invitorList));
+	            }
+	        } catch (Exception e) {
+	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	        }
+	        familyDao.save(family);
+
+	        // 刪除 family_invitation 紀錄
+	        familyInvitationDao.deleteByAccountAndFamilyId(memberAccount, req.getFamilyId());
+	        return new BasicResponse(ResponseMessages.SUCCESS);
+	    }
 	}
 	
 	

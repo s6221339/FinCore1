@@ -395,7 +395,7 @@ public class PaymentServiceImpl implements PaymentService
 			BalanceInfoVO bInfo = new BalanceInfoVO(b.getBalanceId(), b.getName());
 			
 			int familyId = b.getFamliyId();
-			String familyName = "";
+			String familyName = null;
 //			如果該帳戶源自於一個群組，則該群組編號不為0
 			if(familyId != 0)
 			{

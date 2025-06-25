@@ -74,6 +74,8 @@ public final class ApiDocConstants
     
     public final static String FAMILY_INVITE_SUMMARY = "邀請新成員加入家族";
     
+    public static final String FAMILY_INVITATION_LIST_SUMMARY = "查詢家族邀請中成員名單";
+    
     public final static String USER_REGISTER_SUMMARY = "註冊新會員";
     
     public final static String USER_UPDATE_SUMMARY = "更新會員資料";
@@ -198,6 +200,8 @@ public final class ApiDocConstants
     public static final String FAMILY_INVITATION_ACCEPT_DESC = "用戶接受家族邀請，將邀請紀錄標記為已接受並加入家族群組。<br>";
     
     public static final String FAMILY_INVITATION_REJECT_DESC = "用戶拒絕家族邀請，會直接刪除邀請紀錄。<br>";
+    
+    public static final String FAMILY_INVITATION_LIST_DESC = "依據 familyId 查詢目前發出、尚未接受的邀請成員清單（status=0）。<br>";
     
     public final static String USER_REGISTER_DESC = "建立一個會員資料，註冊的會員帳號不可重複<br>";
     

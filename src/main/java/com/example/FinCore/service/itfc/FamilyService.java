@@ -12,6 +12,7 @@ import com.example.FinCore.vo.request.RenameFamilyRequest;
 import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
+import com.example.FinCore.vo.response.FamilyInvitationListResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -64,10 +65,11 @@ public interface FamilyService {
 	public BasicResponse inviteMember(InviteMemberRequest req) throws JsonProcessingException;
 	
 	/**
-	 * 解散家族（僅限 owner）
-	 * @param familyId 家族ID
-	 * @param owner 操作者帳號（驗證身份）
-	 * @return 回應物件
+	 * 解散家族群組。
+	 * 除了刪除 Family 之外，也會同步移除 family_invitation 表中該 familyId 的所有邀請資料。
+	 *
+	 * @param req DismissFamilyRequest，內含 familyId 與 owner
+	 * @return BasicResponse
 	 */
 	public BasicResponse dismissFamily(DismissFamilyRequest req);
 	
@@ -132,5 +134,19 @@ public interface FamilyService {
      * @return 回應物件
      */
     public BasicResponse rejectInvite(InviteRequest req) throws JsonProcessingException;
+    
+    
+    
+    /**
+     * 查詢指定家庭群組（familyId）目前所有尚未接受邀請（邀請中）的成員資訊。
+     * 
+     * 只會回傳狀態為「邀請中」（status=false）的成員名單，
+     * 並包含每位受邀人的帳號（account）與對應的名稱（name），
+     * 不會顯示狀態。
+     *
+     * @param familyId 家庭群組的唯一識別碼
+     * @return 家庭邀請中成員清單回應物件，內含家族ID與邀請中成員資訊（account、name）
+     */
+    public FamilyInvitationListResponse getInvitingList(int familyId);
 
 }

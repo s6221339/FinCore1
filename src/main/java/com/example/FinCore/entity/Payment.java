@@ -548,7 +548,7 @@ public class Payment
 	 * （如果未刪除）
 	 * lifeTime = 99
 	 * <pre>
-	 * @return
+	 * @return 該款項的生命週期
 	 */
 	public int getLifeTime()
 	{

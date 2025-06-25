@@ -202,7 +202,7 @@ public class PaymentController
 			method = "POST",
 			hidden = true
 		)
-	public final void scheduledDelete()
+	public final void scheduledDelete() throws Exception
 	{
 		throw new UnsupportedOperationException("此 API 無法被呼叫！");
 	}

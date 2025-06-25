@@ -35,6 +35,7 @@ public enum ResponseMessages
 	INVITATION_ALREADY_SENT(400, "成員已發出邀請，請勿重複邀請："),
 	INVITATION_ALREADY_ACCEPTED(400, "該邀請已被接受，無法重複操作！"),
 	OWNER_CANNOT_KICK_SELF(400, "群組擁有者無法踢除自己"),
+	PLEASE_LOGIN_FIRST(400, "請先登入！"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),

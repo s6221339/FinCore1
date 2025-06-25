@@ -19,6 +19,7 @@ import com.example.FinCore.vo.request.OwnerResignAndAssignRequest;
 import com.example.FinCore.vo.request.QuitFamilyRequest;
 import com.example.FinCore.vo.request.RenameFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.FamilyInvitationListResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -268,5 +269,28 @@ public class FamilyController {
     public BasicResponse rejectInvite(@Valid@RequestBody InviteRequest req) throws JsonProcessingException {
         return service.rejectInvite(req);
     }
-
+    
+    /**
+     * 查詢指定家庭群組的邀請中名單（只回傳未接受的邀請資訊）
+     * @param familyId 家庭ID
+     * @return FamilyInvitationListResponse
+     */
+    @PostMapping("getInvitingList")
+    @Operation(
+    	    summary = ApiDocConstants.FAMILY_INVITATION_LIST_SUMMARY,
+    	    description = ApiDocConstants.FAMILY_INVITATION_LIST_DESC,
+    	    method = "POST",
+    	    parameters = {
+    	        @Parameter(
+    	            name = "familyId",
+    	            description = "家族群組 ID（必填）"
+    	        )
+    	    }
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+    	})
+    public FamilyInvitationListResponse getInvitingList(@RequestParam("familyId") int familyId) {
+        return service.getInvitingList(familyId);
+    }
 }

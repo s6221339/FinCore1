@@ -21,7 +21,7 @@ public enum ResponseMessages
 	DUPLICATE_FAMILY_MEMBERS(400, "家庭成員重複"),
 	BALANCE_ACTIVATION(400, "帳戶未停用，無法刪除"),
 	PAST_RECORD_DATE(400, "該款項不能記錄在過去時間。"),
-    DUPLICATE_MEMBER(400, "群組擁有者與邀請人不能相同"),
+    DUPLICATE_MEMBER(400, "群組擁有者與受邀人不能相同"),
 	FUTURE_RECORD_DATE(400, "該款項不能記錄在未來時間。"),
 	BALANCE_WITH_NO_OWNER(400, "帳戶不能沒有所屬對象。"),
 	ACCOUNT_NOT_IN_FAMILY(400, "帳號不存在於此家庭群組"),
@@ -34,6 +34,7 @@ public enum ResponseMessages
 	PAYMENT_PERIOD_UNABLE_MODIFYING(400, "無法變更該款項的週期"),
 	INVITATION_ALREADY_SENT(400, "成員已發出邀請，請勿重複邀請："),
 	INVITATION_ALREADY_ACCEPTED(400, "該邀請已被接受，無法重複操作！"),
+	OWNER_CANNOT_KICK_SELF(400, "群組擁有者無法踢除自己"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),

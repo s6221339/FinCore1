@@ -47,4 +47,33 @@ public interface FamilyInvitationDao extends JpaRepository<FamilyInvitation, Fam
     @Transactional
     @Query(value = "delete from family_invitation where account = :account and family_id = :familyId", nativeQuery = true)
     void deleteByAccountAndFamilyId(@Param("account") String account, @Param("familyId") int familyId);
+    
+    /**
+     * 查詢指定 family_id 下，所有尚未接受邀請（status 為 false，邀請中狀態）的家族邀請資料。
+     *
+     * @param familyId 家族群組 ID
+     * @return 所有邀請中（status=false）的 FamilyInvitation 列表
+     */
+    @Query(value = "select * from family_invitation where family_id = :familyId and status = false", nativeQuery = true)
+    List<FamilyInvitation> findByFamilyIdAndStatusFalse(@Param("familyId") int familyId);
+    
+    /**
+     * 刪除指定家族群組的所有邀請紀錄
+     *
+     * @param familyId 家族群組ID
+     */
+    @Modifying
+    @jakarta.transaction.Transactional
+    @Query(value = "delete from family_invitation where family_id = :familyId", nativeQuery = true)
+    void deleteAllByFamilyId(@Param("familyId") int familyId);
+    
+    /**
+     * 刪除某個家庭群組內，指定多個帳號的邀請紀錄
+     * @param familyId 家庭ID
+     * @param accounts 受邀人帳號清單
+     */
+    @Modifying
+    @jakarta.transaction.Transactional
+    @Query(value = "delete from family_invitation where family_id = :familyId and account in :accounts", nativeQuery = true)
+    void deleteByFamilyIdAndAccounts(@Param("familyId") int familyId, @Param("accounts") List<String> accounts);
 }

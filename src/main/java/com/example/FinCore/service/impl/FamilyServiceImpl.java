@@ -356,11 +356,8 @@ public class FamilyServiceImpl implements FamilyService {
 
 	    // 5. 更新成員清單
 	    try {
-	        if (invitorList.isEmpty()) {
-	            family.setInvitor(null);
-	        } else {
-	            family.setInvitor(mapper.writeValueAsString(invitorList));
-	        }
+	    	family.toInvitor(invitorList);
+//	    	family.setInvitor(mapper.writeValueAsString(invitorList));
 	    } catch (Exception e) {
 	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
 	    }

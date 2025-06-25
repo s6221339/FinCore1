@@ -198,11 +198,14 @@ public class UserServiceImpl implements UserService {
 	    List<Family> familyList = familyDao.selectAllFamily();
 
 	    for (Family family : familyList) {
-	        // 4-1. family 的 invitor 欄位是 JSON 字串，要先轉成 List 才能判斷
-	        List<String> invitorList = mapper.readValue(
-	                family.getInvitor(),
-	                new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
-
+	        // 4-1. family 的 invitor 欄位可能為 null，需要先判斷
+	        List<String> invitorList;
+	        String invitorContent = family.getInvitor();
+	        if (invitorContent == null || invitorContent.trim().isEmpty()) {
+	            invitorList = new ArrayList<>();
+	        } else {
+	            invitorList = mapper.readValue(invitorContent, new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
+	        }
 	        // 4-2. 查 owner 的名字（如找不到顯示 null）
 	        User ownerUser = userDao.selectById(family.getOwner());
 	        SimpleUserVO ownerVO = new SimpleUserVO(family.getOwner(),

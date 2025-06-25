@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @CrossOrigin
@@ -124,8 +125,16 @@ public class UserController {
 	
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),//
 					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
-	public BasicResponse login(@Valid @RequestBody loginRequest req) {
-		return service.login(req);
+	public BasicResponse login(@Valid @RequestBody loginRequest req, HttpSession session) {
+		var res = service.login(req);
+		if(res.getCode() == 200)
+		{
+			session.setAttribute("account", req.account());
+			session.setAttribute("sessionId", session.getId());
+//			7天後失效
+			session.setMaxInactiveInterval(604800);
+		}
+		return res;
 	}
 	
 	@PostMapping(value = "getNameByAccount")
@@ -166,7 +175,10 @@ public class UserController {
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 		})
-	public BasicResponse logout(@RequestParam String account) {
-	    return service.logout(account);
+	public BasicResponse logout(@RequestParam String account, HttpSession session) {
+	    var res = service.logout(account);
+	    if(res.getCode() == 200)
+	    	session.invalidate();
+		return res;
 	}
 }

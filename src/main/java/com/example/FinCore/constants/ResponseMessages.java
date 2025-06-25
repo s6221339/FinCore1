@@ -34,6 +34,7 @@ public enum ResponseMessages
 	PAYMENT_PERIOD_UNABLE_MODIFYING(400, "無法變更該款項的週期"),
 	INVITATION_ALREADY_SENT(400, "成員已發出邀請，請勿重複邀請："),
 	INVITATION_ALREADY_ACCEPTED(400, "該邀請已被接受，無法重複操作！"),
+	PLEASE_LOGIN_FIRST(400, "請先登入！"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),

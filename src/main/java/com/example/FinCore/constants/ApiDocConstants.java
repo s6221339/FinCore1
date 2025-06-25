@@ -34,6 +34,8 @@ public final class ApiDocConstants
 
 	public static final String PAYMENT_TRASH_CAN_SUMMARY = "查詢已刪除款項資料";
 	
+	public static final String PAYMENT_STATISTICS_SUMMARY = "統計帳號及家庭帳戶款項資訊";
+	
 	public static final String BALANCE_CREATE_SUMMARY = "新增帳戶資料";
 	
 	public static final String BALANCE_UPDATE_SUMMARY = "更新帳戶名稱與當月儲蓄";
@@ -141,6 +143,9 @@ public final class ApiDocConstants
 	public static final String PAYMENT_TRASH_CAN_DESC =
 			"查詢指定帳號下，所有已被標記為刪除的款項。此操作不會返回未刪除的資料。<br>";
 	
+	public static final String PAYMENT_STATISTICS_DESC =
+			"根據指定帳號與時間範圍，統計該帳號下所有個人及家庭帳戶的款項資料，依月份與類型分類統計。<br>";
+
 	public static final String BALANCE_CREATE_DESC = 
 			"可新增個人或家庭帳戶。帳戶需指定所屬對象，且不可同時指定家庭與使用者帳號。<br>";
 
@@ -262,6 +267,13 @@ public final class ApiDocConstants
 	public static final String PAYMENT_RECOVERY_REQUEST_BODY_RULE =
 			"<ul>"
 			+ "<li>paymentIdList：欲復原的款項 ID 清單，不可為空</li>"
+			+ "</ul>";
+
+	public static final String PAYMENT_STATISTICS_REQUEST_BODY_RULE =
+			"<ul>"
+			+ "<li>account：使用者帳號，必填</li>"
+			+ "<li>year：統計年份（四位數），必填</li>"
+			+ "<li>month：統計月份（1～12），若為 0 則表示統計全年</li>"
 			+ "</ul>";
 
 	public static final String BALANCE_CREATE_REQUEST_BODY_RULE =

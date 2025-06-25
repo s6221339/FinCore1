@@ -212,7 +212,6 @@ public class FamilyServiceImpl implements FamilyService {
 	    }
 
 	    Set<String> invitorSet = new HashSet<>(req.invitor());
-
 	    // 3. 檢查 invitor 有沒有重複
 	    if (invitorSet.size() != req.invitor().size()) {
 	        return new BasicResponse(ResponseMessages.DUPLICATE_MEMBER);
@@ -636,7 +635,6 @@ public class FamilyServiceImpl implements FamilyService {
 	    }
 
 	    FamilyInvitation invitation = invitationOpt.get();
-
 	    // 狀態本來就接受過就直接 return
 	    if (invitation.isStatus()) {
 	        return new BasicResponse(ResponseMessages.INVITATION_ALREADY_ACCEPTED);
@@ -693,7 +691,6 @@ public class FamilyServiceImpl implements FamilyService {
 
 	    // 刪除該邀請
 	    familyInvitationDao.deleteById(pk);
-
 	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 }

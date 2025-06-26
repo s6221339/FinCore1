@@ -44,22 +44,22 @@ public class FamilyController {
 //	@Valid：如果 RequestBody 中有資料驗證，則需要使用該註釋來啟動驗證功能
 	@PostMapping(value = "create")
 	@Operation(
-		        summary = ApiDocConstants.FAMILY_CREATE_SUMMARY,
-		        description = ApiDocConstants.FAMILY_CREATE_DESC
-		        		+ ApiDocConstants.TEST_PASS, 
-		        method = "POST",
-		        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		        (description = "建立請求資料，規則："
-						+ ApiDocConstants.FAMILY_CREATE_REQUEST_BODY_RULE)
-				)
-		    @ApiResponses({
-		        @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
-		        @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_CREATE_FAIL)
-		    })
+		    summary = ApiDocConstants.FAMILY_CREATE_SUMMARY,
+		    description = ApiDocConstants.FAMILY_CREATE_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "建立家族群組請求資料規則：" + ApiDocConstants.FAMILY_CREATE_REQUEST_BODY_RULE
+		    )
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_CREATE_RESPONSE_400),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_CREATE_RESPONSE_404),
+		})
 	public BasicResponse create(@Valid @RequestBody CreateFamilyRequest req) throws Exception {
 		return service.create(req);
 	}
-	
+
 	// update目前只有更新名稱的功能，變更名稱用 finbook/family/rename
 //	@PostMapping(value = "update")
 //	public BasicResponse update(@Valid @RequestBody UpdateFamilyRequest req) {
@@ -109,15 +109,18 @@ public class FamilyController {
 
 	@PostMapping(value = "invite")
 	@Operation(
-		    summary = ApiDocConstants.FAMILY_INVITE_SUMMARY,
-		    description = ApiDocConstants.FAMILY_INVITE_DESC + ApiDocConstants.TEST_PASS,
+		    summary = ApiDocConstants.FAMILY_INVITE_MEMBER_SUMMARY,
+		    description = ApiDocConstants.FAMILY_INVITE_MEMBER_DESC,
 		    method = "POST",
-		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_INVITE_REQUEST_BODY_RULE)
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "邀請家族新成員請求資料規則：" + ApiDocConstants.FAMILY_INVITE_MEMBER_REQUEST_BODY_RULE
+		    )
 		)
 		@ApiResponses({
-		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITE_MEMBER_RESPONSE_400),
+		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITE_MEMBER_RESPONSE_404),
 		})
 	public BasicResponse inviteMember(@Valid @RequestBody InviteMemberRequest req) //
 	throws JsonProcessingException{
@@ -126,16 +129,17 @@ public class FamilyController {
 	
 	@PostMapping(value = "dismiss")
 	@Operation(
-		    summary = ApiDocConstants.FAMILY_DISSMISS_SUMMARY,
-		    description = ApiDocConstants.FAMILY_DISSMISS_DESC
-		    		+ ApiDocConstants.TEST_PASS,
+		    summary = ApiDocConstants.FAMILY_DISMISS_SUMMARY,
+		    description = ApiDocConstants.FAMILY_DISMISS_DESC,
 		    method = "POST",
-		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_DISMISS_REQUEST_BODY_RULE)
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "解散家族群組請求資料規則：" + ApiDocConstants.FAMILY_DISMISS_REQUEST_BODY_RULE
+		    )
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),
-		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION)
+		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
 		})
 	public BasicResponse dismissFamily(@Valid @RequestBody DismissFamilyRequest req) {
 		return service.dismissFamily(req);
@@ -143,68 +147,76 @@ public class FamilyController {
 	
 	@PostMapping(value = "kick")
 	@Operation(
-		    summary = ApiDocConstants.FAMILY_KICK_SUMMARY,
-		    description = ApiDocConstants.FAMILY_KICK_DESC
-		    		+ ApiDocConstants.TEST_PASS,
-		    		method = "POST",
-		    		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    		(description = ApiDocConstants.FAMILY_KICK_REQUEST_BODY_RULE)
+		    summary = ApiDocConstants.FAMILY_KICK_MEMBER_SUMMARY,
+		    description = ApiDocConstants.FAMILY_KICK_MEMBER_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "踢除家族成員請求資料規則：" + ApiDocConstants.FAMILY_KICK_MEMBER_REQUEST_BODY_RULE
+		    )
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_KICK_MEMBER_RESPONSE_400),
+		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.MEMBER_NOT_FOUND),
 		})
 	public BasicResponse kickMember(@Valid @RequestBody KickMemberRequest req) {
 		return service.kickMember(req);
 	}
 	
-	@PostMapping(value = "ownerQuit")
-	@Operation(
-			summary = ApiDocConstants.FAMILY_OWNER_QUIT_SUMMARY,
-				    description = ApiDocConstants.FAMILY_OWNER_QUIT_DESC
-					+ ApiDocConstants.TEST_PASS,
-					method = "POST",
-					requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-					(description = ApiDocConstants.FAMILY_OWNER_QUIT_REQUEST_BODY_RULE)
-			)
-	@ApiResponses({
-	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-	    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION)
-	})
-	public BasicResponse ownerQuit(@Valid @RequestBody OwnerResignAndAssignRequest req) {
-		return service.ownerQuit(req);
-	}
+//  owner退出 合併到 member quit	
+//	@PostMapping(value = "ownerQuit")
+//	@Operation(
+//		    summary = ApiDocConstants.FAMILY_OWNER_QUIT_SUMMARY,
+//		    description = ApiDocConstants.FAMILY_OWNER_QUIT_DESC,
+//		    method = "POST",
+//		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+//		        description = "群組擁有者退位並指派新擁有者請求資料規則：" + ApiDocConstants.FAMILY_OWNER_QUIT_REQUEST_BODY_RULE
+//		    )
+//		)
+//		@ApiResponses({
+//		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+//		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_OWNER_QUIT_RESPONSE_400),
+//		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+//		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_OWNER_QUIT_RESPONSE_404),
+//		})
+//	public BasicResponse ownerQuit(@Valid @RequestBody OwnerResignAndAssignRequest req) {
+//		return service.ownerQuit(req);
+//	}
 	
 	@PostMapping(value = "transferOwner")
 	@Operation(
-	        summary = ApiDocConstants.FAMILY_TRANSFER_OWNER_SUMMARY,
-	        description = ApiDocConstants.FAMILY_TRANSFER_OWNER_DESC + ApiDocConstants.TEST_PASS,
-	        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-	            description = ApiDocConstants.FAMILY_TRANSFER_OWNER_REQUEST_BODY_RULE
-	        )
-	    )
-	    @ApiResponses({
-	        @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-	        @ApiResponse(responseCode = "400", description = ApiDocConstants.NO_PERMISSION + ApiDocConstants.PARAM_FORMAT_ERROR),
-	        @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
-	    })
+		    summary = ApiDocConstants.FAMILY_TRANSFER_OWNER_SUMMARY,
+		    description = ApiDocConstants.FAMILY_TRANSFER_OWNER_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "群組擁有者權限轉讓請求資料規則：" + ApiDocConstants.FAMILY_TRANSFER_OWNER_REQUEST_BODY_RULE
+		    )
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_TRANSFER_OWNER_RESPONSE_400),
+		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_TRANSFER_OWNER_RESPONSE_404),
+		})
 	public BasicResponse transferOwner(@Valid @RequestBody OwnerResignAndAssignRequest req) {
 		return service.transferOwner(req);
 	}
 	
 	@PostMapping(value = "quit")
 	@Operation(
-			summary = ApiDocConstants.FAMILY_QUIT_SUMMARY,
-			description = ApiDocConstants.FAMILY_QUIT_DESC
-					+ ApiDocConstants.TEST_PASS,
-					method = "POST",
-					requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-					(description = ApiDocConstants.FAMILY_QUIT_REQUEST_BODY_RULE)
-			)
-	@ApiResponses({
-	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-	    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND)
-	})
+		    summary = ApiDocConstants.FAMILY_QUIT_MEMBER_SUMMARY,
+		    description = ApiDocConstants.FAMILY_QUIT_MEMBER_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "家族成員退出群組請求資料規則：" + ApiDocConstants.FAMILY_QUIT_MEMBER_REQUEST_BODY_RULE
+		    )
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_QUIT_MEMBER_RESPONSE_400),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
+		})
 	public BasicResponse quitFamily(@Valid @RequestBody QuitFamilyRequest req) {
 		return service.quitFamily(req);
 	}
@@ -212,15 +224,16 @@ public class FamilyController {
 	@PostMapping(value = "rename")
 	@Operation(
 		    summary = ApiDocConstants.FAMILY_RENAME_SUMMARY,
-		    description = ApiDocConstants.FAMILY_RENAME_DESC
-		    		+ ApiDocConstants.TEST_PASS,
+		    description = ApiDocConstants.FAMILY_RENAME_DESC,
 		    method = "POST",
-		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody //
-		    (description = ApiDocConstants.FAMILY_RENAME_REQUEST_BODY_RULE)
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "家族群組改名請求資料規則：" + ApiDocConstants.FAMILY_RENAME_REQUEST_BODY_RULE
+		    )
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION)
+		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
 		})
 	public BasicResponse renameFamily(@Valid @RequestBody RenameFamilyRequest req) {
 		return service.renameFamily(req);

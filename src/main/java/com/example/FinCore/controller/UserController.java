@@ -38,110 +38,145 @@ public class UserController {
 	private UserService service;
 
 	@PostMapping(value = "register")
-	@Operation(summary = ApiDocConstants.USER_REGISTER_SUMMARY,
-			description = ApiDocConstants.USER_REGISTER_DESC + ApiDocConstants.TEST_PASS,
-			method = "POST",//
-			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "註冊請求資料，規則："//
-					+ ApiDocConstants.USER_REGISTER_REQUEST_BODY_RULE))//
-	
-	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),//
-					@ApiResponse(responseCode = "400", description = ApiDocConstants.ACCOUNT_EXIST) })
+	@Operation(
+		    summary = ApiDocConstants.USER_REGISTER_SUMMARY,
+		    description = ApiDocConstants.USER_REGISTER_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "會員註冊請求資料規則：" + ApiDocConstants.USER_REGISTER_REQUEST_BODY_RULE
+		    )
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.ACCOUNT_EXIST),
+		})
 	public BasicResponse register(@Valid @RequestBody RregisterUserRequest req) {
 		return service.register(req);
 	}
 
 	@PostMapping(value = "update")
-	@Operation(summary = ApiDocConstants.USER_UPDATE_SUMMARY,
-		    description = ApiDocConstants.USER_UPDATE_DESC + ApiDocConstants.TEST_PASS,
-			method = "POST",//
-			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "更新請求資料，規則：<br>"//
-					+ ApiDocConstants.USER_UPDATE_REQUEST_BODY_RULE))//
-	
-	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),//
-					@ApiResponse(responseCode = "400", description = ApiDocConstants.UPDATE_USER_FAIL),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
+	@Operation(
+		    summary = ApiDocConstants.USER_UPDATE_SUMMARY,
+		    description = ApiDocConstants.USER_UPDATE_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "會員資料更新請求資料規則：" + ApiDocConstants.USER_UPDATE_REQUEST_BODY_RULE
+		    )
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.UPDATE_USER_FAIL),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
 	public BasicResponse update(@Valid @RequestBody UpdateUserRequest req) {
 		return service.update(req);
 	}
 
 	@PostMapping(value = "cancel")
-	@Operation(summary = ApiDocConstants.USER_CANCEL_SUMMARY,
-		    		description = ApiDocConstants.USER_CANCEL_DESC
-		    		+ ApiDocConstants.TEST_PASS,
-					method = "POST", parameters = {//
-					@Parameter(name = "account", description = "指定要刪除的帳號") })//
-	
-	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
+	@Operation(
+		    summary = ApiDocConstants.USER_CANCEL_SUMMARY,
+		    description = ApiDocConstants.USER_CANCEL_DESC,
+		    method = "POST",
+		    parameters = {
+		        @Parameter(
+		            name = "account",
+		            description = "會員帳號（必填）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
 	public BasicResponse cancel(@RequestParam("account") String account) throws Exception {
 		return service.cancel(account);
 	}
 
 	@PostMapping(value = "updatePasswordUser")
-	@Operation(summary = ApiDocConstants.USER_UPDATE_PW_SUMMARY,
-		    description = ApiDocConstants.USER_UPDATE_PW_DESC + ApiDocConstants.TEST_PASS,
-			method = "POST",//
-			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "更新請求資料，規則：<br>"//
-					+ ApiDocConstants.USER_UPDATE_PW_REQUEST_BODY_RULE))//
-	
-	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
+	@Operation(
+		    summary = ApiDocConstants.USER_UPDATE_PASSWORD_SUMMARY,
+		    description = ApiDocConstants.USER_UPDATE_PASSWORD_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "會員修改密碼請求資料規則：" + ApiDocConstants.USER_UPDATE_PASSWORD_REQUEST_BODY_RULE
+		    )
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.USER_UPDATE_PASSWORD_RESPONSE_400),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
 	public BasicResponse updatePasswordUser(@Valid @RequestBody UpdatePasswordUserRequest req) {
 		return service.updatePasswordUser(req);
 	}
 
 	@PostMapping(value = "getUser")
-	@Operation(summary = ApiDocConstants.USER_GET_USER_SUMMARY,
-		    description = ApiDocConstants.USER_GET_USER_DESC + ApiDocConstants.TEST_PASS,
-			method = "POST",//
-			parameters = {//
-					@Parameter(name = "account", description = "指定要搜尋的帳號") })//
-	
-	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
+	@Operation(
+		    summary = ApiDocConstants.USER_GET_SUMMARY,
+		    description = ApiDocConstants.USER_GET_DESC,
+		    method = "POST",
+		    parameters = {
+		        @Parameter(
+		            name = "account",
+		            description = "會員帳號（必填）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
 	public UserResponse getUser(@RequestParam("account") String account) {
 		return service.getUser(account);
 	}
 
 	@PostMapping(value = "getFamilyByAccount")
-	@Operation(summary = ApiDocConstants.USER_GET_FAMILY_BY_ACCOUNT_SUMMARY,
-		    description = ApiDocConstants.USER_GET_FAMILY_BY_ACCOUNT_DESC + ApiDocConstants.TEST_PASS,
-			method = "POST",//
-			parameters = {@Parameter(name = "account", description = "指定要搜尋的帳號") })//
-	
-	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
+	@Operation(
+		    summary = ApiDocConstants.FAMILY_GET_BY_ACCOUNT_SUMMARY,
+		    description = ApiDocConstants.FAMILY_GET_BY_ACCOUNT_DESC,
+		    method = "POST",
+		    parameters = {
+		        @Parameter(
+		            name = "account",
+		            description = "會員帳號（必填）"
+		        )
+		    }
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		})
 	public FamilyListResponse getFamilyByAccount(@RequestParam("account") String account)
 			throws JsonProcessingException {
 		return service.getFamilyByAccount(account);
 	}
 
 	@PostMapping(value = "login")
-	@Operation(summary = ApiDocConstants.USER_LOGIN_SUMMARY,
-		    description = ApiDocConstants.USER_LOGIN_DESC + ApiDocConstants.TEST_PASS,
-			method = "POST", //
-			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "登入請求資料，規則：<br>"//
-					+ ApiDocConstants.USER_LOGIN_REQUEST_BODY_RULE))//
-	
-	@ApiResponses({ @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),//
-					@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND) })
-	public BasicResponse login(@Valid @RequestBody loginRequest req, HttpSession session) {
-		var res = service.login(req);
-		if(res.getCode() == 200)
-		{
-			session.setAttribute("account", req.account());
-			session.setAttribute("sessionId", session.getId());
-//			7天後失效
-			session.setMaxInactiveInterval(604800);
-		}
-		return res;
+	@Operation(
+		    summary = ApiDocConstants.USER_LOGIN_SUMMARY,
+		    description = ApiDocConstants.USER_LOGIN_DESC,
+		    method = "POST",
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = "會員登入請求資料規則：" + ApiDocConstants.USER_LOGIN_REQUEST_BODY_RULE
+		    )
+		)
+		@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.LOGIN_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.PASSWORD_NOT_MATCH),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		})
+	public BasicResponse login(@Valid @RequestBody loginRequest req) {
+		return service.login(req);
+
 	}
 	
 	@PostMapping(value = "getNameByAccount")
 	@Operation(
 		    summary = ApiDocConstants.USER_GET_NAME_BY_ACCOUNT_SUMMARY,
 		    description = ApiDocConstants.USER_GET_NAME_BY_ACCOUNT_DESC,
-		    method = "GET",
+		    method = "POST",
 		    parameters = {
 		        @Parameter(
 		            name = "account",

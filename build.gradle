@@ -31,6 +31,8 @@ dependencies {
  	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 	// JaveMail: 寄送驗證信用
  	implementation 'org.springframework.boot:spring-boot-starter-mail'
+ 	//avatar 頭像
+ 	implementation 'net.coobird:thumbnailator:0.4.20'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

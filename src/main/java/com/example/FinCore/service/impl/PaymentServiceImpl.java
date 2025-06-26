@@ -40,6 +40,7 @@ import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
 import com.example.FinCore.vo.response.StatisticsResponse;
 
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 
 @EnableScheduling
@@ -180,33 +181,78 @@ public class PaymentServiceImpl implements PaymentService
 		if(!userDao.existsById(account))
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		var resultList = getPaymentInfoOpration(account, -1, 0, true);
+		var resultList = getPaymentInfoOpration(account, new ArrayList<>(), -1, 0, true);
 		
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
 	}
 	
 	@Override
-	public SearchPaymentResponse getPaymentInfoWithDateFilter(AccountWithDateFilterRequest req) 
+	public SearchPaymentResponse getPaymentInfoByAccountWithDateFilter(AccountWithDateFilterRequest req) 
 	{
 		if(!userDao.existsById(req.account()))
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		var resultList = getPaymentInfoOpration(req.account(), req.year(), req.month(), true);
+		var resultList = getPaymentInfoOpration(req.account(), new ArrayList<>(), req.year(), req.month(), true);
 		
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
 	}
 	
+	@Override
+	public SearchPaymentResponse getPaymentInfoOfFamily(String account) 
+	{
+		if(!userDao.existsById(account))
+			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		List<Integer> familyIdList = familyDao.selectAll().stream()
+				.filter((Family t) -> t.isMember(account))
+				.map((Family t) -> t.getId())
+				.toList();
+		
+		var resultList = getPaymentInfoOpration(null, familyIdList, -1, 0, true);
+		
+		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
+	}
+
+	@Override
+	public SearchPaymentResponse getPaymentInfoOfFamilyWithDateFilter(AccountWithDateFilterRequest req) 
+	{
+		if(!userDao.existsById(req.account()))
+			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		List<Integer> familyIdList = familyDao.selectAll().stream()
+				.filter((Family t) -> t.isMember(req.account()))
+				.map((Family t) -> t.getId())
+				.toList();
+		
+		var resultList = getPaymentInfoOpration(null, familyIdList, req.year(), req.month(), true);
+		
+		return new SearchPaymentResponse(ResponseMessages.SUCCESS, resultList);
+	}
+
 	/**
-	 * 生成 BalanceWithPaymentVO 列表
+	 * 生成 BalanceWithPaymentVO 列表，可透過傳參選擇要取得那些款項。<p>
+	 * 如果 {@code account} 為 {@code NULL} 或空字串，將不會取得與帳號關聯的帳款
+	 * 資料；如果群組編號列表為空（不得為 {@code NULL}）則不取得與群組關聯的帳款資料；
+	 * 若兩者均有合法值，會將兩者的帳款資料合併再進行處理。
 	 * @param account 帳號
+	 * @param familyIdList 群組編號列表
 	 * @param year 指定年
 	 * @param month 指定月
 	 * @param deletedFilter 是否啟用刪除過濾器
 	 * @return BalanceWithPaymentVO 列表
 	 */
-	private List<BalanceWithPaymentVO> getPaymentInfoOpration(String account, int year, int month, boolean deletedFilter)
+	private List<BalanceWithPaymentVO> getPaymentInfoOpration(@Nullable String account, List<Integer> familyIdList, int year, int month, boolean deletedFilter)
 	{
-		List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(account);
+		List<Balance> accountBalanceList = new ArrayList<>();
+		List<Balance> familyBalanceList = new ArrayList<>();
+		if(StringUtils.hasText(account))
+			accountBalanceList = balanceDao.getAllBalanceByFamilyIdList(null);
+		if(!familyIdList.isEmpty())
+			familyBalanceList = balanceDao.getAllBalanceByFamilyIdList(familyIdList);
+		
+		List<Balance> balanceList = accountBalanceList;
+		balanceList.addAll(familyBalanceList);
+		List<Integer> balanceIdList = balanceList.stream().map((Balance t) -> t.getBalanceId()).toList();
 		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
 		List<BalanceWithPaymentVO> resultList = new ArrayList<>();
 		Map<Integer, List<PaymentInfoVO>> map = new HashMap<>();
@@ -301,7 +347,11 @@ public class PaymentServiceImpl implements PaymentService
 		if(!userDao.existsById(account))
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		var result = getPaymentInfoOpration(account, -1, 0, false);
+		List<Integer> familyIdList = familyDao.selectAll().stream()
+				.filter((Family t) -> t.isMember(account))
+				.map((Family t) -> t.getId())
+				.toList();
+		var result = getPaymentInfoOpration(account, familyIdList, -1, 0, false);
 		
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, result);
 	}
@@ -355,19 +405,13 @@ public class PaymentServiceImpl implements PaymentService
 		List<Payment> filtedPaymentList = new ArrayList<>();
 		if(req.month() < 1 || req.month() > 12)
 		{
-			paymentList.forEach(payment -> {
-				if(!payment.isDeleted() && payment.isOnTime(req.year()))
-					filtedPaymentList.add(payment);
-			});
+			filtedPaymentList = paymentList.stream().filter(t -> !t.isDeleted() && t.isOnTime(req.year())).toList();
 //			只篩選年份的款項須考慮月份排序問題
 			filtedPaymentList.sort((o1, o2) -> o1.getMonth() - o2.getMonth());
 		}
 		else
 		{
-			paymentList.forEach(payment -> {
-				if(!payment.isDeleted() && payment.isOnTime(req.year(), req.month()))
-					filtedPaymentList.add(payment);
-			});
+			filtedPaymentList = paymentList.stream().filter(t -> !t.isDeleted() && t.isOnTime(req.year(), req.month())).toList();
 		}
 		
 		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year());
@@ -608,14 +652,11 @@ public class PaymentServiceImpl implements PaymentService
 		/* 意旨蒐集所有生命週期為零的款項編號，被儲存在此列表的 
 		 * 款項都將永遠從資料庫中移除。 */
 		List<Integer> noLifePaymentIdList = new ArrayList<>();
-		paymentList.forEach(t -> {
-			if(t.isDeleted())
-				deletedPaymentList.add(t);
-		});
-		deletedPaymentList.forEach(t -> {
-			if(t.getLifeTime() < 0)
-				noLifePaymentIdList.add(t.getPaymentId());
-		});
+		deletedPaymentList = paymentList.stream().filter((Payment t) -> t.isDeleted()).toList();
+		noLifePaymentIdList = deletedPaymentList.stream()
+				.filter((Payment t) -> t.getLifeTime() < 0)
+				.map((Payment t) -> t.getPaymentId())
+				.toList();
 		paymentDao.deleteByPaymentIdList(noLifePaymentIdList);
 	}
 

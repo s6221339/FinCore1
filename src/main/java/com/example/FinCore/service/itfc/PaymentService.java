@@ -47,7 +47,22 @@ public interface PaymentService
 	 * @param req 請求資料
 	 * @return 存放款項資料的回應資料
 	 */
-	public SearchPaymentResponse getPaymentInfoWithDateFilter(AccountWithDateFilterRequest req);
+	public SearchPaymentResponse getPaymentInfoByAccountWithDateFilter(AccountWithDateFilterRequest req);
+	
+	/**
+	 * 取得該帳號所有群組相關聯的所有款項。
+	 * @param account 帳號
+	 * @return 存放款項資料的回應資料，源自於該帳號所在的群組
+	 */
+	public SearchPaymentResponse getPaymentInfoOfFamily(String account);
+	
+	/**
+	 * 和 {@link PaymentService#getPaymentInfoOfFamily(String)} 類似，但增加
+	 * 了年月過濾，因此回傳資料時將會鎖定指定年月的款項
+	 * @param req 請求資料
+	 * @return 存放款項資料的回應資料，源自於該帳號所在的群組
+	 */
+	public SearchPaymentResponse getPaymentInfoOfFamilyWithDateFilter(AccountWithDateFilterRequest req);
 	
 	/**
 	 * 可以復原被刪除的款項資料（僅在款項被真正刪除前可用）。

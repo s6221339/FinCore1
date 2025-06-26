@@ -21,6 +21,7 @@ import com.example.FinCore.vo.response.StatisticsResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -126,7 +127,38 @@ public class PaymentController
 		})
 	public SearchPaymentResponse getPaymentInfoWithDateFilter(@Valid @RequestBody AccountWithDateFilterRequest req) 
 	{
-		return service.getPaymentInfoWithDateFilter(req);
+		return service.getPaymentInfoByAccountWithDateFilter(req);
+	}
+	
+	@PostMapping(value = "getInfoOfFamily")
+	@Operation(
+			summary = ApiDocConstants.PAYMENT_GET_FAMILY_INFO_SUMMARY,
+			description = ApiDocConstants.PAYMENT_GET_FAMILY_INFO_DESC,
+			method = "POST",
+			parameters = {
+				@Parameter(
+					name = "account",
+					description = ApiDocConstants.PARAM_ACCOUNT_DESC
+				)
+			}
+		)
+	public SearchPaymentResponse getPaymentInfoOfFamily(String account) 
+	{
+		return service.getPaymentInfoOfFamily(account);
+	}
+	
+	@PostMapping(value = "getInfoOfFamilyWithDateFilter")
+	@Operation(
+			summary = ApiDocConstants.PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_SUMMARY,
+			description = ApiDocConstants.PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_DESC,
+			method = "POST",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					description = ApiDocConstants.PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_REQUEST_RULE
+					)
+		)
+	public SearchPaymentResponse getPaymentInfoOfFamilyWithDateFilter(AccountWithDateFilterRequest req)
+	{
+		return service.getPaymentInfoOfFamilyWithDateFilter(req);
 	}
 	
 	@PostMapping(value = "recovery")

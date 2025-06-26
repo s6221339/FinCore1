@@ -42,6 +42,10 @@ public final class ApiDocConstants
 
 	public static final String BALANCE_DELETE_SUMMARY = "刪除帳戶資料";
 	
+	public static final String PAYMENT_GET_FAMILY_INFO_SUMMARY = "查詢使用者所屬群組的帳戶款項";
+
+	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_SUMMARY = "查詢使用者所屬群組的帳戶款項（依據年月篩選）";
+
 	public static final String PAYMENT_SCHEDULED_CREATE_SUMMARY = "排程建立下一筆循環帳款（內部任務）";
 	
 	public static final String PAYMENT_SCHEDULED_DELETE_SUMMARY = "排程永久刪除帳款資料（內部任務）";
@@ -156,6 +160,15 @@ public final class ApiDocConstants
 	public static final String PAYMENT_STATISTICS_DESC =
 			"根據指定帳號與時間範圍，統計該帳號下所有個人及家庭帳戶的款項資料，依月份與類型分類統計。<br>";
 
+	public static final String PAYMENT_GET_FAMILY_INFO_DESC =
+			"本 API 用於查詢目前帳號所參與的群組中，所有帳戶的記帳資料，僅包含「未被刪除」的款項資料。<br>"
+			+ "系統會依照提供帳號比對群組成員關係，列出所有相關帳戶的資訊與款項紀錄。";
+
+	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_DESC =
+			"本 API 用於查詢目前帳號所參與的群組中，所有帳戶於指定年、月的款項資料。<br>"
+			+ "系統會自動比對帳號參與的群組關聯，合併查詢其帳戶資料，僅包含「未被刪除」的款項。<br>"
+			+ "若指定的年月無資料則回傳空陣列。";
+	
 	public static final String PAYMENT_SCHEDULED_CREATE_DESC =
     		"每天凌晨自動執行的排程任務，根據循環帳款規則建立下一筆尚未記錄的款項。<br>"
     		+ "篩選條件包括：未刪除、有效週期、當前時間符合周期起點。符合者將自動產生下一筆紀錄。<br>";
@@ -235,6 +248,8 @@ public final class ApiDocConstants
     
     public static final String USER_LOGOUT_DESC = "會員進行登出動作。RESTful 架構多為前端刪除 token，若需強制登出請配合 session 或 token blacklist。<br>";
 
+    public static final String PARAM_ACCOUNT_DESC = "使用者帳號，用於比對群組成員身份";
+    
     /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
 
@@ -302,6 +317,13 @@ public final class ApiDocConstants
 			+ "<li>account：查詢使用者帳號，為必填</li>"
 			+ "<li>year：指定查詢的年份，若為 -1 則不啟用年份篩選</li>"
 			+ "<li>month：指定查詢的月份，0 表示不啟用月份篩選，只有在啟用年份篩選時才會生效</li>"
+			+ "</ul>";
+	
+	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_REQUEST_RULE =
+			"<ul>"
+			+ "<li><b>account</b>：使用者帳號，<code>不可為空</code>，系統會依此比對所屬群組</li>"
+			+ "<li><b>year</b>：指定年份，<code>介於 0～9999</code></li>"
+			+ "<li><b>month</b>：指定月份，<code>1～12</code> 之間</li>"
 			+ "</ul>";
 	
 	public static final String PAYMENT_RECOVERY_REQUEST_BODY_RULE =

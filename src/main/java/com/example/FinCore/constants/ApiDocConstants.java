@@ -52,7 +52,7 @@ public final class ApiDocConstants
 
 	public final static String FAMILY_CREATE_SUMMARY = "建立家族";
 
-	public static final String FAMILY_GET_BY_ID_SUMMARY = "查詢家族群組資訊";
+	public static final String FAMILY_GET_BY_ID_SUMMARY = "查詢家族群組詳細資料";
 	
 	public final static String FAMILY_LIST_ALL_FAMILY_SUMMARY = "查詢所有家族群組清單";
 	
@@ -192,7 +192,7 @@ public final class ApiDocConstants
 
 	public final static String FAMILY_CREATE_DESC = "由指定 owner 建立新的家族，並可一次邀請多位成員<br>";
 	
-	public static final String FAMILY_GET_BY_ID_DESC = "根據 familyId 查詢家族群組詳細資訊<br>";;
+	public static final String FAMILY_GET_BY_ID_DESC = "根據 familyId 查詢該家族群組的詳細資訊，包括擁有者與所有成員姓名。<br>";
 	
 	public final static String FAMILY_LIST_ALL_FAMILY_DESC = "查詢系統內所有家族群組，包含群組名稱、擁有者與成員資訊。<br>";
 	

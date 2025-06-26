@@ -1,45 +1,31 @@
 package com.example.FinCore.vo.response;
 
 import com.example.FinCore.constants.ResponseMessages;
-import com.example.FinCore.entity.Family;
+import com.example.FinCore.vo.FamilyVO;
 
-public class FamilyIdResponse extends BasicResponse{
-	
-	private Family family;
+/**
+ * 查詢家族資訊 Response
+ */
+public class FamilyIdResponse extends BasicResponse {
 
-	public FamilyIdResponse() {
-		super();
-	}
+    private FamilyVO family;
 
-	public FamilyIdResponse(Family family) {
-		super();
-		this.family = family;
-	}
+    // 成功時建構子
+    public FamilyIdResponse(int code, String message, FamilyVO family) {
+        super(code, message);
+        this.family = family;
+    }
 
-	public FamilyIdResponse(int code, String message) {
-		super(code, message);
-	}
-	
-	public FamilyIdResponse(int code, String message, Family family) {
-		super(code, message);
-		this.family = family;
-	}
+    // 僅錯誤回傳時用
+    public FamilyIdResponse(ResponseMessages messages) {
+        super(messages);
+    }
 
-	public FamilyIdResponse(ResponseMessages res) {
-		super(res);
-	}
+    public FamilyVO getFamily() {
+        return family;
+    }
 
-	public FamilyIdResponse(ResponseMessages res, Family family) {
-		super(res);
-		this.family = family;
-	}
-
-	public Family getFamily() {
-		return family;
-	}
-
-	public void setFamily(Family family) {
-		this.family = family;
-	}
-	
+    public void setFamily(FamilyVO family) {
+        this.family = family;
+    }
 }

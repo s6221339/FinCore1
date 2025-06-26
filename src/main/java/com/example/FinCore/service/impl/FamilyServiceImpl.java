@@ -637,14 +637,11 @@ public class FamilyServiceImpl implements FamilyService {
 	        }
 
 	        try {
-	            if (invitorList.isEmpty()) {
-	                family.setInvitor(null);
-	            } else {
-	                family.setInvitor(new ObjectMapper().writeValueAsString(invitorList));
-	            }
-	        } catch (Exception e) {
-	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
-	        }
+    	    	family.toInvitor(invitorList);
+//    	    	family.setInvitor(mapper.writeValueAsString(invitorList));
+    	    } catch (Exception e) {
+    	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+    	    }
 	        familyDao.save(family);
 
 	        // 刪除 family_invitation 紀錄

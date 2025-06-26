@@ -1,6 +1,10 @@
 package com.example.FinCore.service.itfc;
 
 import com.example.FinCore.vo.request.InviteRequest;
+
+import java.util.List;
+
+import com.example.FinCore.vo.FamilyInvitationStatusVO;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
@@ -148,5 +152,22 @@ public interface FamilyService {
      * @return 家庭邀請中成員清單回應物件，內含家族ID與邀請中成員資訊（account、name）
      */
     public FamilyInvitationListResponse getInvitingList(int familyId);
+   
+    
+    /**
+     * Owner 取消發出的邀請（只能 owner 執行，刪除 family_invitation 資料）
+     * @param familyId 家族群組ID
+     * @param owner 帳號（必須是該家族 owner）
+     * @param invitee 受邀人帳號
+     * @return BasicResponse 執行結果
+     */
+    public BasicResponse cancelInvite(int familyId, String owner, String invitee);
+    
+    /**
+     * 查詢該帳號收到的所有家族邀請
+     * @param account 受邀帳號
+     * @return 該帳號所有家族邀請資訊
+     */
+    public List<FamilyInvitationStatusVO> getStatusByAccount(String account);
 
 }

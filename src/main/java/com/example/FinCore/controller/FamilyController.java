@@ -1,5 +1,7 @@
 package com.example.FinCore.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.constants.ApiDocConstants;
 import com.example.FinCore.service.itfc.FamilyService;
+import com.example.FinCore.vo.FamilyInvitationStatusVO;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
 import com.example.FinCore.vo.request.InviteMemberRequest;
@@ -306,4 +309,60 @@ public class FamilyController {
     public FamilyInvitationListResponse getInvitingList(@RequestParam("familyId") int familyId) {
         return service.getInvitingList(familyId);
     }
+
+    /**
+	 * Owner 取消發出的邀請（只能 owner 執行，刪除 family_invitation 資料）
+	 * @param familyId 家族群組ID
+	 * @param owner 帳號（必須是該家族 owner）
+	 * @param invitee 受邀人帳號
+	 * @return BasicResponse 執行結果
+	 */
+    @PostMapping(value = "cancelInvite")
+    @Operation(
+    	    summary = ApiDocConstants.FAMILY_INVITATION_CANCEL_SUMMARY,
+    	    description = ApiDocConstants.FAMILY_INVITATION_CANCEL_DESC,
+    	    method = "POST",
+    	    parameters = {
+    	        @Parameter(name = "familyId", description = "家族群組ID（必填）"),
+    	        @Parameter(name = "owner", description = "群組擁有者帳號（必填）"),
+    	        @Parameter(name = "invitee", description = "受邀人帳號（必填）")
+    	    }
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITATION_CANCEL_RESPONSE_400),
+    	    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITATION_CANCEL_RESPONSE_404),
+    	})
+    public BasicResponse cancelInvite(
+    		@RequestParam("familyId") int familyId, 
+    		@RequestParam("owner") String owner, 
+    		@RequestParam("invitee") String invitee) {
+            return service.cancelInvite(familyId, owner, invitee);
+    }
+    
+    /**
+     * 查詢指定帳號收到的所有「邀請中」家族邀請狀態
+     * 
+     * 僅回傳 status = false（尚未接受）之邀請資料，並包含家族ID、家族名稱與狀態
+     *
+     * @param account 會員帳號（必填）
+     * @return 該帳號收到的所有「邀請中」家族邀請資訊（List<FamilyInvitationStatusVO>）
+     */
+    @PostMapping(value = "getInvitationStatus")
+    @Operation(
+    	    summary = ApiDocConstants.FAMILY_INVITATION_STATUS_SUMMARY,
+    	    description = ApiDocConstants.FAMILY_INVITATION_STATUS_DESC,
+    	    method = "POST",
+    	    parameters = {
+    	        @Parameter(name = "account", description = "會員帳號（必填）")
+    	    }
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS)
+    	})
+    public List<FamilyInvitationStatusVO> getInvitationStatus(@RequestParam("account") String account) {
+        return service.getStatusByAccount(account);
+    }
+    
 }

@@ -20,6 +20,7 @@ import com.example.FinCore.entity.FamilyInvitation;
 import com.example.FinCore.entity.FamilyInvitationPK;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.FamilyService;
+import com.example.FinCore.vo.FamilyInvitationStatusVO;
 import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.SimpleUserVO;
 import com.example.FinCore.vo.request.InviteRequest;
@@ -771,5 +772,77 @@ public class FamilyServiceImpl implements FamilyService {
 	    resp.setFamilyId(familyId);
 	    resp.setInviteeList(inviteeList);
 	    return resp;
+	}
+	
+	/**
+	 * Owner 取消發出的邀請（只能 owner 執行，刪除 family_invitation 資料）
+	 * @param familyId 家族群組ID
+	 * @param owner 帳號（必須是該家族 owner）
+	 * @param invitee 受邀人帳號
+	 * @return BasicResponse 執行結果
+	 */
+	@Override
+	@Transactional
+	public BasicResponse cancelInvite(int familyId, String owner, String invitee) {
+	    // 1. 檢查 owner 與 invitee 是否存在
+	    if (!userDao.existsById(owner) || !userDao.existsById(invitee)) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
+
+	    // 2. 查詢家族資料
+	    Optional<Family> familyOpt = familyDao.findById(familyId);
+	    if (familyOpt.isEmpty()) {
+	        return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
+	    }
+	    Family family = familyOpt.get();
+
+	    // 3. 權限驗證（只有 owner 能執行）
+	    if (!family.getOwner().equals(owner)) {
+	        return new BasicResponse(ResponseMessages.NO_PERMISSION);
+	    }
+
+	    // 4. 查詢邀請紀錄
+	    FamilyInvitationPK pk = new FamilyInvitationPK(invitee, familyId);
+	    Optional<FamilyInvitation> invitationOpt = familyInvitationDao.findById(pk);
+	    if (invitationOpt.isEmpty()) {
+	        return new BasicResponse(ResponseMessages.INVITATION_NOT_FOUND);
+	    }
+	    FamilyInvitation invitation = invitationOpt.get();
+
+	    // 5. 狀態為已接受無法取消
+	    if (invitation.isStatus()) {
+	        return new BasicResponse(ResponseMessages.INVITATION_ALREADY_ACCEPTED);
+	    }
+
+	    // 6. 執行刪除
+	    familyInvitationDao.delete(invitation);
+
+	    // 7. 回傳結果
+	    return new BasicResponse(ResponseMessages.SUCCESS);
+	}
+	
+	/**
+	 * 查詢該帳號收到的所有「邀請中」家族邀請
+	 * @param account 受邀帳號
+	 * @return 該帳號所有「邀請中」家族邀請資訊 (List<FamilyInvitationStatusVO>)
+	 */
+	@Override
+	public List<FamilyInvitationStatusVO> getStatusByAccount(String account) {
+	    List<FamilyInvitationStatusVO> result = new ArrayList<>();
+	    // 1. 查詢該帳號收到的邀請
+	    List<FamilyInvitation> invitations = familyInvitationDao.findByAccount(account);
+	    for (FamilyInvitation inv : invitations) {
+	        if (!inv.isStatus()) { // 只要還沒接受邀請的
+	            Optional<Family> familyOpt = familyDao.findById(inv.getFamilyId());
+	            String familyName = familyOpt.map(Family::getName).orElse("(已刪除家族)");
+	            // 狀態直接寫死為「邀請中」
+	            result.add(new FamilyInvitationStatusVO(
+	                inv.getFamilyId(),
+	                familyName,
+	                "邀請中"
+	            ));
+	        }
+	    }
+	    return result;
 	}
 }

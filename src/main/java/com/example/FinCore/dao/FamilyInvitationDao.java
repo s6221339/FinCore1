@@ -76,4 +76,12 @@ public interface FamilyInvitationDao extends JpaRepository<FamilyInvitation, Fam
     @jakarta.transaction.Transactional
     @Query(value = "delete from family_invitation where family_id = :familyId and account in :accounts", nativeQuery = true)
     void deleteByFamilyIdAndAccounts(@Param("familyId") int familyId, @Param("accounts") List<String> accounts);
+    
+    /**
+     * 根據 account 查詢收到的所有邀請
+     * @param account 受邀帳號
+     * @return 邀請列表
+     */
+    @Query(value = "select * from family_invitation where account = :account", nativeQuery = true)
+    List<FamilyInvitation> findByAccount(@Param("account") String account);
 }

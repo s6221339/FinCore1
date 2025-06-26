@@ -76,6 +76,10 @@ public final class ApiDocConstants
     
     public static final String FAMILY_INVITATION_LIST_SUMMARY = "查詢家族邀請中成員名單";
     
+    public static final String FAMILY_INVITATION_CANCEL_SUMMARY = "取消家族邀請";
+    
+    public static final String FAMILY_INVITATION_STATUS_SUMMARY = "查詢帳號所有邀請中家族";
+    
     public static final String USER_REGISTER_SUMMARY = "會員註冊";
     
     public static final String USER_UPDATE_SUMMARY = "會員資料更新";
@@ -202,6 +206,10 @@ public final class ApiDocConstants
     public static final String FAMILY_INVITATION_REJECT_DESC = "用戶拒絕家族邀請，會直接刪除邀請紀錄。<br>";
     
     public static final String FAMILY_INVITATION_LIST_DESC = "依據 familyId 查詢目前發出、尚未接受的邀請成員清單（status=0）。<br>";
+    
+    public static final String FAMILY_INVITATION_CANCEL_DESC = "群組擁有者可取消尚未被接受的家族邀請。<br>";
+    
+    public static final String FAMILY_INVITATION_STATUS_DESC = "根據會員帳號查詢目前尚未接受的所有家族邀請資訊。<br>";
     
     public static final String USER_REGISTER_DESC = "建立新會員帳號，帳號需唯一且密碼將自動加密。<br>";
     
@@ -536,6 +544,17 @@ public final class ApiDocConstants
 		    "<ul>" +
 		    "<li>密碼錯誤</li>" +
 		    "<li>更新會員失敗</li>" +
+		    "</ul>";
+	
+	public static final String FAMILY_INVITATION_CANCEL_RESPONSE_400 =
+	    "<ul>" +
+	    "<li>該邀請已被接受，無法重複操作！</li>" +
+	    "</ul>";
+	
+	public static final String FAMILY_INVITATION_CANCEL_RESPONSE_404 =
+		    "<ul>" +
+		    "<li>家族群組不存在</li>" +
+		    "<li>查無此邀請紀錄！</li>" +
 		    "</ul>";
 	
 	public static final String PASSWORD_NOT_MATCH = "密碼錯誤";

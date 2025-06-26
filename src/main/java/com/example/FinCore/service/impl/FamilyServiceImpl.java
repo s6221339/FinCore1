@@ -156,16 +156,45 @@ public class FamilyServiceImpl implements FamilyService {
 	}
 
 	public FamilyIdResponse getById(int familyId) {
-		if (familyId < 1) {
-			return new FamilyIdResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-		}
-		Optional<Family> familyOpt = familyDao.findById(familyId);
-		if (familyOpt.isPresent()) {
+	    if (familyId < 1) {
+	        return new FamilyIdResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
+	    Optional<Family> familyOpt = familyDao.findById(familyId);
+	    if (familyOpt.isEmpty()) {
+	        return new FamilyIdResponse(ResponseMessages.FAMILY_NOT_FOUND);
+	    }
+	    Family family = familyOpt.get();
 
-			return new FamilyIdResponse(ResponseMessages.SUCCESS, familyOpt.get());
-		} else {
-			return new FamilyIdResponse(ResponseMessages.FAMILY_NOT_FOUND);
-		}
+	    // 查詢owner名稱
+	    User ownerUser = userDao.selectById(family.getOwner());
+	    SimpleUserVO ownerVO = new SimpleUserVO(
+	        family.getOwner(),
+	        ownerUser != null ? ownerUser.getName() : null
+	    );
+
+	    // 解析家庭成員
+	    List<SimpleUserVO> memberList = new ArrayList<>();
+	    List<String> invitorList = family.toMemberList();
+	    if (invitorList != null) {
+	        for (String account : invitorList) {
+	            User user = userDao.selectById(account);
+	            memberList.add(new SimpleUserVO(account, user != null ? user.getName() : null));
+	        }
+	    }
+
+	    // 組成FamilyVO
+	    FamilyVO vo = new FamilyVO(
+	        family.getId(),
+	        family.getName(),
+	        ownerVO,
+	        memberList
+	    );
+
+	    return new FamilyIdResponse(
+	        ResponseMessages.SUCCESS.getCode(),
+	        ResponseMessages.SUCCESS.getMessage(),
+	        vo
+	    );
 	}
 	
 	

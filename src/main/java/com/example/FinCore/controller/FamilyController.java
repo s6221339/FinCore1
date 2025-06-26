@@ -22,6 +22,7 @@ import com.example.FinCore.vo.request.OwnerResignAndAssignRequest;
 import com.example.FinCore.vo.request.QuitFamilyRequest;
 import com.example.FinCore.vo.request.RenameFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
+import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyInvitationListResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -83,7 +84,7 @@ public class FamilyController {
 		    parameters = {
 		        @Parameter(
 		            name = "familyId",
-		            description = "家族群組 ID（必填，需大於 0）"
+		            description = "家族群組ID（必填，需大於 0）"
 		        )
 		    }
 		)
@@ -92,7 +93,7 @@ public class FamilyController {
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
 		})
-	public BasicResponse getById(@RequestParam("familyId") int familyId) {
+	public FamilyIdResponse getById(@RequestParam("familyId") int familyId) {
 		return service.getById(familyId);
 	}
 	

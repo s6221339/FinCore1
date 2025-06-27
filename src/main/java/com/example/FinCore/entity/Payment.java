@@ -246,7 +246,7 @@ public class Payment
 	public boolean isPeriodValid()
 	{
 		var period = getPeriod();
-		return period.isPeriodValid();
+		return period.checkPeriodValid();
 	}
 	
 	/**
@@ -403,7 +403,7 @@ public class Payment
 	public Payment nextRecurrence()
 	{
 		var period = getPeriod();
-		if(!period.isPeriodValid())
+		if(!period.checkPeriodValid())
 			return this;
 		
 		LocalDate nextRecordDate = recordDate;

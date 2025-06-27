@@ -246,7 +246,7 @@ public class PaymentServiceImpl implements PaymentService
 		List<Balance> accountBalanceList = new ArrayList<>();
 		List<Balance> familyBalanceList = new ArrayList<>();
 		if(StringUtils.hasText(account))
-			accountBalanceList = balanceDao.getAllBalanceByFamilyIdList(null);
+			accountBalanceList = balanceDao.getAllBalanceByAccount(account);
 		if(!familyIdList.isEmpty())
 			familyBalanceList = balanceDao.getAllBalanceByFamilyIdList(familyIdList);
 		
@@ -309,11 +309,7 @@ public class PaymentServiceImpl implements PaymentService
 	 */
 	private PaymentInfoVO setPaymentInfoVO(Payment payment)
 	{
-		var period = new RecurringPeriodVO(
-				payment.getRecurringPeriodYear(), 
-				payment.getRecurringPeriodMonth(), 
-				payment.getRecurringPeriodDay()
-				);
+		var period = payment.getPeriod();
 		var paymentInfo = new PaymentInfoVO(
 				payment.getPaymentId(),
 				payment.getDescription(), 

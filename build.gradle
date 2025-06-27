@@ -33,6 +33,9 @@ dependencies {
  	implementation 'org.springframework.boot:spring-boot-starter-mail'
  	//avatar 頭像
  	implementation 'net.coobird:thumbnailator:0.4.20'
+ 	// Open AI
+ 	implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
+ 	implementation 'org.springframework.ai:spring-ai-openai'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

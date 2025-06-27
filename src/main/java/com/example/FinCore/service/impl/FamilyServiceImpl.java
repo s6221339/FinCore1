@@ -91,7 +91,6 @@ public class FamilyServiceImpl implements FamilyService {
 	            return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
 
 	    // List轉String
-	    @SuppressWarnings("unused")
 		String invitorStr = mapper.writeValueAsString(req.getInvitor());
 	    
 	    // 建立 Family 物件
@@ -99,7 +98,7 @@ public class FamilyServiceImpl implements FamilyService {
 	    family.setOwner(req.getOwner());
 	    family.setName(req.getName());
 	    // 不要直接把受邀人設成 invitor
-	    family.setInvitor(null); // 成員清單先不加人
+	    family.setInvitor("[]"); // 成員清單先不加人
 	    family.setCreateDate(LocalDate.now());
 
 	    // 儲存資料庫

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.constants.ApiDocConstants;
+import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.request.RregisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
@@ -207,13 +208,20 @@ public class UserController {
 		)
 		@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.LOGOUT_SUCCESS),
-		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
-		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+		    @ApiResponse(responseCode = "500", description = ApiDocConstants.INVALID_SESSION),
 		})
-	public BasicResponse logout(@RequestParam String account, HttpSession session) {
-	    var res = service.logout(account);
-	    if(res.getCode() == 200)
-	    	session.invalidate();
-		return res;
+	/**
+	 * 使用者登出（如需真正後端驗證，請配合 session 或 token blacklist 等方式）
+	 * @param account 使用者帳號
+	 * @return 登出結果
+	 */
+	public BasicResponse logout(HttpSession session) {
+		try {
+			session.invalidate();
+		}
+	    catch (IllegalStateException e) {
+	    	return new BasicResponse(ResponseMessages.INVALID_SESSION);
+		}
+		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 }

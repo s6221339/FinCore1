@@ -13,7 +13,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.example.FinCore.annotation.TODO;
 import com.example.FinCore.constants.ResponseMessages;
+import com.example.FinCore.constants.TodoPriority;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.PaymentDao;
@@ -352,6 +354,7 @@ public class PaymentServiceImpl implements PaymentService
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, result);
 	}
 	
+	@TODO(value = "修復Bug：統計資料中會出現重複項", priority = TodoPriority.HIGH)
 	@Override
 	public StatisticsResponse statistics(StatisticsRequest req) 
 	{
@@ -410,7 +413,10 @@ public class PaymentServiceImpl implements PaymentService
 			filtedPaymentList = paymentList.stream().filter(t -> !t.isDeleted() && t.isOnTime(req.year(), req.month())).toList();
 		}
 		
-		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year());
+		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year())
+				.stream()
+				.sorted((o1, o2) -> o1.month() - o2.month())
+				.toList();
 		return new StatisticsResponse(ResponseMessages.SUCCESS, statisticsList);
 	}
 	
@@ -465,102 +471,78 @@ public class PaymentServiceImpl implements PaymentService
 			Map<BalanceInfoVO, FamilyInfoVO> infoMap,
 			int year)
 	{
-		List<StatisticsVO> result = new ArrayList<>();
-//		該映射表存放月分與分析資料
-		Map<Integer, List<StatisticsInfoVO>> statisticsInfoVOMap = new HashMap<>();
-		Map<String, Integer> paymentAmountMap = new HashMap<>();
-		
-		for(Payment payment : paymentList)
-		{
-			int month = payment.getMonth();
-			List<StatisticsInfoVO> statisticsInfoVOList = 
-					statisticsInfoVOMap.containsKey(month) ? statisticsInfoVOMap.get(month) : new ArrayList<>();
+	    List<StatisticsVO> result = new ArrayList<>();
 
-//			設定帳戶資訊與群組資訊
-			BalanceInfoVO bInfo = null;
-			FamilyInfoVO fInfo = null;
-			for(Entry<BalanceInfoVO, FamilyInfoVO> infoEntry : infoMap.entrySet())
-			{
-				var k = infoEntry.getKey();
-				var v = infoEntry.getValue();
-//				通常可保證執行，因為每筆帳款必定源自某個帳戶
-				if(payment.getBalanceId() == k.id())
-				{
-					bInfo = k;
-					fInfo = v;
-					break;
-				}
-			}
-			
-			StatisticsInfoVO sInfo = null;
-//			檢查 statisticsInfoVOList 是否已存在資料
-			for(StatisticsInfoVO sInfoVO : statisticsInfoVOList)
-			{
-				if(sInfoVO.balanceInfo().id() == bInfo.id())
-				{
-//					如果統計資料儲存的帳戶資訊與該帳款的帳戶資訊一致就設值
-					sInfo = sInfoVO;
-					break;
-				}
-			}
-			if(sInfo != null)
-			{
-//				找到資料時執行
-				var paymentAmountVOList = sInfo.paymentAmountList();
-				String type = payment.getType();
-				int amount = payment.getAmount();
-//				檢查是否有相同類型的款項統計資料
-				PaymentAmountVO paymentAmount = null;
-				for(PaymentAmountVO paVO : paymentAmountVOList)
-				{
-					if(paVO.type().equals(type))
-					{
-						paymentAmount = paVO;
-						break;
-					}
-				}
-				if(paymentAmount != null)
-				{
-//					如果發現相同類型：
-//					將統計金額累計，將原本的資料刪除，重新增加新的帳款資料
-					paymentAmountVOList.remove(paymentAmount);
-					paymentAmount = new PaymentAmountVO(type, paymentAmount.totalAmount() + amount);
-				}
-				else
-				{
-//					如果是新的類型：
-//					直接新增新資料
-					paymentAmount = new PaymentAmountVO(type, amount);
-				}
-//				設定款項統計列表與映射表
-				paymentAmountVOList.add(paymentAmount);
-				paymentAmountMap.put(type, amount);
-//				設定統計資料
-				sInfo = new StatisticsInfoVO(bInfo, fInfo, paymentAmountVOList);
-			}
-			else
-			{
-//				找不到對應資料
-//				抽取帳款資料（類型與金額）
-				String type = payment.getType();
-				int amount = payment.getAmount();
-//				初始化資料並加入陣列中
-				var paymentAmount = new PaymentAmountVO(type, amount);
-				List<PaymentAmountVO> paymentAmountVOList = new ArrayList<>();
-				paymentAmountVOList.add(paymentAmount);
-				paymentAmountMap.put(type, amount);
-//				設定帳款資料
-				sInfo = new StatisticsInfoVO(bInfo, fInfo, paymentAmountVOList);
-			}
-			statisticsInfoVOList.add(sInfo);
-			statisticsInfoVOMap.put(month, statisticsInfoVOList);
-		}
-		for(Entry<Integer, List<StatisticsInfoVO>> statisticsInfoVOEntry : statisticsInfoVOMap.entrySet())
-		{
-			StatisticsVO statisticsVO = new StatisticsVO(year, statisticsInfoVOEntry.getKey(), statisticsInfoVOEntry.getValue());
-			result.add(statisticsVO);
-		}
-		return result;
+	    // 月份 -> (帳戶ID -> 統計資料)
+	    Map<Integer, Map<Integer, StatisticsInfoVO>> statisticsMap = new HashMap<>();
+
+	    for (Payment payment : paymentList) {
+	        int month = payment.getMonth();
+	        int balanceId = payment.getBalanceId();
+	        String type = payment.getType();
+	        int amount = payment.getAmount();
+
+	        // 找出 BalanceInfoVO 和 FamilyInfoVO
+	        BalanceInfoVO bInfo = null;
+	        FamilyInfoVO fInfo = null;
+	        for (Map.Entry<BalanceInfoVO, FamilyInfoVO> entry : infoMap.entrySet()) 
+	        {
+	            if (entry.getKey().id() == balanceId) 
+	            {
+	                bInfo = entry.getKey();
+	                fInfo = entry.getValue();
+	                break;
+	            }
+	        }
+	        if (bInfo == null) continue; // 安全防呆
+
+	        // 取得對應月份的 map
+	        Map<Integer, StatisticsInfoVO> monthMap = statisticsMap.computeIfAbsent(month, k -> new HashMap<>());
+
+	        // 看這個 balanceId 的統計資料是否存在
+	        StatisticsInfoVO sInfo = monthMap.get(balanceId);
+	        if (sInfo == null) 
+	        {
+	            // 初次建立該帳戶統計資料
+	            List<PaymentAmountVO> paymentAmountVOList = new ArrayList<>();
+	            paymentAmountVOList.add(new PaymentAmountVO(type, amount));
+	            sInfo = new StatisticsInfoVO(bInfo, fInfo, paymentAmountVOList);
+	            monthMap.put(balanceId, sInfo);
+	        } 
+	        else 
+	        {
+	            // 已有該帳戶統計資料，要更新裡面的金額
+	            List<PaymentAmountVO> paymentAmountList = new ArrayList<>(sInfo.paymentAmountList());
+	            boolean found = false;
+	            for (int i = 0; i < paymentAmountList.size(); i++) 
+	            {
+	                PaymentAmountVO pa = paymentAmountList.get(i);
+	                if (pa.type().equals(type)) 
+	                {
+	                    paymentAmountList.set(i, new PaymentAmountVO(type, pa.totalAmount() + amount));
+	                    found = true;
+	                    break;
+	                }
+	            }
+	            if (!found) 
+	            	paymentAmountList.add(new PaymentAmountVO(type, amount));
+	            
+	            sInfo = new StatisticsInfoVO(bInfo, fInfo, paymentAmountList);
+	            monthMap.put(balanceId, sInfo); // 更新新的 sInfo（不可共用舊的 record）
+	        }
+	    }
+
+	    // 整理成結果列表
+	    for (var entry : statisticsMap.entrySet()) 
+	    {
+	        int month = entry.getKey();
+	        List<StatisticsInfoVO> infoList = new ArrayList<>(entry.getValue().values());
+	        infoList = infoList.stream().sorted((o1, o2) -> o1.balanceInfo().id() - o2.balanceInfo().id()).toList();
+	        StatisticsVO statisticsVO = new StatisticsVO(year, month, infoList);
+	        result.add(statisticsVO);
+	    }
+
+	    return result;
 	}
 
 	/**

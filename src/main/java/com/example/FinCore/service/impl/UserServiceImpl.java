@@ -282,26 +282,4 @@ public class UserServiceImpl implements UserService {
 	    return new MemberNameResponse(ResponseMessages.SUCCESS.getCode(), "查詢成功", memberData);
 	}
 	
-	/**
-	 * 使用者登出（如需真正後端驗證，請配合 session 或 token blacklist 等方式）
-	 * @param account 使用者帳號
-	 * @return 登出結果
-	 */
-	@Override
-	public BasicResponse logout(String account) {
-	    // 1. 檢查帳號參數是否為空
-	    if (account == null || account.isEmpty()) {
-	        return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-	    }
-	    // 2. 檢查帳號是否存在
-	    int exists = userDao.selectCountByAccount(account);
-	    if (exists == 0) {
-	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
-	    }
-	    // 3. 執行登出邏輯
-	    // RESTful 無狀態系統通常不做 server-side logout，前端只需刪除 token/session
-	    // 若有 session 管理，這裡可加上 session 失效、token black list 等操作
-	    return new BasicResponse(ResponseMessages.SUCCESS);
-	}
-	
 }

@@ -596,6 +596,8 @@ public final class ApiDocConstants
 	public static final String INVITATION_NOT_FOUND = "查無此邀請紀錄！";
 	
 	public static final String INTERNAL_ONLY = "<b>此 API 為系統排程用途，不可由前端或第三方呼叫！</b><br>";
+	
+	public static final String INVALID_SESSION = "無效的 SESSION";
     
 	/* === 成功訊息 === */
 	

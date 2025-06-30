@@ -67,12 +67,5 @@ public interface UserService {
 	 * @return 姓名（找不到會回傳 null）
 	 */
 	public MemberNameResponse getNameByAccount(String account);
-
-	/**
-	 * 使用者登出（如需真正後端驗證，請配合 session 或 token blacklist 等方式）
-	 * @param account 使用者帳號
-	 * @return 登出結果
-	 */
-	BasicResponse logout(String account);
 	
 }

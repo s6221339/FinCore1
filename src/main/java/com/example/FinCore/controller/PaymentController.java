@@ -155,7 +155,7 @@ public class PaymentController
 				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SearchPaymentResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 	})
-	public BasicResponse getPaymentInfoOfFamily(String account) 
+	public BasicResponse getPaymentInfoOfFamily(@RequestParam("account") String account) 
 	{
 		return service.getPaymentInfoOfFamily(account);
 	}
@@ -175,7 +175,7 @@ public class PaymentController
 				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SearchPaymentResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 	})
-	public BasicResponse getPaymentInfoOfFamilyWithDateFilter(AccountWithDateFilterRequest req)
+	public BasicResponse getPaymentInfoOfFamilyWithDateFilter(@Valid @RequestBody AccountWithDateFilterRequest req)
 	{
 		return service.getPaymentInfoOfFamilyWithDateFilter(req);
 	}

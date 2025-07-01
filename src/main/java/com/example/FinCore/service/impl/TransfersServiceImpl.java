@@ -7,9 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.FinCore.annotation.TODO;
 import com.example.FinCore.constants.ResponseMessages;
-import com.example.FinCore.constants.TodoPriority;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.PaymentDao;
@@ -46,7 +44,6 @@ public class TransfersServiceImpl implements TransfersService
 	@Autowired
 	private FamilyDao familyDao;
 
-	@TODO(value = "建立轉帳需添加「僅限同群組成員轉帳」限制", priority = TodoPriority.HIGH)
 	@Transactional(rollbackOn = Exception.class)
 	@Override
 	public BasicResponse create(CreateTransfersRequest req) throws Exception

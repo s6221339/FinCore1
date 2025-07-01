@@ -13,9 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.example.FinCore.annotation.TODO;
 import com.example.FinCore.constants.ResponseMessages;
-import com.example.FinCore.constants.TodoPriority;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.PaymentDao;
@@ -354,7 +352,6 @@ public class PaymentServiceImpl implements PaymentService
 		return new SearchPaymentResponse(ResponseMessages.SUCCESS, result);
 	}
 	
-	@TODO(value = "修復Bug：統計資料中會出現重複項", priority = TodoPriority.HIGH)
 	@Override
 	public StatisticsResponse statistics(StatisticsRequest req) 
 	{

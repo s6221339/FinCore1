@@ -23,11 +23,11 @@ import com.example.FinCore.service.itfc.FamilyService;
 import com.example.FinCore.vo.FamilyInvitationStatusVO;
 import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.SimpleUserVO;
-import com.example.FinCore.vo.request.InviteRequest;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
 import com.example.FinCore.vo.request.InviteMemberRequest;
+import com.example.FinCore.vo.request.InviteRequest;
 import com.example.FinCore.vo.request.KickMemberRequest;
 import com.example.FinCore.vo.request.OwnerResignAndAssignRequest;
 import com.example.FinCore.vo.request.QuitFamilyRequest;
@@ -40,7 +40,6 @@ import com.example.FinCore.vo.response.FamilyInvitationStatusListResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.InviteMemberResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
@@ -91,9 +90,6 @@ public class FamilyServiceImpl implements FamilyService {
 	        if (!userDao.existsById(member))
 	            return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
 
-	    // List轉String
-		String invitorStr = mapper.writeValueAsString(req.getInvitor());
-	    
 	    // 建立 Family 物件
 	    Family family = new Family();
 	    family.setOwner(req.getOwner());

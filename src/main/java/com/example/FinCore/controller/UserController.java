@@ -18,11 +18,14 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
+import com.example.FinCore.vo.response.StatisticsResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -125,8 +128,10 @@ public class UserController {
 		    }
 		)
 		@ApiResponses({
-		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsResponse.class))}),
+			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 		})
 	public UserResponse getUser(@RequestParam("account") String account) {
@@ -146,8 +151,10 @@ public class UserController {
 		    }
 		)
 		@ApiResponses({
-		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyListResponse.class))}),
+			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		})
 	public FamilyListResponse getFamilyByAccount(@RequestParam("account") String account)
 			throws JsonProcessingException {
@@ -168,8 +175,15 @@ public class UserController {
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.PASSWORD_NOT_MATCH),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 		})
-	public BasicResponse login(@Valid @RequestBody loginRequest req) {
-		return service.login(req);
+	public BasicResponse login(@Valid @RequestBody loginRequest req, HttpSession session) {
+		var res = service.login(req);
+		if(res.getCode() == 200)
+		{
+			session.setAttribute("account", req.account());
+			session.setAttribute("sessionId", session.getId());
+			session.setMaxInactiveInterval(604800);
+		}
+		return res;
 
 	}
 	
@@ -186,8 +200,10 @@ public class UserController {
 		    }
 		)
 		@ApiResponses({
-		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = MemberNameResponse.class))}),
+			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 		})
 	public MemberNameResponse getNameByAccount(@RequestParam("account") String account) {

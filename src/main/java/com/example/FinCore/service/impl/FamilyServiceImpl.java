@@ -366,7 +366,6 @@ public class FamilyServiceImpl implements FamilyService {
 	        return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
 	    }
 
-	    ObjectMapper mapper = new ObjectMapper();
 	    List<String> invitorList;
 	    try {
 	        invitorList = family.toMemberList();

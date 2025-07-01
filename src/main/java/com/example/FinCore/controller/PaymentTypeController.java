@@ -16,6 +16,8 @@ import com.example.FinCore.vo.response.GetPaymentTypeListResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,9 +61,12 @@ public class PaymentTypeController
 			parameters = {@Parameter(name = "account", description = "帳號")}
 			)
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS + "：取得所有項目"),
+		@ApiResponse(
+				responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS + "：取得所有項目", 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = GetPaymentTypeListResponse.class))}),
 	})
-	public GetPaymentTypeListResponse getTypeByAccount(@RequestParam("account") String account)
+	public BasicResponse getTypeByAccount(@RequestParam("account") String account)
 	{
 		return service.getTypeByAccount(account);
 	}

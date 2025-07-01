@@ -2,7 +2,7 @@ package com.example.FinCore.vo.response;
 
 import java.util.List;
 
-public class FamilyInvitationListResponse {
+public class FamilyInvitationListResponse extends BasicResponse {
 	
 	private int familyId;
 	

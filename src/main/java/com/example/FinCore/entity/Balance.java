@@ -2,6 +2,8 @@ package com.example.FinCore.entity;
 
 import java.time.LocalDate;
 
+import org.springframework.util.StringUtils;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -71,6 +73,24 @@ public class Balance
 
 	public void setCreateDate(LocalDate createDate) {
 		this.createDate = createDate;
+	}
+	
+	/**
+	 * 檢測該帳戶是否屬於群組帳戶。
+	 * @return 屬於群組帳戶時返回 {@code TRUE}
+	 */
+	public boolean belongToFamily()
+	{
+		return famliyId != 0;
+	}
+	
+	/**
+	 * 檢測該帳戶是否屬於個人帳戶。
+	 * @return 屬於個人帳戶時返回 {@code TRUE}
+	 */
+	public boolean belongToAccount()
+	{
+		return StringUtils.hasText(account);
 	}
 	
 }

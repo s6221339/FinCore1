@@ -135,5 +135,17 @@ public class Family {
 		return false;
 	}
 	
+	/**
+	 * 檢測所有帳號是否都是該群組的成員。
+	 * @param accountList 一群帳號
+	 * @return 如果全部的帳號都是該群組的成員，返回 {@code TRUE}
+	 */
+	public boolean isMember(String... accountList)
+	{
+		List<String> memberList = toMemberList();
+		memberList.add(owner);
+		return memberList.containsAll(List.of(accountList));
+	}
+	
 
 }

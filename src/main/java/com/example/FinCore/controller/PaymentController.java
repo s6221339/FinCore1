@@ -21,6 +21,8 @@ import com.example.FinCore.vo.response.StatisticsResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,8 +48,8 @@ public class PaymentController
 					+ ApiDocConstants.PAYMENT_CREATE_REQUEST_BODY_RULE)
 			)
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
-		@ApiResponse(responseCode = "404", description = ApiDocConstants.BALANCE_NOT_FOUND),
+			@ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
+			@ApiResponse(responseCode = "404", description = ApiDocConstants.BALANCE_NOT_FOUND),
 	})
 	public BasicResponse create(@Valid @RequestBody CreatePaymentRequest req) 
 			throws Exception
@@ -84,7 +86,9 @@ public class PaymentController
 					+ ApiDocConstants.PAYMENT_UPDATE_REQUEST_BODY_RULE)
 			)
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.PAYMENT_NOT_FOUND),
 		@ApiResponse(responseCode = "400", description = ApiDocConstants.PAYMENT_UPDATE_RESPONSE_400),
 	})
@@ -103,10 +107,12 @@ public class PaymentController
 			parameters = {@Parameter(name = "paymentId", description = "款項編號")}
 			)
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SearchPaymentResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.PAYMENT_NOT_FOUND),
 	})
-	public SearchPaymentResponse getPaymentInfoByAccount(@RequestParam("account") String account) 
+	public BasicResponse getPaymentInfoByAccount(@RequestParam("account") String account) 
 	{
 		return service.getPaymentInfoByAccount(account);
 	}
@@ -121,10 +127,12 @@ public class PaymentController
 			)
 		)
 		@ApiResponses({
-			@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SearchPaymentResponse.class))}),
 			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 		})
-	public SearchPaymentResponse getPaymentInfoWithDateFilter(@Valid @RequestBody AccountWithDateFilterRequest req) 
+	public BasicResponse getPaymentInfoWithDateFilter(@Valid @RequestBody AccountWithDateFilterRequest req) 
 	{
 		return service.getPaymentInfoByAccountWithDateFilter(req);
 	}
@@ -141,7 +149,13 @@ public class PaymentController
 				)
 			}
 		)
-	public SearchPaymentResponse getPaymentInfoOfFamily(String account) 
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SearchPaymentResponse.class))}),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+	})
+	public BasicResponse getPaymentInfoOfFamily(String account) 
 	{
 		return service.getPaymentInfoOfFamily(account);
 	}
@@ -155,7 +169,13 @@ public class PaymentController
 					description = ApiDocConstants.PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_REQUEST_RULE
 					)
 		)
-	public SearchPaymentResponse getPaymentInfoOfFamilyWithDateFilter(AccountWithDateFilterRequest req)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SearchPaymentResponse.class))}),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+	})
+	public BasicResponse getPaymentInfoOfFamilyWithDateFilter(AccountWithDateFilterRequest req)
 	{
 		return service.getPaymentInfoOfFamilyWithDateFilter(req);
 	}
@@ -188,10 +208,12 @@ public class PaymentController
 			}
 		)
 		@ApiResponses({
-			@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SearchPaymentResponse.class))}),
 			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 		})
-	public SearchPaymentResponse getDeletedPayment(@RequestParam("account") String account) 
+	public BasicResponse getDeletedPayment(@RequestParam("account") String account) 
 	{
 		return service.getDeletedPayment(account);
 	}
@@ -206,10 +228,12 @@ public class PaymentController
 			)
 		)
 		@ApiResponses({
-			@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsResponse.class))}),
 			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 		})
-	public StatisticsResponse statistics(@Valid @RequestBody StatisticsRequest req) 
+	public BasicResponse statistics(@Valid @RequestBody StatisticsRequest req) 
 	{
 		return service.statistics(req);
 	}

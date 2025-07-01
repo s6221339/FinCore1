@@ -83,7 +83,23 @@ public interface BalanceDao extends JpaRepository<Balance, Integer>
 	@Query(value = "select * from balance where account = ?1", nativeQuery = true)
 	public List<Balance> getAllBalanceByAccount(String account);
 	
+	/**
+	 * 取得與家庭群組相關聯的帳戶資料。
+	 * @param familyIdList 群組編號列表
+	 * @return 帳戶資料列表
+	 */
 	@Query(value = "select * from balance where family_id in (?1)", nativeQuery = true)
 	public List<Balance> getAllBalanceByFamilyIdList(List<Integer> familyIdList);
 
+	/**
+	 * 取得指定帳戶的持有者帳號。
+	 * @param balanceId 帳戶編號
+	 * @return 持有者的帳號
+	 */
+	@Query(value = "select account from balance where balance_id = ?1", nativeQuery = true)
+	public String getBalanceOwner(int balanceId);
+	
+	@Query(value = "select * from balance where balance_id in (?1)", nativeQuery = true)
+	public List<Balance> getByBalanceIdList(List<Integer> balanceIdList);
+	
 }

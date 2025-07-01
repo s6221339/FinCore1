@@ -30,6 +30,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,7 +58,7 @@ public class FamilyController {
 		        description = "建立家族群組請求資料規則：" + ApiDocConstants.FAMILY_CREATE_REQUEST_BODY_RULE
 		    )
 		)
-		@ApiResponses({
+	@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_CREATE_RESPONSE_400),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_CREATE_RESPONSE_404),
@@ -89,12 +91,14 @@ public class FamilyController {
 		        )
 		    }
 		)
-		@ApiResponses({
-		    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyIdResponse.class))}),
+			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
 		})
-	public FamilyIdResponse getById(@RequestParam("familyId") int familyId) {
+	public BasicResponse getById(@RequestParam("familyId") int familyId) {
 		return service.getById(familyId);
 	}
 	
@@ -105,10 +109,12 @@ public class FamilyController {
 	        		+ ApiDocConstants.TEST_PASS,
 	        method = "POST"
 	    )
-	    @ApiResponses({
-	        @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS)
+    @ApiResponses({
+	    	@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyListResponse.class))}),
 	    })
-	public FamilyListResponse listAllFamily() throws JsonProcessingException {
+	public BasicResponse listAllFamily() throws JsonProcessingException {
 		return service.listAllFamily();
 	}
 
@@ -121,14 +127,14 @@ public class FamilyController {
 		        description = "邀請家族新成員請求資料規則：" + ApiDocConstants.FAMILY_INVITE_MEMBER_REQUEST_BODY_RULE
 		    )
 		)
-		@ApiResponses({
+	@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITE_MEMBER_RESPONSE_400),
 		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITE_MEMBER_RESPONSE_404),
 		})
 	public BasicResponse inviteMember(@Valid @RequestBody InviteMemberRequest req) //
-	throws JsonProcessingException{
+			throws JsonProcessingException{
 		return service.inviteMember(req);
 	}
 	
@@ -141,7 +147,7 @@ public class FamilyController {
 		        description = "解散家族群組請求資料規則：" + ApiDocConstants.FAMILY_DISMISS_REQUEST_BODY_RULE
 		    )
 		)
-		@ApiResponses({
+	@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.DELETE_SUCCESS),
 		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
@@ -159,7 +165,7 @@ public class FamilyController {
 		        description = "踢除家族成員請求資料規則：" + ApiDocConstants.FAMILY_KICK_MEMBER_REQUEST_BODY_RULE
 		    )
 		)
-		@ApiResponses({
+	@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_KICK_MEMBER_RESPONSE_400),
 		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
@@ -198,7 +204,7 @@ public class FamilyController {
 		        description = "群組擁有者權限轉讓請求資料規則：" + ApiDocConstants.FAMILY_TRANSFER_OWNER_REQUEST_BODY_RULE
 		    )
 		)
-		@ApiResponses({
+	@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_TRANSFER_OWNER_RESPONSE_400),
 		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
@@ -217,7 +223,7 @@ public class FamilyController {
 		        description = "家族成員退出群組請求資料規則：" + ApiDocConstants.FAMILY_QUIT_MEMBER_REQUEST_BODY_RULE
 		    )
 		)
-		@ApiResponses({
+	@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_QUIT_MEMBER_RESPONSE_400),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
@@ -235,7 +241,7 @@ public class FamilyController {
 		        description = "家族群組改名請求資料規則：" + ApiDocConstants.FAMILY_RENAME_REQUEST_BODY_RULE
 		    )
 		)
-		@ApiResponses({
+	@ApiResponses({
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
 		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_NOT_FOUND),
@@ -257,11 +263,11 @@ public class FamilyController {
     	        description = "接受邀請請求，規則：" + ApiDocConstants.FAMILY_INVITATION_ACCEPT_REQUEST_BODY_RULE
     	    )
     	)
-    	@ApiResponses({
-    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITATION_ACCEPT_RESPONSE_400),
-    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITATION_ACCEPT_RESPONSE_404),
-    	})
+	@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITATION_ACCEPT_RESPONSE_400),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITATION_ACCEPT_RESPONSE_404),
+		})
     public BasicResponse acceptInvite(@Valid@RequestBody InviteRequest req) throws JsonProcessingException {
         return service.acceptInvite(req);
     }
@@ -279,11 +285,11 @@ public class FamilyController {
     	        description = "拒絕邀請請求，規則：" + ApiDocConstants.FAMILY_INVITATION_REJECT_REQUEST_BODY_RULE
     	    )
     	)
-    	@ApiResponses({
-    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
-    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.INVITATION_NOT_FOUND),
-    	})
+	@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.INVITATION_NOT_FOUND),
+		})
     public BasicResponse rejectInvite(@Valid@RequestBody InviteRequest req) throws JsonProcessingException {
         return service.rejectInvite(req);
     }
@@ -305,10 +311,12 @@ public class FamilyController {
     	        )
     	    }
     	)
-    	@ApiResponses({
-    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-    	})
-    public FamilyInvitationListResponse getInvitingList(@RequestParam("familyId") int familyId) {
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyInvitationListResponse.class))}),
+		})
+    public BasicResponse getInvitingList(@RequestParam("familyId") int familyId) {
         return service.getInvitingList(familyId);
     }
 
@@ -330,12 +338,12 @@ public class FamilyController {
     	        @Parameter(name = "invitee", description = "受邀人帳號（必填）")
     	    }
     	)
-    	@ApiResponses({
-    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
-    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITATION_CANCEL_RESPONSE_400),
-    	    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
-    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITATION_CANCEL_RESPONSE_404),
-    	})
+	@ApiResponses({
+		    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		    @ApiResponse(responseCode = "400", description = ApiDocConstants.FAMILY_INVITATION_CANCEL_RESPONSE_400),
+		    @ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PERMISSION),
+		    @ApiResponse(responseCode = "404", description = ApiDocConstants.FAMILY_INVITATION_CANCEL_RESPONSE_404),
+		})
     public BasicResponse cancelInvite(
     		@RequestParam("familyId") int familyId, 
     		@RequestParam("owner") String owner, 
@@ -360,10 +368,13 @@ public class FamilyController {
     	        @Parameter(name = "account", description = "會員帳號（必填）")
     	    }
     	)
-    	@ApiResponses({
-    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS)
-    	})
-    public FamilyInvitationStatusListResponse getInvitationStatus(@RequestParam("account") String account) {
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyInvitationStatusListResponse.class))}),
+		})
+    public BasicResponse getInvitationStatus(@RequestParam("account") String account) {
+
         return service.getStatusByAccount(account);
     }
     

@@ -1,18 +1,17 @@
 package com.example.FinCore.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.FinCore.constants.ApiDocConstants;
 import com.example.FinCore.service.itfc.SavingsService;
+import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SavingsListResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,10 +35,12 @@ public class SavingsController
 			parameters = {@Parameter(name = "account", description = "帳號")}
 			)
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS + "：取得所有項目"),
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SavingsListResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 	})
-	public SavingsListResponse getAll(@RequestParam("account") String account) 
+	public BasicResponse getAll(@RequestParam("account") String account) 
 	{
 		return service.getAll(account);
 	}

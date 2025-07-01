@@ -7,11 +7,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.FinCore.annotation.TODO;
 import com.example.FinCore.constants.ResponseMessages;
+import com.example.FinCore.constants.TodoPriority;
 import com.example.FinCore.dao.BalanceDao;
+import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.TransfersDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.entity.Balance;
+import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.Payment;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.TransfersService;
@@ -37,7 +42,11 @@ public class TransfersServiceImpl implements TransfersService
 	
 	@Autowired
 	private PaymentDao paymentDao;
+	
+	@Autowired
+	private FamilyDao familyDao;
 
+	@TODO(value = "建立轉帳需添加「僅限同群組成員轉帳」限制", priority = TodoPriority.HIGH)
 	@Transactional(rollbackOn = Exception.class)
 	@Override
 	public BasicResponse create(CreateTransfersRequest req) throws Exception
@@ -45,8 +54,29 @@ public class TransfersServiceImpl implements TransfersService
 		if(req.fromBalance() == req.toBalance())
 			return new BasicResponse(ResponseMessages.SAME_BALANCE_OPERATION);
 		
-		if(!balanceDao.existsById(req.fromBalance()) || !balanceDao.existsById(req.toBalance()))
+		Balance from = balanceDao.getReferenceById(req.fromBalance());
+		Balance to = balanceDao.getReferenceById(req.toBalance());
+		if(from == null || to == null)
 			return new BasicResponse(ResponseMessages.BALANCE_NOT_FOUND);
+		
+		if(from.belongToFamily() || to.belongToFamily())
+			return new BasicResponse(ResponseMessages.UNABLE_TRANSFERS_TO_FAMILY_BALANCE);
+		
+		if(from.belongToAccount() && to.belongToAccount() && from.getAccount() != to.getAccount())
+		{
+			List<Family> allFamilyList = familyDao.findAll();
+			/* 用來確認是否找到同一個群組的旗標 */
+			boolean flag = false;
+			for(Family f : allFamilyList)
+				if(f.isMember(from.getAccount(), to.getAccount()))
+				{
+					flag = true;
+					break;
+				}
+			
+			if(!flag)
+				return new BasicResponse(ResponseMessages.UNABLE_TRANSFERS_TO_DIFF_FAMILY_ACCOUNT);
+		}
 		
 		LocalDate today = LocalDate.now();
 		transfersDao.create(

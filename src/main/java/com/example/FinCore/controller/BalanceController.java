@@ -23,6 +23,8 @@ import com.example.FinCore.vo.response.BudgetResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -101,25 +103,79 @@ public class BalanceController
 //	}
 	
 	@PostMapping(value = "getBudget")
-	public BudgetResponse getBudget(@Valid @RequestBody GetBudgetByBalanceIdRequest req) 
+	@Operation(
+			summary = ApiDocConstants.BALANCE_GET_BUDGET_SUMMARY,
+			description = ApiDocConstants.BALANCE_GET_BUDGET_DESC,
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+				description = ApiDocConstants.BALANCE_GET_BUDGET_REQUEST_BODY_RULE,
+				required = true
+			)
+		)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BudgetResponse.class))}),
+		@ApiResponse(responseCode = "400", description = ApiDocConstants.BALANCE_GET_BUDGET_RESPONSE_400)
+	})
+	public BasicResponse getBudget(@Valid @RequestBody GetBudgetByBalanceIdRequest req) 
 	{
 		return service.getBudget(req);
 	}
 	
 	@PostMapping(value = "getBudgetByAccount")
-	public BudgetListResponse getBudgetByAccount(@Valid @RequestBody AccountWithDateFilterRequest req) 
+	@Operation(
+		    summary = ApiDocConstants.BALANCE_GET_BUDGET_BY_ACCOUNT_SUMMARY,
+		    description = ApiDocConstants.BALANCE_GET_BUDGET_BY_ACCOUNT_DESC,
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = ApiDocConstants.BALANCE_GET_BUDGET_BY_ACCOUNT_REQUEST_BODY_RULE
+		    )
+		)
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BudgetListResponse.class))}),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+	    @ApiResponse(responseCode = "404", description = ApiDocConstants.BALANCE_NOT_FOUND)
+	})
+	public BasicResponse getBudgetByAccount(@Valid @RequestBody AccountWithDateFilterRequest req) 
 	{
 		return service.getBudgetByAccount(req);
 	}
 	
 	@PostMapping(value = "getAllByAccount")
-	public BalanceListResponse getAllBalance(@RequestParam("account") String account) 
+	@Operation(
+		    summary = ApiDocConstants.BALANCE_GET_ALL_BY_ACCOUNT_SUMMARY,
+		    description = ApiDocConstants.BALANCE_GET_ALL_BY_ACCOUNT_DESC,
+		    parameters = {
+		        @Parameter(name = "account", description = "欲查詢的帳號，不能為空")
+		    }
+		)
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BalanceListResponse.class))}),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+	})
+	public BasicResponse getAllBalance(@RequestParam("account") String account) 
 	{
 		return service.getPersonalBalance(account);
 	}
 	
 	@PostMapping(value = "getAllByFamily")
-	public BalanceListResponse getFamilyBalance(@RequestParam("account") String account) 
+	@Operation(
+		    summary = ApiDocConstants.BALANCE_GET_ALL_BY_FAMILY_SUMMARY,
+		    description = ApiDocConstants.BALANCE_GET_ALL_BY_FAMILY_DESC,
+		    parameters = {
+		        @Parameter(name = "account", description = "欲查詢的帳號，不能為空")
+		    }
+		)
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BalanceListResponse.class))}),
+			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+	})
+	public BasicResponse getFamilyBalance(@RequestParam("account") String account) 
 	{
 		return service.getFamilyBalance(account);
 	}

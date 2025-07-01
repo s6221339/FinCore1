@@ -42,6 +42,14 @@ public final class ApiDocConstants
 
 	public static final String BALANCE_DELETE_SUMMARY = "刪除帳戶資料";
 	
+	public static final String BALANCE_GET_BUDGET_SUMMARY = "查詢帳戶預算資訊";
+	
+	public static final String BALANCE_GET_BUDGET_BY_ACCOUNT_SUMMARY = "取得帳戶清單預算統計";
+
+	public static final String BALANCE_GET_ALL_BY_ACCOUNT_SUMMARY = "取得帳戶清單資訊";
+
+	public static final String BALANCE_GET_ALL_BY_FAMILY_SUMMARY = "取得帳號所屬群組之帳戶清單資訊_POST_SUMMARY";
+
 	public static final String PAYMENT_GET_FAMILY_INFO_SUMMARY = "查詢使用者所屬群組的帳戶款項";
 
 	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_SUMMARY = "查詢使用者所屬群組的帳戶款項（依據年月篩選）";
@@ -71,6 +79,8 @@ public final class ApiDocConstants
     public static final String FAMILY_OWNER_QUIT_SUMMARY = "群組擁有者退位並指派新擁有者";
     
     public static final String FAMILY_TRANSFER_OWNER_SUMMARY = "群組擁有者權限轉讓";
+
+    public static final String FAMILY_GET_BY_ACCOUNT_SUMMARY = "查詢會員所屬家族清單";
     
     public static final String FAMILY_INVITATION_ACCEPT_SUMMARY = "接受家族邀請";
     	
@@ -94,8 +104,6 @@ public final class ApiDocConstants
     
     public static final String USER_GET_SUMMARY = "查詢會員基本資料";
     
-    public static final String FAMILY_GET_BY_ACCOUNT_SUMMARY = "查詢會員所屬家族清單";
-    
     public static final String USER_LOGIN_SUMMARY = "會員登入";
     
     public final static String USER_VERIFY_CODE_SEND_VERIFY_CODE_SUMMARY = "發送驗證信";
@@ -110,7 +118,7 @@ public final class ApiDocConstants
     
     /* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
-	
+    
 	public final static String PAYMENT_TYPE_CREATE_DESC = "建立一筆新的分類與細項，不允許使用者新增完全重複的類型與項目。<br>";
 	
 	public final static String PAYMENT_TYPE_GET_TYPE_DESC = "取得帳號創建的所有類型與項目資料，其中包含了預設的資料。該操作必定成功<del>（大不了就沒自己ㄉ東東）</del><br>";
@@ -190,6 +198,14 @@ public final class ApiDocConstants
 	public static final String BALANCE_DELETE_DESC =
 			"依帳戶 ID 刪除該筆帳戶資料，包含關聯的儲蓄紀錄與款項。<br>";
 
+    public static final String BALANCE_GET_BUDGET_DESC = "根據帳戶編號與時間查詢該月份預算與實際支出資料<br>";
+
+    public static final String BALANCE_GET_BUDGET_BY_ACCOUNT_DESC = "根據帳號與指定年月，取得所有帳戶之該月份預算統計資料，若查詢時間為未來則不允許查詢。<br>";
+
+    public static final String BALANCE_GET_ALL_BY_ACCOUNT_DESC = "根據帳號取得該使用者所有帳戶資料。<br>";
+    
+    public static final String BALANCE_GET_ALL_BY_FAMILY_DESC = "根據帳號取得該使用者所屬群組的所有帳戶資料。<br>";
+    
 	public final static String FAMILY_CREATE_DESC = "由指定 owner 建立新的家族，並可一次邀請多位成員<br>";
 	
 	public static final String FAMILY_GET_BY_ID_DESC = "根據 familyId 查詢該家族群組的詳細資訊，包括擁有者與所有成員姓名。<br>";
@@ -212,6 +228,8 @@ public final class ApiDocConstants
     
     public static final String FAMILY_TRANSFER_OWNER_DESC = "群組現任 owner 可將權限轉讓給指定家庭成員，新 owner 必須為現有成員且不可為自己。<br>";
     
+    public static final String FAMILY_GET_BY_ACCOUNT_DESC = "根據會員帳號查詢其所屬的所有家族群組，包含群組名稱、擁有者與成員資訊。<br>";
+    
     public static final String FAMILY_INVITE_MEMBER_DESC = "群組擁有者邀請新成員加入家族群組，支援多帳號同時邀請。<br>";
     
     public static final String FAMILY_INVITATION_ACCEPT_DESC = "用戶接受家族邀請，將邀請紀錄標記為已接受並加入家族群組。<br>";
@@ -233,8 +251,6 @@ public final class ApiDocConstants
     public static final String USER_UPDATE_PASSWORD_DESC = "會員可比對舊密碼並修改新密碼。<br>";
     
     public static final String USER_GET_DESC = "根據會員帳號查詢會員基本資訊，包括帳號、名稱、電話、生日、頭像、角色。<br>";
-    
-    public static final String FAMILY_GET_BY_ACCOUNT_DESC = "根據會員帳號查詢其所屬的所有家族群組，包含群組名稱、擁有者與成員資訊。<br>";
     
     public static final String USER_LOGIN_DESC = "會員輸入帳號與密碼進行登入驗證。<br>";
     
@@ -359,6 +375,21 @@ public final class ApiDocConstants
 		    "<li>invitor：必填，受邀成員帳號清單（不可重複、不可包含擁有者）</li>" +
 		    "</ul>";
 	
+    public static final String BALANCE_GET_BUDGET_REQUEST_BODY_RULE =
+    		"""
+    		<ul>
+    			<li>balanceId：欲查詢的帳戶編號，必須為正整數</li>
+    			<li>year：年份，介於 0～9999 間</li>
+    			<li>month：月份，介於 1～12 間</li>
+    		</ul>
+    		""";
+    
+    public static final String BALANCE_GET_BUDGET_BY_ACCOUNT_REQUEST_BODY_RULE = "<ul>"
+    	    + "<li><b>account</b>：欲查詢的帳號，不能為空</li>"
+    	    + "<li><b>year</b>：年份，範圍介於 0 至 9999</li>"
+    	    + "<li><b>month</b>：月份，範圍介於 1 至 12</li>"
+    	    + "</ul>";
+    
 	public static final String FAMILY_INVITE_MEMBER_REQUEST_BODY_RULE =
 		    "<ul>" +
 		    "<li>familyId：必填，家族群組ID</li>" +
@@ -598,6 +629,8 @@ public final class ApiDocConstants
 	public static final String INTERNAL_ONLY = "<b>此 API 為系統排程用途，不可由前端或第三方呼叫！</b><br>";
 	
 	public static final String INVALID_SESSION = "無效的 SESSION";
+	
+	public static final String BALANCE_GET_BUDGET_RESPONSE_400 = "無法搜尋未來的時間";
     
 	/* === 成功訊息 === */
 	

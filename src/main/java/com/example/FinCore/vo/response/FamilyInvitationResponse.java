@@ -1,6 +1,6 @@
 package com.example.FinCore.vo.response;
 
-public class FamilyInvitationResponse {
+public class FamilyInvitationResponse extends BasicResponse {
 
     /** 被邀請者帳號 */
     private String account;

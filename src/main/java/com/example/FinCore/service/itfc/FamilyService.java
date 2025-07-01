@@ -17,6 +17,7 @@ import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyInvitationListResponse;
+import com.example.FinCore.vo.response.FamilyInvitationStatusListResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -168,6 +169,6 @@ public interface FamilyService {
      * @param account 受邀帳號
      * @return 該帳號所有家族邀請資訊
      */
-    public List<FamilyInvitationStatusVO> getStatusByAccount(String account);
+    public FamilyInvitationStatusListResponse getStatusByAccount(String account);
 
 }

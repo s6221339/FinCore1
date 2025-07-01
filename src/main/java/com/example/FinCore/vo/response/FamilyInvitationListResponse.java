@@ -2,11 +2,17 @@ package com.example.FinCore.vo.response;
 
 import java.util.List;
 
-public class FamilyInvitationListResponse {
+public class FamilyInvitationListResponse extends BasicResponse {
 	
 	private int familyId;
 	
 	private List<InviteeInfo> inviteeList;
+
+    public FamilyInvitationListResponse(int code, String message, int familyId, List<InviteeInfo> inviteeList) {
+        super(code, message);
+        this.familyId = familyId;
+        this.inviteeList = inviteeList;
+    }
 
 	public static class InviteeInfo {
 		private String account;

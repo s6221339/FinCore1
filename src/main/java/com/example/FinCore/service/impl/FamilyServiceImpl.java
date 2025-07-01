@@ -36,6 +36,7 @@ import com.example.FinCore.vo.request.UpdateFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyInvitationListResponse;
+import com.example.FinCore.vo.response.FamilyInvitationStatusListResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.InviteMemberResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -796,10 +797,12 @@ public class FamilyServiceImpl implements FamilyService {
 	        inviteeList.add(info);
 	    }
 
-	    FamilyInvitationListResponse resp = new FamilyInvitationListResponse();
-	    resp.setFamilyId(familyId);
-	    resp.setInviteeList(inviteeList);
-	    return resp;
+	    return new FamilyInvitationListResponse(
+	    	    ResponseMessages.SUCCESS.getCode(),
+	    	    ResponseMessages.SUCCESS.getMessage(),
+	    	    familyId,
+	    	    inviteeList
+	    	);
 	}
 	
 	/**
@@ -855,7 +858,7 @@ public class FamilyServiceImpl implements FamilyService {
 	 * @return 該帳號所有「邀請中」家族邀請資訊 (List<FamilyInvitationStatusVO>)
 	 */
 	@Override
-	public List<FamilyInvitationStatusVO> getStatusByAccount(String account) {
+	public FamilyInvitationStatusListResponse getStatusByAccount(String account) {
 	    List<FamilyInvitationStatusVO> result = new ArrayList<>();
 	    // 1. 查詢該帳號收到的邀請
 	    List<FamilyInvitation> invitations = familyInvitationDao.findByAccount(account);
@@ -871,6 +874,11 @@ public class FamilyServiceImpl implements FamilyService {
 	            ));
 	        }
 	    }
-	    return result;
+	    return new FamilyInvitationStatusListResponse(
+	        ResponseMessages.SUCCESS.getCode(),
+	        ResponseMessages.SUCCESS.getMessage(),
+	        result
+	    );
 	}
+
 }

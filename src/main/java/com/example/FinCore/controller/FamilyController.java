@@ -24,6 +24,7 @@ import com.example.FinCore.vo.request.RenameFamilyRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyIdResponse;
 import com.example.FinCore.vo.response.FamilyInvitationListResponse;
+import com.example.FinCore.vo.response.FamilyInvitationStatusListResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -362,7 +363,7 @@ public class FamilyController {
     	@ApiResponses({
     	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS)
     	})
-    public List<FamilyInvitationStatusVO> getInvitationStatus(@RequestParam("account") String account) {
+    public FamilyInvitationStatusListResponse getInvitationStatus(@RequestParam("account") String account) {
         return service.getStatusByAccount(account);
     }
     

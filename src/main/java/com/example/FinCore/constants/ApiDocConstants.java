@@ -34,8 +34,18 @@ public final class ApiDocConstants
 
 	public static final String PAYMENT_TRASH_CAN_SUMMARY = "查詢已刪除款項資料";
 	
-	public static final String PAYMENT_STATISTICS_SUMMARY = "統計帳號及家庭帳戶款項資訊";
+	public static final String PAYMENT_STATISTICS_LOOKUP_BALANCE_SUMMARY = "統計帳號及家庭帳戶款項資訊";
 	
+	public static final String PAYMENT_GET_FAMILY_INFO_SUMMARY = "查詢使用者所屬群組的帳戶款項";
+
+	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_SUMMARY = "查詢使用者所屬群組的帳戶款項（依據年月篩選）";
+
+	public static final String PAYMENT_STATISTICS_SUMMARY_INCOME_AND_OUTLAY_SUMMARY = "統計帳號收入與支出總覽";
+
+	public static final String PAYMENT_SCHEDULED_CREATE_SUMMARY = "排程建立下一筆循環帳款（內部任務）";
+	
+	public static final String PAYMENT_SCHEDULED_DELETE_SUMMARY = "排程永久刪除帳款資料（內部任務）";
+
 	public static final String BALANCE_CREATE_SUMMARY = "新增帳戶資料";
 	
 	public static final String BALANCE_UPDATE_SUMMARY = "更新帳戶名稱與當月儲蓄";
@@ -49,14 +59,6 @@ public final class ApiDocConstants
 	public static final String BALANCE_GET_ALL_BY_ACCOUNT_SUMMARY = "取得帳戶清單資訊";
 
 	public static final String BALANCE_GET_ALL_BY_FAMILY_SUMMARY = "取得帳號所屬群組之帳戶清單資訊_POST_SUMMARY";
-
-	public static final String PAYMENT_GET_FAMILY_INFO_SUMMARY = "查詢使用者所屬群組的帳戶款項";
-
-	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_SUMMARY = "查詢使用者所屬群組的帳戶款項（依據年月篩選）";
-
-	public static final String PAYMENT_SCHEDULED_CREATE_SUMMARY = "排程建立下一筆循環帳款（內部任務）";
-	
-	public static final String PAYMENT_SCHEDULED_DELETE_SUMMARY = "排程永久刪除帳款資料（內部任務）";
 
 	public final static String FAMILY_CREATE_SUMMARY = "建立家族";
 
@@ -165,18 +167,22 @@ public final class ApiDocConstants
 	public static final String PAYMENT_TRASH_CAN_DESC =
 			"查詢指定帳號下，所有已被標記為刪除的款項。此操作不會返回未刪除的資料。<br>";
 	
-	public static final String PAYMENT_STATISTICS_DESC =
+	public static final String PAYMENT_STATISTICS_LOOKUP_BALANCE_DESC =
 			"根據指定帳號與時間範圍，統計該帳號下所有個人及家庭帳戶的款項資料，依月份與類型分類統計。<br>";
 
 	public static final String PAYMENT_GET_FAMILY_INFO_DESC =
 			"本 API 用於查詢目前帳號所參與的群組中，所有帳戶的記帳資料，僅包含「未被刪除」的款項資料。<br>"
-			+ "系統會依照提供帳號比對群組成員關係，列出所有相關帳戶的資訊與款項紀錄。";
+			+ "系統會依照提供帳號比對群組成員關係，列出所有相關帳戶的資訊與款項紀錄。<br>";
 
 	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_DESC =
 			"本 API 用於查詢目前帳號所參與的群組中，所有帳戶於指定年、月的款項資料。<br>"
 			+ "系統會自動比對帳號參與的群組關聯，合併查詢其帳戶資料，僅包含「未被刪除」的款項。<br>"
-			+ "若指定的年月無資料則回傳空陣列。";
+			+ "若指定的年月無資料則回傳空陣列。<br>";
 	
+	public static final String PAYMENT_STATISTICS_SUMMARY_INCOME_AND_OUTLAY_DESC = 
+			"統計指定帳號於某年（可選擇指定月份）之所有帳戶的收入與支出金額總覽資訊，會忽略"
+			+ "未來與已刪除的資料。<br>";
+
 	public static final String PAYMENT_SCHEDULED_CREATE_DESC =
     		"每天凌晨自動執行的排程任務，根據循環帳款規則建立下一筆尚未記錄的款項。<br>"
     		+ "篩選條件包括：未刪除、有效週期、當前時間符合周期起點。符合者將自動產生下一筆紀錄。<br>";
@@ -347,13 +353,19 @@ public final class ApiDocConstants
 			+ "<li>paymentIdList：欲復原的款項 ID 清單，不可為空</li>"
 			+ "</ul>";
 
-	public static final String PAYMENT_STATISTICS_REQUEST_BODY_RULE =
+	public static final String PAYMENT_STATISTICS_LOOKUP_BALANCE_REQUEST_BODY_RULE =
 			"<ul>"
 			+ "<li>account：使用者帳號，必填</li>"
 			+ "<li>year：統計年份（四位數），必填</li>"
 			+ "<li>month：統計月份（1～12），若為 0 則表示統計全年</li>"
 			+ "</ul>";
 
+	public static final String PAYMENT_STATISTICS_SUMMARY_INCOME_AND_OUTLAY_REQUEST_BODY_RULE = "<ul>"
+		    + "<li><b>account</b>：欲查詢的帳號，不能為空</li>"
+		    + "<li><b>year</b>：查詢年份，必須為 0～9999 的整數</li>"
+		    + "<li><b>month</b>：查詢月份，若為 0 則代表全年，1~12 則為指定月份</li>"
+		    + "</ul>";
+	
 	public static final String BALANCE_CREATE_REQUEST_BODY_RULE =
 			"<ul>"
 			+ "<li>familyId：群組（家庭）編號，為 0 表示不使用</li>"

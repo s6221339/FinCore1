@@ -29,6 +29,7 @@ import com.example.FinCore.vo.FamilyInfoVO;
 import com.example.FinCore.vo.PaymentAmountVO;
 import com.example.FinCore.vo.PaymentInfoVO;
 import com.example.FinCore.vo.RecurringPeriodVO;
+import com.example.FinCore.vo.StatisticsIncomeAndOutlayVO;
 import com.example.FinCore.vo.StatisticsInfoVO;
 import com.example.FinCore.vo.StatisticsVO;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
@@ -38,6 +39,7 @@ import com.example.FinCore.vo.request.StatisticsRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
+import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
 import com.example.FinCore.vo.response.StatisticsResponse;
 
 import jakarta.annotation.Nullable;
@@ -353,7 +355,7 @@ public class PaymentServiceImpl implements PaymentService
 	}
 	
 	@Override
-	public StatisticsResponse statistics(StatisticsRequest req) 
+	public StatisticsResponse statisticsLookupBalance(StatisticsRequest req) 
 	{
 		if(!userDao.existsById(req.account()))
 			return new StatisticsResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
@@ -540,6 +542,63 @@ public class PaymentServiceImpl implements PaymentService
 	    }
 
 	    return result;
+	}
+
+	@Override
+	public StatisticsIncomeAndOutlayResponse statisticsIncomeAndOutlaySummarize(StatisticsRequest req) 
+	{
+		if(!userDao.existsById(req.account()))
+			return new StatisticsIncomeAndOutlayResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+		List<Balance> accountBalanceList = balanceDao.getAllBalanceByAccount(req.account());
+		List<Integer> balanceIdList = accountBalanceList.stream().map(t -> t.getBalanceId()).toList();
+		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
+		var filtedPaymentList = paymentList.stream().filter(t -> {
+			if(req.month() >= 1 && req.month() <= 12)
+				return !t.isDeleted() && !t.isFuture() && t.isOnTime(req.year(), req.month());
+			else
+				return !t.isDeleted() && !t.isFuture() && t.isOnTime(req.year());
+		}).toList();
+		var result = incomeAndOutlayInfoVOFactory(req.year(), filtedPaymentList);
+		return new StatisticsIncomeAndOutlayResponse(ResponseMessages.SUCCESS, result);
+	}
+	
+	private List<StatisticsIncomeAndOutlayVO> incomeAndOutlayInfoVOFactory(int year, List<Payment> paymentList)
+	{
+		List<StatisticsIncomeAndOutlayVO> result = new ArrayList<>();
+		// monthMap -> k: 月份, v: 存放收入與支出
+		Map<Integer, Map<String, Integer>> monthMap = new HashMap<>();
+		final String INCOME = "income";
+		final String OUTLAY = "outlay";
+		for(Payment payment : paymentList)
+		{
+			int month = payment.getMonth();
+			
+			Map<String, Integer> table = monthMap.computeIfAbsent(month, t -> new HashMap<>());
+			if(!table.containsKey(INCOME))
+			{
+				table.put(INCOME, 0);
+				table.put(OUTLAY, 0);
+			}
+			if(payment.isIncome())
+				table.put(INCOME, table.get(INCOME) + payment.getAmount());
+			else
+				table.put(OUTLAY, table.get(OUTLAY) + payment.getAmount());
+			
+			monthMap.put(month, table);
+		}
+		for(var entry : monthMap.entrySet())
+		{
+			var vo = new StatisticsIncomeAndOutlayVO(
+					year, 
+					entry.getKey(), 
+					entry.getValue().get(INCOME), 
+					entry.getValue().get(OUTLAY)
+					);
+			result.add(vo);
+		}
+		result.sort((o1, o2) -> o1.month() - o2.month());
+		return result;
 	}
 
 	/**

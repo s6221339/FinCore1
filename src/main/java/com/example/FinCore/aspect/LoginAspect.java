@@ -1,6 +1,5 @@
 package com.example.FinCore.aspect;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -37,8 +36,8 @@ public class LoginAspect
 		
 	}
 	
-	@Around("pointcut() && args(requestObj, ..)")
-	public Object around(ProceedingJoinPoint pjp, Object requestObj) throws Throwable
+	@Around("pointcut()")
+	public Object around(ProceedingJoinPoint pjp) throws Throwable
 	{
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		HttpSession session = attributes.getRequest().getSession();

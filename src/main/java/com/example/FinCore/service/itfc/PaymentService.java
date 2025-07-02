@@ -7,6 +7,7 @@ import com.example.FinCore.vo.request.StatisticsRequest;
 import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
+import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
 import com.example.FinCore.vo.response.StatisticsResponse;
 
 public interface PaymentService 
@@ -79,12 +80,19 @@ public interface PaymentService
 	public SearchPaymentResponse getDeletedPayment(String account);
 	
 	/**
-	 * 查看帳號在指定年月的帳款統計。
+	 * 查看帳號在指定年月的帳款統計。（帳戶分開統計）
 	 * @param account 帳號
 	 * @param year 指定年
 	 * @param month 指定月，若設為 0 將無視月，會傳回一整年的資料
 	 * @return 帳款統計
 	 */
-	public StatisticsResponse statistics(StatisticsRequest req);
+	public StatisticsResponse statisticsLookupBalance(StatisticsRequest req);
+	
+	/**
+	 * 取得指定帳戶在指定時間的所有帳戶支出與收入統計數據。（帳戶合併統計）
+	 * @param req 
+	 * @return 支出與收入的統計數據列表
+	 */
+	public StatisticsIncomeAndOutlayResponse statisticsIncomeAndOutlaySummarize(StatisticsRequest req);
 	
 }

@@ -1,7 +1,5 @@
 package com.example.FinCore.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.constants.ApiDocConstants;
 import com.example.FinCore.service.itfc.FamilyService;
-import com.example.FinCore.vo.FamilyInvitationStatusVO;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;
 import com.example.FinCore.vo.request.InviteMemberRequest;

@@ -1,6 +1,7 @@
 package com.example.FinCore.dao;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -162,5 +163,20 @@ public interface UserDao extends JpaRepository<User, String> {
 	 */
 	@Query(value = "select name from user where account = :account", nativeQuery = true)
 	String findNameByAccount(@Param("account") String account);
+	
+	/**
+	 * 更新訂閱狀態
+	 * 
+	 * @param account account 使用者帳號
+	 * @param subscription 訂閱狀態
+	 * @param expirationDate 訂閱到期日期
+	 * @return
+	 */
+	@Modifying
+	@Transactional
+	@Query(value = "update user set subscription = :subscription, expiration_date = :expirationDate where account = :account", nativeQuery = true)
+	int updateSubscription(@Param("account") String account,
+	                      @Param("subscription") Boolean subscription,
+	                      @Param("expirationDate") LocalDateTime expirationDate);
 	
 }

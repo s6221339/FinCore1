@@ -2,9 +2,6 @@ package com.example.FinCore.service.itfc;
 
 import com.example.FinCore.vo.request.InviteRequest;
 
-import java.util.List;
-
-import com.example.FinCore.vo.FamilyInvitationStatusVO;
 import com.example.FinCore.vo.request.CreateFamilyRequest;
 import com.example.FinCore.vo.request.DeleteFamilyRequest;
 import com.example.FinCore.vo.request.DismissFamilyRequest;

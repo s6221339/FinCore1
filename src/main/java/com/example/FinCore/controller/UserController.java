@@ -1,5 +1,7 @@
 package com.example.FinCore.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
 import com.example.FinCore.vo.response.StatisticsResponse;
+import com.example.FinCore.vo.response.SubscriptionResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -240,4 +243,29 @@ public class UserController {
 		}
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
+
+	    /**
+	     * 更新會員訂閱狀態
+	     * @param account 會員帳號
+	     * @param subscription 是否訂閱
+	     * @param expirationDate 訂閱到期日（yyyy-MM-ddTHH:mm:ss）
+	     * @return BasicResponse
+	     */
+	    @PostMapping(value = "updateSubscription")
+	    public BasicResponse updateSubscription(
+	            @RequestParam("account") String account,
+	            @RequestParam("subscription") Boolean subscription
+	    ) {
+	        return service.updateSubscription(account, subscription);
+	    }
+
+	    /**
+	     * 查詢會員訂閱狀態
+	     * @param account 會員帳號
+	     * @return SubscriptionResponse
+	     */
+	    @PostMapping(value = "getSubscription")
+	    public SubscriptionResponse getSubscription(@RequestParam("account") String account) {
+	        return service.getSubscription(account);
+	    }
 }

@@ -1,6 +1,7 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.FamilyVO;
 import com.example.FinCore.vo.SimpleUserVO;
+import com.example.FinCore.vo.SubscriptionVO;
 import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.RregisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
@@ -29,6 +31,7 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
+import com.example.FinCore.vo.response.SubscriptionResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -281,5 +284,60 @@ public class UserServiceImpl implements UserService {
 	    MemberNameResponse.MemberData memberData = new MemberNameResponse.MemberData(name, account); 
 	    return new MemberNameResponse(ResponseMessages.SUCCESS.getCode(), "查詢成功", memberData);
 	}
+	
+	/**
+	 * 更新會員訂閱狀態
+	 * @param account 會員帳號
+	 * @param subscription 是否訂閱
+	 */
+	@Override
+	@Transactional
+	public BasicResponse updateSubscription(String account, Boolean subscription) {
+	    // 1. 檢查必要欄位
+	    if (account == null || account.isEmpty()) {
+	        return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
+	    // 2. 檢查帳號是否存在
+	    int exists = userDao.selectCountByAccount(account);
+	    if (exists == 0) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
+	    // 3. 訂閱到期日設為現在起一個月
+	    LocalDateTime expirationDate = LocalDateTime.now().plusMonths(1);
+
+	    // 4. 更新資料庫（DAO方法要對應LocalDateTime）
+	    int updated = userDao.updateSubscription(account, subscription, expirationDate);
+	    if (updated > 0) {
+	        return new BasicResponse(ResponseMessages.SUCCESS);
+	    } else {
+	        return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
+	    }
+	}
+
+    /**
+     * 查詢會員訂閱狀態
+     * @param account 會員帳號
+     * @return SubscriptionResponse，data 為 SubscriptionVO
+     */
+    @Override
+    public SubscriptionResponse getSubscription(String account) {
+        // 1. 檢查帳號參數是否有填寫
+        if (account == null || account.isEmpty()) {
+            return new SubscriptionResponse(ResponseMessages.MISSING_REQUIRED_FIELD, null);
+        }
+        // 2. 依帳號查詢會員資料
+        User user = userDao.selectById(account);
+        if (user == null) {
+            // 找不到該帳號，回傳錯誤
+            return new SubscriptionResponse(ResponseMessages.ACCOUNT_NOT_FOUND, null);
+        }
+        // 3. 組裝訂閱資訊回傳物件
+        SubscriptionVO vo = new SubscriptionVO(
+            user.isSubscription(),           // 是否訂閱
+            user.getExpirationDate()         // 到期時間
+        );
+        // 4. 回傳查詢成功、帶訂閱資訊
+        return new SubscriptionResponse(ResponseMessages.SUCCESS, vo);
+    }
 	
 }

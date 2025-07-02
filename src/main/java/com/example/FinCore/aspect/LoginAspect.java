@@ -14,10 +14,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.example.FinCore.constants.ConstantsMessage;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Component
@@ -39,28 +42,44 @@ public class LoginAspect
 	{
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		HttpSession session = attributes.getRequest().getSession();
-		var res = loginCheck(session, requestObj);
+		Object[] args = pjp.getArgs();
+		String account = extractAccountFromArgs(args);
+		var res = loginCheck(session, account);
 		if(res != null)
 			return res;
 		return pjp.proceed();
 	}
 	
-	@SuppressWarnings({ "unchecked" })
-	private BasicResponse loginCheck(HttpSession session, Object requestObj)
+	@SuppressWarnings("unchecked")
+	private String extractAccountFromArgs(Object[] args)
 	{
-		final ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> requestMap = new HashMap<>();
-		try {
-			requestMap = mapper.convertValue(requestObj, Map.class);
+		for(Object arg : args)
+		{
+			if(arg instanceof String account && account.matches(ConstantsMessage.EMAIL_PATTERN))
+				return account;
+			
+			if(!(arg instanceof HttpServletRequest) && !(arg instanceof HttpServletResponse))
+			{
+				final ObjectMapper mapper = new ObjectMapper();
+				try {
+					Map<String, Object> requestMap = mapper.convertValue(arg, Map.class);
+					if(requestMap.containsKey("account"))
+						return (String) requestMap.get("account");
+				}
+				catch (Exception e) {
+					logger.warn("轉換物件時發生例外事件。");
+				}
+			}
 		}
-		catch (IllegalArgumentException e) {
-			logger.warn("存在無法被序列化的 requestObj，跳過此次驗證");
-			return null;
-		}
-		String account = (String) requestMap.get("account");
+		return null;
+	}
+
+	private BasicResponse loginCheck(HttpSession session, String account)
+	{
 		String sessionAccount = (String) session.getAttribute("account");
 		String sessionId = session.getId();
-		System.out.println("account：" + account + ", sessionAccount：" + sessionAccount + ", sessionId：" + sessionId);
+//		System.out.println("account：" + account + ", sessionAccount：" + sessionAccount + ", sessionId：" + sessionId);
+		
 		if(sessionId == null || sessionAccount == null)
 			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
 		

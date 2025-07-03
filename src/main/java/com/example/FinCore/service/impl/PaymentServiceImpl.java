@@ -620,7 +620,6 @@ public class PaymentServiceImpl implements PaymentService
 			monthMap.put(month, typeMap);
 		}
 		
-		
 		for(var monthEntry : monthMap.entrySet())
 		{
 			List<PaymentAmountVO> amountVOList = new ArrayList<>();

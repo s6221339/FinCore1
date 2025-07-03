@@ -35,6 +35,7 @@ import com.example.FinCore.vo.response.SubscriptionResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Base64;
 
 import jakarta.transaction.Transactional;
 
@@ -197,12 +198,19 @@ public class UserServiceImpl implements UserService {
 	    // superAdmin 轉成 role 字串
 	    String role = user.isSuperAdmin() ? "admin" : "user";
 
+	    // 將資料庫 byte[] avatar 轉回 base64 字串，前端才能用
+	    String avatarBase64 = null;
+	    byte[] avatarBytes = user.getAvatar();
+	    if (avatarBytes != null && avatarBytes.length > 0) {
+	        avatarBase64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(avatarBytes);
+	    }
+
 	    UserVO vo = new UserVO(
 	        user.getAccount(),
 	        user.getName(),
 	        user.getPhone(),
 	        user.getBirthday(),
-	        user.getAvatar(),
+	        avatarBase64,   // 回傳 base64 字串給前端
 	        role
 	    );
 	    return new UserResponse(ResponseMessages.SUCCESS, vo);

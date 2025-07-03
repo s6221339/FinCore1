@@ -80,7 +80,7 @@ public interface PaymentService
 	public SearchPaymentResponse getDeletedPayment(String account);
 	
 	/**
-	 * 查看帳號在指定年月的帳款統計。（帳戶分開統計）
+	 * 查看帳號在指定年月的各項帳款統計。（帳戶分開統計）
 	 * @param req 統計專用請求資料
 	 * @return 所有帳戶的帳款統計，每個帳戶將分開統計，包含群組帳戶
 	 */

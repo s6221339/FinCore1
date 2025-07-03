@@ -49,22 +49,25 @@ public interface UserDao extends JpaRepository<User, String> {
 	/**
 	 * 更新會員資料
 	 * 
-	 * @param account    會員帳號
+	 * @param account    會員帳號(Email)
 	 * @param name       會員名稱
+	 * @param password   密碼
 	 * @param phone      手機號碼
-	 * @param birthday   生日
-	 * @param avatar     頭像(byte[]，對應DB BLOB)
-	 * @return           更新筆數
+	 * @param avatar     頭像
+	 * @param superAdmin 是否為超級管理員
+	 * @param createDate 建立日期
+	 * @return
 	 */
 	@Modifying
 	@Transactional
-	@Query(value = "update user set name = :name, phone = :phone, avatar = :avatar, birthday = :birthday where account = :account", nativeQuery = true)
+	@Query(value = "update user set name = :name, phone = :phone,"
+			+ " avatar = :avatar, birthday = :birthday where account = :account", nativeQuery = true)
 	public int update(
-	        @Param("account") String account,
-	        @Param("name") String name,
-	        @Param("phone") String phone,
-	        @Param("birthday") LocalDate birthday,
-	        @Param("avatar") byte[] avatar);
+			@Param("account") String account, //
+			@Param("name") String name, //
+			@Param("phone") String phone, //
+			@Param("birthday") LocalDate birthday, //
+			@Param("avatar") byte[] avatar);
 	
 	/**
      * 設定帳號為已驗證

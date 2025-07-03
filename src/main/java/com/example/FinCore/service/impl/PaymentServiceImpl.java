@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.example.FinCore.annotation.TODO;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
@@ -32,6 +31,7 @@ import com.example.FinCore.vo.PaymentInfoVO;
 import com.example.FinCore.vo.RecurringPeriodVO;
 import com.example.FinCore.vo.StatisticsIncomeAndOutlayVO;
 import com.example.FinCore.vo.StatisticsInfoVO;
+import com.example.FinCore.vo.StatisticsPaymentTypeVO;
 import com.example.FinCore.vo.StatisticsVO;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
@@ -41,7 +41,8 @@ import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
-import com.example.FinCore.vo.response.StatisticsResponse;
+import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
+import com.example.FinCore.vo.response.StatisticsLookupAllBalanceResponse;
 
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
@@ -356,16 +357,16 @@ public class PaymentServiceImpl implements PaymentService
 	}
 	
 	@Override
-	public StatisticsResponse statisticsLookupAllBalance(StatisticsRequest req) 
+	public StatisticsLookupAllBalanceResponse statisticsLookupAllBalance(StatisticsRequest req) 
 	{
 		if(!userDao.existsById(req.account()))
-			return new StatisticsResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+			return new StatisticsLookupAllBalanceResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
 		/* 最終統計列表 */
 		List<StatisticsVO> statisticsList = new ArrayList<>();
 		
 //		取得與帳號關聯的所有帳戶
-		List<Balance> balanceFromAccountList = balanceDao.getAllBalanceByAccount(req.account());
+		List<Balance> personalbalanceList = balanceDao.getAllBalanceByAccount(req.account());
 		
 //		取得與群組關聯的所有帳戶
 		List<Family> allFamilyList = familyDao.findAll();
@@ -381,7 +382,7 @@ public class PaymentServiceImpl implements PaymentService
 			familyMap.put(t.getId(), t.getName());
 		});
 		List<Balance> balanceFromFamilyList = balanceDao.getAllBalanceByFamilyIdList(familyIdList);
-		var balanceList = balanceFromAccountList;
+		var balanceList = personalbalanceList;
 		
 //		合併帳號與群組的帳戶，並依照帳戶編號排序
 		balanceList.addAll(balanceFromFamilyList);
@@ -401,23 +402,12 @@ public class PaymentServiceImpl implements PaymentService
 		
 //		如果月份指定 1~12 月，就針對該設定進行篩選
 //		如果不指定則僅篩選該年分的所有款項
-		List<Payment> filtedPaymentList = new ArrayList<>();
-		if(req.month() < 1 || req.month() > 12)
-		{
-			filtedPaymentList = paymentList.stream().filter(t -> !t.isDeleted() && t.isOnTime(req.year())).toList();
-//			只篩選年份的款項須考慮月份排序問題
-			filtedPaymentList.sort((o1, o2) -> o1.getMonth() - o2.getMonth());
-		}
-		else
-		{
-			filtedPaymentList = paymentList.stream().filter(t -> !t.isDeleted() && t.isOnTime(req.year(), req.month())).toList();
-		}
-		
+		List<Payment> filtedPaymentList = getFilterPaymentListForStatistics(paymentList, req.year(), req.month());
 		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year())
 				.stream()
 				.sorted((o1, o2) -> o1.month() - o2.month())
 				.toList();
-		return new StatisticsResponse(ResponseMessages.SUCCESS, statisticsList);
+		return new StatisticsLookupAllBalanceResponse(ResponseMessages.SUCCESS, statisticsList);
 	}
 	
 	/** 
@@ -551,15 +541,10 @@ public class PaymentServiceImpl implements PaymentService
 		if(!userDao.existsById(req.account()))
 			return new StatisticsIncomeAndOutlayResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		List<Balance> accountBalanceList = balanceDao.getAllBalanceByAccount(req.account());
-		List<Integer> balanceIdList = accountBalanceList.stream().map(t -> t.getBalanceId()).toList();
+		List<Balance> personalBalanceList = balanceDao.getAllBalanceByAccount(req.account());
+		List<Integer> balanceIdList = personalBalanceList.stream().map(t -> t.getBalanceId()).toList();
 		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
-		var filtedPaymentList = paymentList.stream().filter(t -> {
-			if(req.month() >= 1 && req.month() <= 12)
-				return !t.isDeleted() && !t.isFuture() && t.isOnTime(req.year(), req.month());
-			else
-				return !t.isDeleted() && !t.isFuture() && t.isOnTime(req.year());
-		}).toList();
+		var filtedPaymentList = getFilterPaymentListForStatistics(paymentList, req.year(), req.month());
 		var result = incomeAndOutlayInfoVOFactory(req.year(), filtedPaymentList);
 		return new StatisticsIncomeAndOutlayResponse(ResponseMessages.SUCCESS, result);
 	}
@@ -602,12 +587,77 @@ public class PaymentServiceImpl implements PaymentService
 		return result;
 	}
 
-	@TODO(value = "修改Response")
 	@Override
-	public StatisticsResponse statisticsLookupPaymentTypePersonal(StatisticsRequest req) 
+	public StatisticsPersonalBalanceWithPaymentTypeResponse statisticsLookupPaymentTypePersonalBalance(StatisticsRequest req) 
 	{
+		if(!userDao.existsById(req.account()))
+			return new StatisticsPersonalBalanceWithPaymentTypeResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
-		return null;
+		List<Balance> personalBalanceList = balanceDao.getAllBalanceByAccount(req.account());
+		var balanceIdList = personalBalanceList.stream().map(t -> t.getBalanceId()).toList();
+		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
+		var filterPaymentList = getFilterPaymentListForStatistics(paymentList, req.year(), req.month());
+		var result = StatisticsPaymentTypeVOFactory(req.year(), filterPaymentList);
+		return new StatisticsPersonalBalanceWithPaymentTypeResponse(ResponseMessages.SUCCESS, result);
+	}
+	
+	private List<StatisticsPaymentTypeVO> StatisticsPaymentTypeVOFactory(int year, List<Payment> paymentList)
+	{
+		List<StatisticsPaymentTypeVO> result = new ArrayList<>();
+		// monthMap -> k: 月份, v: typeMap 
+		Map<Integer, Map<String, Integer>> monthMap = new HashMap<>(); 
+		for(Payment payment : paymentList)
+		{
+			int month = payment.getMonth();
+			String type = payment.getType();
+			int amount = payment.getAmount();
+			// typeMap -> k: 類型, v: 總金額
+			Map<String, Integer> typeMap = monthMap.computeIfAbsent(month, t -> new HashMap<>());
+			if(typeMap.containsKey(type))
+				amount += typeMap.get(type); 
+			
+			typeMap.put(type, amount);
+			monthMap.put(month, typeMap);
+		}
+		
+		
+		for(var monthEntry : monthMap.entrySet())
+		{
+			List<PaymentAmountVO> amountVOList = new ArrayList<>();
+			for(var typeEntry : monthEntry.getValue().entrySet())
+			{
+				PaymentAmountVO vo = new PaymentAmountVO(typeEntry.getKey(), typeEntry.getValue());
+				amountVOList.add(vo);
+			}
+			StatisticsPaymentTypeVO vo = new StatisticsPaymentTypeVO(year, monthEntry.getKey(), amountVOList);
+			result.add(vo);
+		}
+		return result;
+	}
+	
+	/**
+	 * 依照指定條件篩選款項列表：
+	 * <ol>
+	 * 	<li>未刪除款項</li>
+	 * 	<li>過去的款項</li>
+	 * 	<li>如果指定月份（1~12），會指定篩出該月份的款項，不指定則篩出整年的款項</li>
+	 * </ol>
+	 * 該方法主要用於款項統計。
+	 * @param paymentList 原始款項列表
+	 * @param year 篩選年
+	 * @param month 篩選月（1~12），可不指定月份
+	 * @return 篩選過的款項列表
+	 */
+	private List<Payment> getFilterPaymentListForStatistics(List<Payment> paymentList, int year, int month)
+	{
+		return paymentList.stream()
+				.filter(t -> !t.isDeleted() && !t.isFuture())
+				.filter(t -> {
+					if(month >= 1 && month <= 12)
+						return t.isOnTime(year, month);
+					else
+						return t.isOnTime(year);
+		}).toList();
 	}
 
 	/**

@@ -19,15 +19,6 @@ public class UpdateUserRequest {
 	private LocalDate birthday;
 	
 	private byte[] avatar;
-	
-	/**
-	 * 前端傳 Base64 格式頭像（如 data:image/png;base64,xxxx）
-	 */
-	private String avatarString; // 新增，接收 base64
-	
-	public String getAvatarString() { return avatarString; }
-	
-	public void setAvatarString(String avatarString) { this.avatarString = avatarString; }
 
 	public LocalDate getBirthday() {
 		return birthday;

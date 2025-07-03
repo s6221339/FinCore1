@@ -88,35 +88,31 @@ public class UserServiceImpl implements UserService {
 	    // 1. 確認帳號是否存在
 	    int exists = userDao.selectCountByAccount(req.getAccount());
 	    if (exists == 0) {
-	        // 帳號不存在，回傳錯誤訊息
 	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 	    }
 
-	    // 2. 處理頭像資料
-	    // 優先採用 byte[]，如果為空則解析 avatarString（Base64字串）
-	    byte[] avatar = req.getAvatar();
-	    if ((avatar == null || avatar.length == 0)
-	            && req.getAvatarString() != null && !req.getAvatarString().isEmpty()) {
-	        String base64 = req.getAvatarString();
-	        // 處理有 data:image/png;base64, 前綴的情境
+	    // 2. 解析 avatar 的 base64 字串，轉成 byte[]
+	    byte[] avatarBytes = null;
+	    String base64 = req.getAvatar();
+	    if (base64 != null && !base64.isEmpty()) {
+	        // 去掉 "data:image/png;base64," 前綴
 	        if (base64.contains(",")) {
 	            base64 = base64.substring(base64.indexOf(",") + 1);
 	        }
 	        try {
-	            avatar = java.util.Base64.getDecoder().decode(base64);
+	            avatarBytes = java.util.Base64.getDecoder().decode(base64);
 	        } catch (IllegalArgumentException e) {
-	            // Base64解析失敗，回傳自訂錯誤訊息
 	            return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
 	        }
 	    }
 
-	    // 3. 執行更新
+	    // 3. 執行資料更新
 	    int updated = userDao.update(
 	        req.getAccount(),
 	        req.getName(),
 	        req.getPhone(),
 	        req.getBirthday(),
-	        avatar // 這裡丟轉好的 byte[]
+	        avatarBytes  // 直接存byte[]
 	    );
 	    if (updated > 0) {
 	        return new BasicResponse(ResponseMessages.SUCCESS);

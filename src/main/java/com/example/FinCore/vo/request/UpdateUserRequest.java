@@ -18,13 +18,15 @@ public class UpdateUserRequest {
 	
 	private LocalDate birthday;
 	
-	private byte[] avatar;
-	
-	private String avatarString; // 新增，接收 base64，例如 data:image/png;base64
-	
-	public String getAvatarString() { return avatarString; }
-	
-	public void setAvatarString(String avatarString) { this.avatarString = avatarString; }
+	private String avatar; // 新增，接收 base64，例如 data:image/png;base64
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
 
 	public LocalDate getBirthday() {
 		return birthday;
@@ -32,14 +34,6 @@ public class UpdateUserRequest {
 
 	public void setBirthday(LocalDate birthday) {
 		this.birthday = birthday;
-	}
-
-	public byte[] getAvatar() {
-		return avatar;
-	}
-
-	public void setAvatar(byte[] avatar) {
-		this.avatar = avatar;
 	}
 
 	public String getAccount() {

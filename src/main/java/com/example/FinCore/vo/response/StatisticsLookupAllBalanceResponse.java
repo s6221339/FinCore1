@@ -5,29 +5,29 @@ import java.util.List;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.vo.StatisticsVO;
 
-public class StatisticsResponse extends BasicResponse
+public class StatisticsLookupAllBalanceResponse extends BasicResponse
 {
 
 	List<StatisticsVO> statisticsList;
 
-	public StatisticsResponse() {
+	public StatisticsLookupAllBalanceResponse() {
 		super();
 	}
 
-	public StatisticsResponse(int code, String message) {
+	public StatisticsLookupAllBalanceResponse(int code, String message) {
 		super(code, message);
 	}
 
-	public StatisticsResponse(ResponseMessages res) {
+	public StatisticsLookupAllBalanceResponse(ResponseMessages res) {
 		super(res);
 	}
 	
-	public StatisticsResponse(int code, String message, List<StatisticsVO> statisticsList) {
+	public StatisticsLookupAllBalanceResponse(int code, String message, List<StatisticsVO> statisticsList) {
 		super(code, message);
 		this.statisticsList = statisticsList;
 	}
 
-	public StatisticsResponse(ResponseMessages res, List<StatisticsVO> statisticsList) {
+	public StatisticsLookupAllBalanceResponse(ResponseMessages res, List<StatisticsVO> statisticsList) {
 		super(res);
 		this.statisticsList = statisticsList;
 	}

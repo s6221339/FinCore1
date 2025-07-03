@@ -8,7 +8,7 @@ import com.example.FinCore.vo.StatisticsIncomeAndOutlayVO;
 public class StatisticsIncomeAndOutlayResponse extends BasicResponse 
 {
 	
-	private List<StatisticsIncomeAndOutlayVO> voList;
+	private List<StatisticsIncomeAndOutlayVO> statisticsList;
 
 	public StatisticsIncomeAndOutlayResponse() {
 		super();
@@ -24,16 +24,16 @@ public class StatisticsIncomeAndOutlayResponse extends BasicResponse
 	
 	public StatisticsIncomeAndOutlayResponse(int code, String message, List<StatisticsIncomeAndOutlayVO> voList) {
 		super(code, message);
-		this.voList = voList;
+		this.statisticsList = voList;
 	}
 
 	public StatisticsIncomeAndOutlayResponse(ResponseMessages res, List<StatisticsIncomeAndOutlayVO> voList) {
 		super(res);
-		this.voList = voList;
+		this.statisticsList = voList;
 	}
 
-	public List<StatisticsIncomeAndOutlayVO> getVoList() {
-		return voList;
+	public List<StatisticsIncomeAndOutlayVO> getStatisticsList() {
+		return statisticsList;
 	}
 	
 }

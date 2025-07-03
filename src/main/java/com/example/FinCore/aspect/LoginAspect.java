@@ -30,7 +30,9 @@ public class LoginAspect
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Pointcut("execution (public * com.example.FinCore.controller.*.*(..)) "
-			+ "&& !execution (public * com.example.FinCore.controller.*.login(..))")
+			+ "&& !execution (public * com.example.FinCore.controller.*.login(..))"
+			+ "&& !execution (public * com.example.FinCore.controller.*.register(..))"
+			+ "&& !execution (public * com.example.FinCore.controller.*.getNameByAccount(..))")
 	public void pointcut()
 	{
 		
@@ -67,6 +69,7 @@ public class LoginAspect
 				}
 				catch (Exception e) {
 					logger.warn("轉換物件時發生例外事件。");
+					return null;
 				}
 			}
 		}
@@ -79,9 +82,11 @@ public class LoginAspect
 		String sessionId = session.getId();
 //		System.out.println("account：" + account + ", sessionAccount：" + sessionAccount + ", sessionId：" + sessionId);
 		
+//		確認登入狀態
 		if(sessionId == null || sessionAccount == null)
 			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
 		
+//		如果API有帳號操作，比對登入帳號與操作帳號是否一致
 		if((StringUtils.hasText(account) && !sessionAccount.equals(account)) || !sessionId.equals(session.getId()))
 			return new BasicResponse(ResponseMessages.LOGIN_INFO_NOT_SYNC);
 		return null;

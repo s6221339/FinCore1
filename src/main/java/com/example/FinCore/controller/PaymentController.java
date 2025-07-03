@@ -219,13 +219,13 @@ public class PaymentController
 		return service.getDeletedPayment(account);
 	}
 	
-	@PostMapping(value = "statistics/lookupBalance")
+	@PostMapping(value = "statistics/lookupAllBalance")
 	@Operation(
-			summary = ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_BALANCE_SUMMARY,
-			description = ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_BALANCE_DESC + ApiDocConstants.TEST_PASS,
+			summary = ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_SUMMARY,
+			description = ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-				description = "查詢統計資料的請求格式，規則：" + ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_BALANCE_REQUEST_BODY_RULE
+				description = "查詢統計資料的請求格式，規則：" + ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_REQUEST_BODY_RULE
 			)
 		)
 		@ApiResponses({
@@ -234,9 +234,9 @@ public class PaymentController
 					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsResponse.class))}),
 			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 		})
-	public BasicResponse statisticsLookupBalance(@Valid @RequestBody StatisticsRequest req) 
+	public BasicResponse statisticsLookupAllBalance(@Valid @RequestBody StatisticsRequest req) 
 	{
-		return service.statisticsLookupBalance(req);
+		return service.statisticsLookupAllBalance(req);
 	}
 	
 	@PostMapping(value = "statistics/summaryIncomeAndOutlay")
@@ -248,12 +248,12 @@ public class PaymentController
 		        required = true
 		    )
 		)
-		@ApiResponses(value = {
-				@ApiResponse(responseCode = "200", 
-						description = ApiDocConstants.SEARCH_SUCCESS, 
-						content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsIncomeAndOutlayResponse.class))}),
-				@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
-		})
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsIncomeAndOutlayResponse.class))}),
+			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+	})
 	public BasicResponse statisticsIncomeAndOutlaySummarize(@Valid @RequestBody StatisticsRequest req) 
 	{
 		return service.statisticsIncomeAndOutlaySummarize(req);

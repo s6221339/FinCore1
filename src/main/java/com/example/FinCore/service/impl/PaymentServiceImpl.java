@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.example.FinCore.annotation.TODO;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
@@ -355,7 +356,7 @@ public class PaymentServiceImpl implements PaymentService
 	}
 	
 	@Override
-	public StatisticsResponse statisticsLookupBalance(StatisticsRequest req) 
+	public StatisticsResponse statisticsLookupAllBalance(StatisticsRequest req) 
 	{
 		if(!userDao.existsById(req.account()))
 			return new StatisticsResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
@@ -599,6 +600,14 @@ public class PaymentServiceImpl implements PaymentService
 		}
 		result.sort((o1, o2) -> o1.month() - o2.month());
 		return result;
+	}
+
+	@TODO(value = "修改Response")
+	@Override
+	public StatisticsResponse statisticsLookupPaymentTypePersonal(StatisticsRequest req) 
+	{
+		
+		return null;
 	}
 
 	/**

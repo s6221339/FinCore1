@@ -81,18 +81,23 @@ public interface PaymentService
 	
 	/**
 	 * 查看帳號在指定年月的帳款統計。（帳戶分開統計）
-	 * @param account 帳號
-	 * @param year 指定年
-	 * @param month 指定月，若設為 0 將無視月，會傳回一整年的資料
-	 * @return 帳款統計
+	 * @param req 統計專用請求資料
+	 * @return 所有帳戶的帳款統計，每個帳戶將分開統計，包含群組帳戶
 	 */
-	public StatisticsResponse statisticsLookupBalance(StatisticsRequest req);
+	public StatisticsResponse statisticsLookupAllBalance(StatisticsRequest req);
 	
 	/**
 	 * 取得指定帳戶在指定時間的所有帳戶支出與收入統計數據。（帳戶合併統計）
-	 * @param req 
-	 * @return 支出與收入的統計數據列表
+	 * @param req 統計專用請求資料
+	 * @return 支出與收入的統計數據列表，所有帳戶將合併統計，不包含群組帳戶
 	 */
 	public StatisticsIncomeAndOutlayResponse statisticsIncomeAndOutlaySummarize(StatisticsRequest req);
+	
+	/**
+	 * 查看帳號在指定年月的各項帳款統計。（帳戶合併統計）
+	 * @param req 統計專用請求資料
+	 * @return 指定年月的帳款類型數據統計，所有帳戶將合併統計，不包含群組帳戶
+	 */
+	public StatisticsResponse statisticsLookupPaymentTypePersonal(StatisticsRequest req);
 	
 }

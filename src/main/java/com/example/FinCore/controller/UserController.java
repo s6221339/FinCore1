@@ -18,7 +18,6 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
-import com.example.FinCore.vo.response.StatisticsResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -130,11 +129,11 @@ public class UserController {
 		@ApiResponses({
 			@ApiResponse(responseCode = "200", 
 					description = ApiDocConstants.SEARCH_SUCCESS, 
-					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsResponse.class))}),
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponse.class))}),
 			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 		})
-	public UserResponse getUser(@RequestParam("account") String account) {
+	public BasicResponse getUser(@RequestParam("account") String account) {
 		return service.getUser(account);
 	}
 
@@ -156,7 +155,7 @@ public class UserController {
 					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyListResponse.class))}),
 			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		})
-	public FamilyListResponse getFamilyByAccount(@RequestParam("account") String account)
+	public BasicResponse getFamilyByAccount(@RequestParam("account") String account)
 			throws JsonProcessingException {
 		return service.getFamilyByAccount(account);
 	}
@@ -206,7 +205,7 @@ public class UserController {
 			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 		})
-	public MemberNameResponse getNameByAccount(@RequestParam("account") String account) {
+	public BasicResponse getNameByAccount(@RequestParam("account") String account) {
 		return service.getNameByAccount(account);
 	}
 	

@@ -1,5 +1,7 @@
 package com.example.FinCore.service.itfc;
 
+import java.time.LocalDateTime;
+
 import com.example.FinCore.vo.request.RregisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
@@ -7,6 +9,7 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
+import com.example.FinCore.vo.response.SubscriptionResponse;
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -67,5 +70,21 @@ public interface UserService {
 	 * @return 姓名（找不到會回傳 null）
 	 */
 	public MemberNameResponse getNameByAccount(String account);
+	
+	/**
+	 * 更新會員訂閱狀態
+	 * @param account 使用者帳號
+	 * @param subscription 訂閱狀態
+	 * @param expirationDate 訂閱到期日期
+	 * @return
+	 */
+	public BasicResponse updateSubscription(String account, Boolean subscription);
+	
+	/**
+	 * 查詢會員訂閱狀態
+	 * @param account 使用者帳號
+	 * @return
+	 */
+	public SubscriptionResponse getSubscription(String account);
 	
 }

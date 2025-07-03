@@ -32,7 +32,7 @@ public enum ResponseMessages
 	VERIFICATION_FAILED(400, "驗證失敗：驗證碼錯誤或已過期"),
 	PAYMENT_HAS_BEEN_DELETED(400, "該帳款已刪除"),
 	PAYMENT_PERIOD_UNABLE_MODIFYING(400, "無法變更該款項的週期"),
-	INVITATION_ALREADY_SENT(400, "成員已發出邀請，請勿重複邀請："),
+	INVITATION_ALREADY_SENT(400, "成員已發出邀請，請勿重複邀請"),
 	INVITATION_ALREADY_ACCEPTED(400, "該邀請已被接受，無法重複操作！"),
 	OWNER_CANNOT_KICK_SELF(400, "群組擁有者無法踢除自己"),
 	PLEASE_LOGIN_FIRST(400, "請先登入！"),

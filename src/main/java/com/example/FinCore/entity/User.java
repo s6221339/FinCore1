@@ -1,6 +1,7 @@
 package com.example.FinCore.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,12 @@ public class User {
     
     @Column(name = "verified")
     private boolean verified;
+    
+    @Column(name = "subscription")
+    private boolean subscription;
+    
+    @Column(name = "expiration_date")
+    private LocalDateTime expirationDate;
     
     public String getAccount() {
         return account;
@@ -115,6 +122,22 @@ public class User {
 	public void setVerified(boolean verified) {
 		this.verified = verified;
 	}
-    
-    
+
+	public boolean isSubscription() {
+		return subscription;
+	}
+
+	public void setSubscription(boolean subscription) {
+		this.subscription = subscription;
+	}
+
+	public LocalDateTime getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(LocalDateTime expirationDate) {
+		this.expirationDate = expirationDate;
+	}
+	
+	
 }

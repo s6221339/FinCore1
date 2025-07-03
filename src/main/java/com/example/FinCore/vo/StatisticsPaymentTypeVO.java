@@ -5,7 +5,7 @@ import java.util.List;
 public record StatisticsPaymentTypeVO(
 		int year,
 		int month,
-		List<PaymentAmountVO> paymentInfo
+		List<PaymentInfoVO> paymentInfo
 		) {
 
 }

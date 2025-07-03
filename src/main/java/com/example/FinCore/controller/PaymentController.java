@@ -18,8 +18,7 @@ import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
-import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
-import com.example.FinCore.vo.response.StatisticsLookupAllBalanceResponse;
+import com.example.FinCore.vo.response.StatisticsResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -90,7 +89,7 @@ public class PaymentController
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", 
 				description = ApiDocConstants.SEARCH_SUCCESS, 
-				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsLookupAllBalanceResponse.class))}),
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.PAYMENT_NOT_FOUND),
 		@ApiResponse(responseCode = "400", description = ApiDocConstants.PAYMENT_UPDATE_RESPONSE_400),
 	})
@@ -226,13 +225,13 @@ public class PaymentController
 			description = ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_DESC + ApiDocConstants.TEST_PASS,
 			method = "POST",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-				description = "查詢統計資料的請求格式，規則：" + ApiDocConstants.PAYMENT_STATISTICS_REQUEST_BODY_RULE
+				description = "查詢統計資料的請求格式，規則：" + ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_REQUEST_BODY_RULE
 			)
 		)
 		@ApiResponses({
 			@ApiResponse(responseCode = "200", 
 					description = ApiDocConstants.SEARCH_SUCCESS, 
-					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsLookupAllBalanceResponse.class))}),
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsResponse.class))}),
 			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 		})
 	public BasicResponse statisticsLookupAllBalance(@Valid @RequestBody StatisticsRequest req) 
@@ -245,7 +244,7 @@ public class PaymentController
 		    summary = ApiDocConstants.PAYMENT_STATISTICS_SUMMARY_INCOME_AND_OUTLAY_SUMMARY,
 		    description = ApiDocConstants.PAYMENT_STATISTICS_SUMMARY_INCOME_AND_OUTLAY_DESC,
 		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-		        description = ApiDocConstants.PAYMENT_STATISTICS_REQUEST_BODY_RULE,
+		        description = ApiDocConstants.PAYMENT_STATISTICS_SUMMARY_INCOME_AND_OUTLAY_REQUEST_BODY_RULE,
 		        required = true
 		    )
 		)
@@ -258,26 +257,6 @@ public class PaymentController
 	public BasicResponse statisticsIncomeAndOutlaySummarize(@Valid @RequestBody StatisticsRequest req) 
 	{
 		return service.statisticsIncomeAndOutlaySummarize(req);
-	}
-	
-	@PostMapping(value = "statistics/personalBalanceWithPaymentType")
-	@Operation(
-		    summary = ApiDocConstants.PAYMENT_STATISTICS_PERSONAL_BALANCE_WITH_PAYMENT_TYPE_SUMMARY,
-		    description = ApiDocConstants.PAYMENT_STATISTICS_PERSONAL_BALANCE_WITH_PAYMENT_TYPE_DESC,
-		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-		        description = ApiDocConstants.PAYMENT_STATISTICS_REQUEST_BODY_RULE,
-		        required = true
-		    )
-		)
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", 
-					description = ApiDocConstants.SEARCH_SUCCESS, 
-					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsPersonalBalanceWithPaymentTypeResponse.class))}),
-			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
-	})
-	public BasicResponse statisticsLookupPaymentTypePersonalBalance(@Valid @RequestBody StatisticsRequest req)
-	{
-		return service.statisticsLookupPaymentTypePersonalBalance(req);
 	}
 	
 	@PostMapping(value = "disable/scheduledCreate")

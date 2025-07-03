@@ -85,20 +85,44 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public BasicResponse update(UpdateUserRequest req) {
-		// 1. 確認帳號存在
-		int exists = userDao.selectCountByAccount(req.getAccount());
-		if (exists == 0) {
-			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
-		}
+	    // 1. 確認帳號是否存在
+	    int exists = userDao.selectCountByAccount(req.getAccount());
+	    if (exists == 0) {
+	        // 帳號不存在，回傳錯誤訊息
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
 
-		// 2. 更新
-		int updated = userDao.update(req.getAccount(), req.getName(), req.getPhone(), req.getBirthday(),
-				req.getAvatar());
-		if (updated > 0) {
-			return new BasicResponse(ResponseMessages.SUCCESS);
-		} else {
-			return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
-		}
+	    // 2. 處理頭像資料
+	    // 優先採用 byte[]，如果為空則解析 avatarString（Base64字串）
+	    byte[] avatar = req.getAvatar();
+	    if ((avatar == null || avatar.length == 0)
+	            && req.getAvatarString() != null && !req.getAvatarString().isEmpty()) {
+	        String base64 = req.getAvatarString();
+	        // 處理有 data:image/png;base64, 前綴的情境
+	        if (base64.contains(",")) {
+	            base64 = base64.substring(base64.indexOf(",") + 1);
+	        }
+	        try {
+	            avatar = java.util.Base64.getDecoder().decode(base64);
+	        } catch (IllegalArgumentException e) {
+	            // Base64解析失敗，回傳自訂錯誤訊息
+	            return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
+	        }
+	    }
+
+	    // 3. 執行更新
+	    int updated = userDao.update(
+	        req.getAccount(),
+	        req.getName(),
+	        req.getPhone(),
+	        req.getBirthday(),
+	        avatar // 這裡丟轉好的 byte[]
+	    );
+	    if (updated > 0) {
+	        return new BasicResponse(ResponseMessages.SUCCESS);
+	    } else {
+	        return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
+	    }
 	}
 
 	@Override

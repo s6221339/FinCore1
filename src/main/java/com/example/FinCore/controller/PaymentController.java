@@ -18,8 +18,9 @@ import com.example.FinCore.vo.request.UpdatePaymentRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
+import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayWithBalanceInfoResponse;
 import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
-import com.example.FinCore.vo.response.StatisticsLookupAllBalanceResponse;
+import com.example.FinCore.vo.response.StatisticsLookupPaymentTypeWithAllBalanceResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -90,7 +91,7 @@ public class PaymentController
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", 
 				description = ApiDocConstants.SEARCH_SUCCESS, 
-				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsLookupAllBalanceResponse.class))}),
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsLookupPaymentTypeWithAllBalanceResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.PAYMENT_NOT_FOUND),
 		@ApiResponse(responseCode = "400", description = ApiDocConstants.PAYMENT_UPDATE_RESPONSE_400),
 	})
@@ -220,7 +221,7 @@ public class PaymentController
 		return service.getDeletedPayment(account);
 	}
 	
-	@PostMapping(value = "statistics/lookupAllBalance")
+	@PostMapping(value = "statistics/paymentTypeWithAllBalance")
 	@Operation(
 			summary = ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_SUMMARY,
 			description = ApiDocConstants.PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_DESC + ApiDocConstants.TEST_PASS,
@@ -232,12 +233,12 @@ public class PaymentController
 		@ApiResponses({
 			@ApiResponse(responseCode = "200", 
 					description = ApiDocConstants.SEARCH_SUCCESS, 
-					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsLookupAllBalanceResponse.class))}),
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsLookupPaymentTypeWithAllBalanceResponse.class))}),
 			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 		})
-	public BasicResponse statisticsLookupAllBalance(@Valid @RequestBody StatisticsRequest req) 
+	public BasicResponse statisticsLookupPaymentTypeWithAllBalance(@Valid @RequestBody StatisticsRequest req) 
 	{
-		return service.statisticsLookupAllBalance(req);
+		return service.statisticsLookupPaymentTypeWithAllBalance(req);
 	}
 	
 	@PostMapping(value = "statistics/summaryIncomeAndOutlay")
@@ -277,7 +278,27 @@ public class PaymentController
 	})
 	public BasicResponse statisticsLookupPaymentTypePersonalBalance(@Valid @RequestBody StatisticsRequest req)
 	{
-		return service.statisticsLookupPaymentTypePersonalBalance(req);
+		return service.statisticsLookupPaymentTypeSummarize(req);
+	}
+	
+	@PostMapping(value = "statistics/incomeAndOutlayWithAllBalance")
+	@Operation(
+		    summary = ApiDocConstants.PAYMENT_STATISTICS_INCOME_AND_OUTLAY_WITH_ALL_BALANCE_SUMMARY,
+		    description = ApiDocConstants.PAYMENT_STATISTICS_INCOME_AND_OUTLAY_WITH_ALL_BALANCE_DESC,
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = ApiDocConstants.PAYMENT_STATISTICS_REQUEST_BODY_RULE,
+		        required = true
+		    )
+		)
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsIncomeAndOutlayWithBalanceInfoResponse.class))}),
+			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+	})
+	public BasicResponse statisticsIncomeAndOutlayWithAllBalance(@Valid @RequestBody StatisticsRequest req) 
+	{
+		return service.statisticsIncomeAndOutlayWithAllBalance(req);
 	}
 	
 	@PostMapping(value = "disable/scheduledCreate")

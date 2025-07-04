@@ -24,12 +24,14 @@ public class MemberNameResponse extends BasicResponse {
     public static class MemberData {
         private String name;
         private String account; 
+        private String avatar;
 
         public MemberData() {}
 
-        public MemberData(String name, String account) {
+        public MemberData(String name, String account, String avatar) {
             this.name = name;
             this.account = account;
+            this.avatar = avatar;
         }
 
         public String getName() {
@@ -47,5 +49,15 @@ public class MemberNameResponse extends BasicResponse {
         public void setAccount(String account) {
             this.account = account;
         }
+
+		public String getAvatar() {
+			return avatar;
+		}
+
+		public void setAvatar(String avatar) {
+			this.avatar = avatar;
+		}
+        
+        
     }
 }

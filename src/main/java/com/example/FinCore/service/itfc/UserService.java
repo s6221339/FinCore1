@@ -5,7 +5,7 @@ import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
-import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.FamilyAvatarListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
 import com.example.FinCore.vo.response.SubscriptionResponse;
 import com.example.FinCore.vo.response.UserResponse;
@@ -53,7 +53,7 @@ public interface UserService {
 	 * @param account
 	 * @return
 	 */
-	public FamilyListResponse getFamilyByAccount(String account) throws JsonProcessingException;
+	public FamilyAvatarListResponse getFamilyByAccount(String account) throws JsonProcessingException;
 	
 	/**
 	 * 會員登入

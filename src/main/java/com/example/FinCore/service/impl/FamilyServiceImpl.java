@@ -2,6 +2,7 @@ package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -786,19 +787,47 @@ public class FamilyServiceImpl implements FamilyService {
 	    for (FamilyInvitation inv : invites) {
 	        FamilyInvitationListResponse.InviteeInfo info = new FamilyInvitationListResponse.InviteeInfo();
 	        info.setAccount(inv.getAccount());
-	        // 查詢受邀人名稱
+
+	        // 查詢受邀人名稱和頭像
 	        User user = userDao.selectById(inv.getAccount());
 	        info.setName(user != null ? user.getName() : null);
+
+	        // 處理 avatar（byte[] -> base64，判斷 mime type）
+	        String avatarBase64 = null;
+	        if (user != null && user.getAvatar() != null && user.getAvatar().length > 0) {
+	            String mimeType = detectImageMimeType(user.getAvatar());
+	            avatarBase64 = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(user.getAvatar());
+	        }
+	        info.setAvatar(avatarBase64);
+
 	        inviteeList.add(info);
 	    }
 
 	    return new FamilyInvitationListResponse(
-	    	    ResponseMessages.SUCCESS.getCode(),
-	    	    ResponseMessages.SUCCESS.getMessage(),
-	    	    familyId,
-	    	    inviteeList
-	    	);
+	        ResponseMessages.SUCCESS.getCode(),
+	        ResponseMessages.SUCCESS.getMessage(),
+	        familyId,
+	        inviteeList
+	    );
 	}
+	
+	// 支援 PNG/JPEG/GIF
+		private String detectImageMimeType(byte[] imageBytes) {
+		    if (imageBytes == null || imageBytes.length < 8) {
+		        return "image/png";
+		    }
+		    if (imageBytes[0] == (byte)0x89 && imageBytes[1] == 0x50 &&
+		        imageBytes[2] == 0x4E && imageBytes[3] == 0x47) {
+		        return "image/png";
+		    }
+		    if (imageBytes[0] == (byte)0xFF && imageBytes[1] == (byte)0xD8) {
+		        return "image/jpeg";
+		    }
+		    if (imageBytes[0] == 0x47 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46) {
+		        return "image/gif";
+		    }
+		    return "image/png"; // 預設
+		}
 	
 	/**
 	 * Owner 取消發出的邀請（只能 owner 執行，刪除 family_invitation 資料）

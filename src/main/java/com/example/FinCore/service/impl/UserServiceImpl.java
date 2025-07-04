@@ -20,8 +20,8 @@ import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.UserService;
-import com.example.FinCore.vo.FamilyVO;
-import com.example.FinCore.vo.SimpleUserVO;
+import com.example.FinCore.vo.FamilyAvatarVO;
+import com.example.FinCore.vo.SimpleUserAvatarVO;
 import com.example.FinCore.vo.SubscriptionVO;
 import com.example.FinCore.vo.UserVO;
 import com.example.FinCore.vo.request.RregisterUserRequest;
@@ -29,7 +29,7 @@ import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
-import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.FamilyAvatarListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
 import com.example.FinCore.vo.response.SubscriptionResponse;
 import com.example.FinCore.vo.response.UserResponse;
@@ -235,19 +235,28 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public FamilyListResponse getFamilyByAccount(String account) throws JsonProcessingException {
-	    // 1. 檢查帳號有沒有填，沒填就直接回傳錯誤
+	public FamilyAvatarListResponse getFamilyByAccount(String account) throws JsonProcessingException {
 	    if (account == null || account.isEmpty()) {
-	        return new FamilyListResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	        return new FamilyAvatarListResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 	    }
-
-	    // 2. 準備一個結果清單，把有關的家族資料都丟進去
-	    List<FamilyVO> voList = new ArrayList<>();
-	    // 3. 從資料庫撈出所有家族，之後要一個一個檢查
+	    List<FamilyAvatarVO> voList = new ArrayList<>();
 	    List<Family> familyList = familyDao.selectAllFamily();
 
 	    for (Family family : familyList) {
-	        // 4-1. family 的 invitor 欄位可能為 null，需要先判斷
+	        // 處理 owner avatar
+	        User ownerUser = userDao.selectById(family.getOwner());
+	        String ownerAvatar = null;
+	        if (ownerUser != null && ownerUser.getAvatar() != null && ownerUser.getAvatar().length > 0) {
+	            String mimeType = detectImageMimeType(ownerUser.getAvatar());
+	            ownerAvatar = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(ownerUser.getAvatar());
+	        }
+	        SimpleUserAvatarVO ownerVO = new SimpleUserAvatarVO(
+	            family.getOwner(),
+	            ownerUser != null ? ownerUser.getName() : null,
+	            ownerAvatar
+	        );
+
+	        // 處理 memberList avatar
 	        List<String> invitorList;
 	        String invitorContent = family.getInvitor();
 	        if (invitorContent == null || invitorContent.trim().isEmpty()) {
@@ -255,39 +264,39 @@ public class UserServiceImpl implements UserService {
 	        } else {
 	            invitorList = mapper.readValue(invitorContent, new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
 	        }
-	        // 4-2. 查 owner 的名字（如找不到顯示 null）
-	        User ownerUser = userDao.selectById(family.getOwner());
-	        SimpleUserVO ownerVO = new SimpleUserVO(family.getOwner(),
-	                ownerUser != null ? ownerUser.getName() : null);
 
-	        // 4-3. 組成成員物件清單
-	        List<SimpleUserVO> memberList = new ArrayList<>();
+	        List<SimpleUserAvatarVO> memberList = new ArrayList<>();
 	        if (invitorList != null) {
 	            for (String memberAccount : invitorList) {
 	                User memberUser = userDao.selectById(memberAccount);
-	                memberList.add(new SimpleUserVO(
-	                        memberAccount,
-	                        memberUser != null ? memberUser.getName() : null
+	                String memberAvatar = null;
+	                if (memberUser != null && memberUser.getAvatar() != null && memberUser.getAvatar().length > 0) {
+	                    String mimeType = detectImageMimeType(memberUser.getAvatar());
+	                    memberAvatar = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(memberUser.getAvatar());
+	                }
+	                memberList.add(new SimpleUserAvatarVO(
+	                    memberAccount,
+	                    memberUser != null ? memberUser.getName() : null,
+	                    memberAvatar
 	                ));
 	            }
 	        }
 
-	        // 4-4. 判斷自己是不是 owner 或 invitor（只要有一項就加入回傳清單）
+	        // 判斷自己是不是 owner 或 invitor（只要有一項就加入回傳清單）
 	        boolean isOwner = account.equals(family.getOwner());
 	        boolean isInvitor = invitorList != null && invitorList.contains(account);
 
 	        if (isOwner || isInvitor) {
-	            FamilyVO vo = new FamilyVO(
-	                    family.getId(),
-	                    family.getName(),
-	                    ownerVO,      // Owner 是物件
-	                    memberList    // 成員清單
+	        	FamilyAvatarVO vo = new FamilyAvatarVO(
+	                family.getId(),
+	                family.getName(),
+	                ownerVO,      // Owner 是物件
+	                memberList    // 成員清單
 	            );
 	            voList.add(vo);
 	        }
 	    }
-	    // 5. 統一回傳查詢成功與結果清單
-	    return new FamilyListResponse(ResponseMessages.SUCCESS, voList);
+	    return new FamilyAvatarListResponse(ResponseMessages.SUCCESS, voList);
 	}
 	
 	@Override
@@ -311,23 +320,32 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public MemberNameResponse getNameByAccount(String account) {
 	    if (account == null || account.isEmpty()) {
-	        // 可用 ResponseMessages.MISSING_REQUIRED_FIELD
 	        return new MemberNameResponse(
 	            ResponseMessages.MISSING_REQUIRED_FIELD.getCode(),
 	            "account 不可為空",
 	            null
 	        );
 	    }
-	    String name = userDao.findNameByAccount(account);
-	    if (name == null) {
+	    User user = userDao.selectById(account);  // 這裡要查完整 User 物件
+	    if (user == null) {
 	        return new MemberNameResponse(
 	            ResponseMessages.ACCOUNT_NOT_FOUND.getCode(),
 	            "查無此帳號",
 	            null
 	        );
 	    }
-	    
-	    MemberNameResponse.MemberData memberData = new MemberNameResponse.MemberData(name, account); 
+
+	    // 處理 avatar (byte[] -> base64，判斷MIME)
+	    String avatarBase64 = null;
+	    byte[] avatarBytes = user.getAvatar();
+	    if (avatarBytes != null && avatarBytes.length > 0) {
+	        String mimeType = detectImageMimeType(avatarBytes);
+	        avatarBase64 = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(avatarBytes);
+	    }
+
+	    MemberNameResponse.MemberData memberData =
+	        new MemberNameResponse.MemberData(user.getName(), user.getAccount(), avatarBase64);
+
 	    return new MemberNameResponse(ResponseMessages.SUCCESS.getCode(), "查詢成功", memberData);
 	}
 	

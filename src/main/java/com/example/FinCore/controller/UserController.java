@@ -16,7 +16,7 @@ import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
-import com.example.FinCore.vo.response.FamilyListResponse;
+import com.example.FinCore.vo.response.FamilyAvatarListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
 import com.example.FinCore.vo.response.SubscriptionResponse;
 
@@ -154,7 +154,7 @@ public class UserController {
 		@ApiResponses({
 			@ApiResponse(responseCode = "200", 
 					description = ApiDocConstants.SEARCH_SUCCESS, 
-					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyListResponse.class))}),
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FamilyAvatarListResponse.class))}),
 			@ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 		})
 	public BasicResponse getFamilyByAccount(@RequestParam("account") String account)

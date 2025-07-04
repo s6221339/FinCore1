@@ -195,14 +195,14 @@ public class UserServiceImpl implements UserService {
 	        return new UserResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 	    }
 
-	    // superAdmin 轉成 role 字串
 	    String role = user.isSuperAdmin() ? "admin" : "user";
 
-	    // 將資料庫 byte[] avatar 轉回 base64 字串，前端才能用
+	    // 動態判斷圖片格式
 	    String avatarBase64 = null;
 	    byte[] avatarBytes = user.getAvatar();
 	    if (avatarBytes != null && avatarBytes.length > 0) {
-	        avatarBase64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(avatarBytes);
+	        String mimeType = detectImageMimeType(avatarBytes);
+	        avatarBase64 = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(avatarBytes);
 	    }
 
 	    UserVO vo = new UserVO(
@@ -210,10 +210,28 @@ public class UserServiceImpl implements UserService {
 	        user.getName(),
 	        user.getPhone(),
 	        user.getBirthday(),
-	        avatarBase64,   // 回傳 base64 字串給前端
+	        avatarBase64,
 	        role
 	    );
 	    return new UserResponse(ResponseMessages.SUCCESS, vo);
+	}
+
+	// 支援 PNG/JPEG/GIF
+	private String detectImageMimeType(byte[] imageBytes) {
+	    if (imageBytes == null || imageBytes.length < 8) {
+	        return "image/png";
+	    }
+	    if (imageBytes[0] == (byte)0x89 && imageBytes[1] == 0x50 &&
+	        imageBytes[2] == 0x4E && imageBytes[3] == 0x47) {
+	        return "image/png";
+	    }
+	    if (imageBytes[0] == (byte)0xFF && imageBytes[1] == (byte)0xD8) {
+	        return "image/jpeg";
+	    }
+	    if (imageBytes[0] == 0x47 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46) {
+	        return "image/gif";
+	    }
+	    return "image/png"; // 預設
 	}
 
 	@Override

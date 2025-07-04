@@ -29,26 +29,53 @@ public class LoginAspect
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Pointcut("execution (public * com.example.FinCore.controller.*.*(..)) "
-			+ "&& !execution (public * com.example.FinCore.controller.*.login(..))"
-			+ "&& !execution (public * com.example.FinCore.controller.*.register(..))"
-			+ "&& !execution (public * com.example.FinCore.controller.*.getNameByAccount(..))")
+	@Pointcut("!execution (public * com.example.FinCore.controller.*.login(..)) "
+			+ "&& !execution (public * com.example.FinCore.controller.*.register(..)) ")
+	public void loginPointcut()
+	{
+		
+	}
+	
+	@Pointcut("loginPointcut() && "
+			+ "!execution (public * com.example.FinCore.controller.*.getNameByAccount(..))")
+	public void accountCheckPointcut()
+	{
+		
+	}
+	
+	@Pointcut("execution (public * com.example.FinCore.controller.*.*(..)) ")
 	public void pointcut()
 	{
 		
 	}
 	
-	@Around("pointcut()")
-	public Object around(ProceedingJoinPoint pjp) throws Throwable
+	@Around("pointcut() && loginPointcut()")
+	public Object loginCheckAround(ProceedingJoinPoint pjp) throws Throwable
 	{
-		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		HttpSession session = attributes.getRequest().getSession();
-		Object[] args = pjp.getArgs();
-		String account = extractAccountFromArgs(args);
-		var res = loginCheck(session, account);
+		HttpSession session = getSession();
+		var res = loginCheck(session);
 		if(res != null)
 			return res;
 		return pjp.proceed();
+	}
+	
+	@Around("pointcut() && accountCheckPointcut()")
+	public Object accountCheckAround(ProceedingJoinPoint pjp) throws Throwable
+	{
+		HttpSession session = getSession();
+		Object[] args = pjp.getArgs();
+		String account = extractAccountFromArgs(args);
+		var res = accountCheck(session, account);
+		if(res != null)
+			return res;
+		return pjp.proceed();
+	}
+	
+	private HttpSession getSession()
+	{
+		return ((ServletRequestAttributes) RequestContextHolder
+				.getRequestAttributes())
+				.getRequest().getSession();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -76,7 +103,7 @@ public class LoginAspect
 		return null;
 	}
 
-	private BasicResponse loginCheck(HttpSession session, String account)
+	private BasicResponse loginCheck(HttpSession session)
 	{
 		String sessionAccount = (String) session.getAttribute("account");
 		String sessionId = session.getId();
@@ -85,6 +112,14 @@ public class LoginAspect
 //		確認登入狀態
 		if(sessionId == null || sessionAccount == null)
 			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
+		return null;
+	}
+	
+	private BasicResponse accountCheck(HttpSession session, String account)
+	{
+		String sessionAccount = (String) session.getAttribute("account");
+		String sessionId = session.getId();
+//		System.out.println("account：" + account + ", sessionAccount：" + sessionAccount + ", sessionId：" + sessionId);
 		
 //		如果API有帳號操作，比對登入帳號與操作帳號是否一致
 		if((StringUtils.hasText(account) && !sessionAccount.equals(account)) || !sessionId.equals(session.getId()))

@@ -34,8 +34,6 @@ public final class ApiDocConstants
 
 	public static final String PAYMENT_TRASH_CAN_SUMMARY = "查詢已刪除款項資料";
 	
-	public static final String PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_SUMMARY = "統計帳號及家庭帳戶款項資訊";
-	
 	public static final String PAYMENT_GET_FAMILY_INFO_SUMMARY = "查詢使用者所屬群組的帳戶款項";
 
 	public static final String PAYMENT_GET_FAMILY_INFO_WITH_DATE_FILTER_SUMMARY = "查詢使用者所屬群組的帳戶款項（依據年月篩選）";
@@ -43,6 +41,10 @@ public final class ApiDocConstants
 	public static final String PAYMENT_STATISTICS_SUMMARY_INCOME_AND_OUTLAY_SUMMARY = "統計帳號收入與支出總覽";
 
 	public static final String PAYMENT_STATISTICS_PERSONAL_BALANCE_WITH_PAYMENT_TYPE_SUMMARY = "統計個人帳戶依類型分類之收入支出";
+
+	public static final String PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_SUMMARY = "統計帳號及家庭帳戶款項資訊";
+	
+	public static final String PAYMENT_STATISTICS_INCOME_AND_OUTLAY_WITH_ALL_BALANCE_SUMMARY = "統計個人與群組帳戶的收支資訊";
 
 	public static final String PAYMENT_SCHEDULED_CREATE_SUMMARY = "排程建立下一筆循環帳款（內部任務）";
 	
@@ -169,9 +171,6 @@ public final class ApiDocConstants
 	public static final String PAYMENT_TRASH_CAN_DESC =
 			"查詢指定帳號下，所有已被標記為刪除的款項。此操作不會返回未刪除的資料。<br>";
 	
-	public static final String PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_DESC =
-			"根據指定帳號與時間範圍，統計該帳號下所有個人及家庭帳戶的款項資料，依月份與類型分類統計。<br>";
-
 	public static final String PAYMENT_GET_FAMILY_INFO_DESC =
 			"本 API 用於查詢目前帳號所參與的群組中，所有帳戶的記帳資料，僅包含「未被刪除」的款項資料。<br>"
 			+ "系統會依照提供帳號比對群組成員關係，列出所有相關帳戶的資訊與款項紀錄。<br>";
@@ -185,8 +184,14 @@ public final class ApiDocConstants
 			"統計指定帳號於某年（可選擇指定月份）之所有帳戶的收入與支出金額總覽資訊，會忽略"
 			+ "未來與已刪除的資料。<br>";
 
+	public static final String PAYMENT_STATISTICS_LOOKUP_ALL_BALANCE_DESC =
+			"根據指定帳號與時間範圍，統計該帳號下所有個人及家庭帳戶的款項資料，依月份與類型分類統計。<br>";
+
 	public static final String PAYMENT_STATISTICS_PERSONAL_BALANCE_WITH_PAYMENT_TYPE_DESC = 
 			"統計指定帳號之所有帳戶中，各類型的支出與收入金額總和。可依據年月篩選資料，會忽略未來與已刪除的款項。<br>";
+	
+	public static final String PAYMENT_STATISTICS_INCOME_AND_OUTLAY_WITH_ALL_BALANCE_DESC = 
+		    "根據指定帳號取得其個人帳戶與所屬群組帳戶，在指定年月的收入與支出統計資訊，資料會依照帳戶分開列出，並標示其來源。<br>";
 	
 	public static final String PAYMENT_SCHEDULED_CREATE_DESC =
     		"每天凌晨自動執行的排程任務，根據循環帳款規則建立下一筆尚未記錄的款項。<br>"

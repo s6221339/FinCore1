@@ -67,13 +67,13 @@ public class Payment
 	@Column(name = "day")
 	private int day;
 	
-	private final static String TYPE_INCOME = "收入";
+	public final static String TYPE_INCOME = "收入";
 	
-	private final static String TYPE_OTHER = "其他";
+	public final static String TYPE_OTHER = "其他";
 	
-	private final static String TRANSFERS_IN = "（轉帳）轉入";
+	public final static String TRANSFERS_IN = "（轉帳）轉入";
 	
-	private final static String TRANSFERS_OUT = "（轉帳）轉出";
+	public final static String TRANSFERS_OUT = "（轉帳）轉出";
 
 	public Payment() {
 		super();

@@ -117,9 +117,14 @@ public class LoginAspect
 	
 	private BasicResponse accountCheck(HttpSession session, String account)
 	{
+		var res = loginCheck(session);
+		if(res != null)
+			return res;
+		
 		String sessionAccount = (String) session.getAttribute("account");
 		String sessionId = session.getId();
 //		System.out.println("account：" + account + ", sessionAccount：" + sessionAccount + ", sessionId：" + sessionId);
+		
 		
 //		如果API有帳號操作，比對登入帳號與操作帳號是否一致
 		if((StringUtils.hasText(account) && !sessionAccount.equals(account)) || !sessionId.equals(session.getId()))

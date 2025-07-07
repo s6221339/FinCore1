@@ -154,7 +154,7 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Modifying
 	@Transactional
 	@Query(value = "update user set verified = 0 where verified = 1", nativeQuery = true)
-	void resetAllVerified();
+	public void resetAllVerified();
 	
 	/**
 	 * 根據帳號查詢成員名稱（使用原生 SQL）
@@ -162,7 +162,7 @@ public interface UserDao extends JpaRepository<User, String> {
 	 * @return 姓名（如果找不到會回傳 null）
 	 */
 	@Query(value = "select name from user where account = :account", nativeQuery = true)
-	String findNameByAccount(@Param("account") String account);
+	public String findNameByAccount(@Param("account") String account);
 	
 	/**
 	 * 更新訂閱狀態
@@ -175,8 +175,19 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Modifying
 	@Transactional
 	@Query(value = "update user set subscription = :subscription, expiration_date = :expirationDate where account = :account", nativeQuery = true)
-	int updateSubscription(@Param("account") String account,
+	public int updateSubscription(@Param("account") String account,
 	                      @Param("subscription") Boolean subscription,
 	                      @Param("expirationDate") LocalDateTime expirationDate);
+	
+	/**
+	 * 更新帳號 verified 狀態為未驗證（false/0）
+	 * 
+	 * @param account 會員帳號(Email)
+	 * @return 更新筆數（1 = 成功, 0 = 失敗）
+	 */
+	@Modifying
+	@Transactional
+	@Query(value = "update user set verified = 0 where account = :account", nativeQuery = true)
+	public int updateVerifiedFalse(@Param("account") String account);
 	
 }

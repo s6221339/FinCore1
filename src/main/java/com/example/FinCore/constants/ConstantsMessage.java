@@ -55,5 +55,9 @@ public class ConstantsMessage {
 	public final static String PASSWORD_PATTERN = "";
 
 	public final static String PARAM_PASSWORD_COMPLEXITY_ERROR = "密碼複雜度不足：密碼太簡單，請提高安全性（建議加上特殊字元）";
+	
+	public final static String PARAM_PASSWORD_FORMAT_ERROR = "密碼格式錯誤，請確認符合長度與複雜度要求！";
+	
+	public final static String PARAM_CODE_ERROR = "驗證碼錯誤，請重新輸入！";
 
 }

@@ -81,5 +81,26 @@ public class UserVerifyCodeController {
 	public BasicResponse updatePwdByEmail(@Valid @RequestBody UpdatePwdByEmailRequest req) {
 		return service.updatePwdByEmail(req);
 	}
+	
+	/**
+     * 註冊會員發送驗證碼
+     * @param account 新會員帳號(Email)
+     */
+    @PostMapping("sendRegisterVerifyCode")
+    public BasicResponse sendRegisterVerifyCode(@RequestParam("account") String account) {
+        return service.sendRegisterVerifyCode(account);
+    }
+
+    /**
+     * 註冊會員驗證驗證碼
+     * @param code 驗證碼
+     * @param account 新會員帳號(Email)
+     */
+    @PostMapping("checkRegisterVerifyCode")
+    public BasicResponse checkRegisterVerifyCode(//
+    		@RequestParam("code") String code,//
+    		@RequestParam("account") String account) {
+        return service.checkRegisterVerifyCode(code, account);
+    }
 
 }

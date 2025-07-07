@@ -31,6 +31,7 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
 	/**
+	 * 更改密碼
 	 * 發送驗證信
 	 */
 	@Override
@@ -48,10 +49,11 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 			"【User系統】更改密碼驗證碼通知",
 			"您的驗證碼是： " + code + " ，請在10分鐘內完成驗證"
 		);
-		return new BasicResponse(ResponseMessages.SUCCESS);
+		return new BasicResponse(ResponseMessages.SUCCESS); 
 	}
 
 	/**
+	 * 更改密碼
 	 * 認證驗證碼
 	 */
 	@Override
@@ -77,24 +79,27 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 	
-	/**
-	 * 忘記密碼：重設密碼（必須已驗證過）
-	 */
 	@Override
 	public BasicResponse updatePwdByEmail(UpdatePwdByEmailRequest req) {
-		User user = userDao.selectById(req.getAccount());
-		// 檢查帳號是否存在
-		if (user == null) {
-			return new BasicResponse(ResponseMessages.NOT_FOUND);
-		}
-		// 若是驗證狀態還是 false 代表尚未驗證
-		if (!user.isVerified()) {
-			return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
-		}
-		// 修改密碼
-		userDao.updatePassword(req.getAccount(), encoder.encode(req.getNewPassword()));
-		return new BasicResponse(ResponseMessages.SUCCESS);
+	    User user = userDao.selectById(req.getAccount());
+	    // 1. 檢查帳號是否存在
+	    if (user == null) {
+	        return new BasicResponse(ResponseMessages.NOT_FOUND);
+	    }
+	    // 2. 檢查是否已經驗證過
+	    if (!user.isVerified()) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
+	    }
+	    // 3. 比對新舊密碼是否相同（防止使用者重複設置相同密碼）
+	    if (encoder.matches(req.getNewPassword(), user.getPassword())) {
+	        return new BasicResponse(ResponseMessages.PASSWORD_DUPLICATE);
+	    }
+	    // 4. 修改密碼
+	    userDao.updatePassword(req.getAccount(), encoder.encode(req.getNewPassword()));
+	    // 5. 修改完密碼後，把 verified 設回 false(0)
+	    userDao.updateVerifiedFalse(req.getAccount());
 
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 	private String randomCodeGenerator() {
@@ -107,6 +112,48 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 			code += charPool.charAt(index);
 		}
 		return code;
+	}
+	
+	/**
+	 * 註冊會員時，發送驗證信
+	 * 不檢查帳號是否存在（因為還沒註冊）
+	 */
+	@Override
+	public BasicResponse sendRegisterVerifyCode(String account) {
+	    String code = randomCodeGenerator();
+	    // 將驗證碼寫入 user_verify_code 表
+	    userVerifyCodeDao.insertOrUpdateVerified(code, LocalDateTime.now().plusMinutes(10), account);
+
+	    emailServiceImpl.sendVerificationCode(
+	        account,
+	        "【User系統】註冊驗證碼通知",
+	        "您的註冊驗證碼是： " + code + " ，請在10分鐘內完成驗證"
+	    );
+	    return new BasicResponse(ResponseMessages.SUCCESS);
+	}
+	
+	/**
+	 * 註冊會員時，認證驗證碼
+	 * 不檢查 verified，只確認驗證碼正確與有效
+	 */
+	@Override
+	public BasicResponse checkRegisterVerifyCode(String code, String account) {
+	    UserVerifyCode userVerifyCode = userVerifyCodeDao.selectById(account);
+	    // 沒有驗證碼紀錄代表呼叫錯 API
+	    if (userVerifyCode == null) {
+	        return new BasicResponse(ResponseMessages.FAILED);
+	    }
+	    // 驗證碼錯誤
+	    if (!userVerifyCode.getCode().equals(code)) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
+	    }
+	    // 驗證碼過期
+	    if (LocalDateTime.now().isAfter(userVerifyCode.getExpireAt())) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_CODE_VALID);
+	    }
+	    // 驗證成功後刪除驗證碼
+	    userVerifyCodeDao.deleteByAccount(account);
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 }

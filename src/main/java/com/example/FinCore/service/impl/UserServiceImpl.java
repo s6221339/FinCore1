@@ -17,8 +17,10 @@ import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.PaymentTypeDao;
 import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.dao.UserVerifyCodeDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
+import com.example.FinCore.entity.UserVerifyCode;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.FamilyAvatarVO;
 import com.example.FinCore.vo.SimpleUserAvatarVO;
@@ -59,28 +61,48 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private PaymentTypeDao paymentTypeDao;
+	
+	@Autowired
+	private UserVerifyCodeDao userVerifyCodeDao;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
 	@Transactional
 	public BasicResponse register(RregisterUserRequest req) {
-		// 1. 帳號不可重複
-		int exists = userDao.selectCountByAccount(req.getAccount());
-		if (exists > 0) {
-			return new BasicResponse(ResponseMessages.ACCOUNT_EXIST);
-		}
+	    // 1. 先檢查驗證碼是否正確（從 user_verify_code 表查）
+	    UserVerifyCode userVerifyCode = userVerifyCodeDao.selectById(req.getAccount());
+	    if (userVerifyCode == null) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
+	    }
+	    // 驗證碼錯誤
+	    if (!userVerifyCode.getCode().equals(req.getCode())) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
+	    }
+	    // 驗證碼過期
+	    if (LocalDateTime.now().isAfter(userVerifyCode.getExpireAt())) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_CODE_VALID);
+	    }
+	    // 驗證成功後，刪除驗證碼紀錄
+	    userVerifyCodeDao.deleteByAccount(req.getAccount());
 
-		// 2. 密碼加密
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    // 2. 帳號不可重複
+	    int exists = userDao.selectCountByAccount(req.getAccount());
+	    if (exists > 0) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_EXIST);
+	    }
 
-		String encodedPwd = encoder.encode(req.getPassword());
+	    // 3. 密碼已在 @Pattern 驗證（如果沒用 @Valid 要再寫手動正則）
+	    // 此處省略手動檢查，因為已經用 @Pattern 保證格式
 
-		// 3. 建立新帳號
-		userDao.register(req.getAccount(), req.getName(), encodedPwd, req.getPhone(), LocalDate.now());
+	    // 4. 密碼加密
+	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    String encodedPwd = encoder.encode(req.getPassword());
 
-		return new BasicResponse(ResponseMessages.SUCCESS);
+	    // 5. 建立新帳號
+	    userDao.register(req.getAccount(), req.getName(), encodedPwd, req.getPhone(), LocalDate.now());
 
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 	@Override

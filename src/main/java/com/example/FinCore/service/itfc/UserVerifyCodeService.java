@@ -29,4 +29,19 @@ public interface UserVerifyCodeService {
      * @return BasicResponse 執行結果（驗證成功/驗證失敗/驗證碼過期/查無資料）
      */
 	public BasicResponse checkVerifyCode(String code, String account);
+	
+	/**
+     * 註冊會員時發送驗證信
+     * @param account 新會員帳號(Email)
+     * @return 驗證碼寄送結果
+     */
+    public BasicResponse sendRegisterVerifyCode(String account);
+
+    /**
+     * 註冊會員時驗證驗證碼
+     * @param code 驗證碼
+     * @param account 新會員帳號(Email)
+     * @return 驗證結果
+     */
+    public BasicResponse checkRegisterVerifyCode(String code, String account);
 }

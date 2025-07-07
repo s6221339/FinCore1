@@ -39,6 +39,8 @@ public enum ResponseMessages
 	LOGIN_INFO_NOT_SYNC(400, "登入資料不同步"),
 	UNABLE_TRANSFERS_TO_DIFF_FAMILY_ACCOUNT(400, "無法對不同家庭群組的帳號進行轉帳"),
 	UNABLE_TRANSFERS_TO_FAMILY_BALANCE(400, "群組帳戶不支援轉帳功能"),
+	PASSWORD_DUPLICATE(400, "新舊密碼不可相同！"),
+	PASSWORD_INVALID(400, "密碼無效，請確認格式或內容正確！"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),

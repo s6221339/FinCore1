@@ -30,7 +30,10 @@ public class LoginAspect
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Pointcut("!execution (public * com.example.FinCore.controller.*.login(..)) "
-			+ "&& !execution (public * com.example.FinCore.controller.*.register(..)) ")
+			+ "&& !execution (public * com.example.FinCore.controller.*.register(..)) "
+			+ "&& !execution (public * com.example.FinCore.controller.*.sendVerifyCode(..)) "
+			+ "&& !execution (public * com.example.FinCore.controller.*.checkVerifyCode(..)) "
+			+ "&& !execution (public * com.example.FinCore.controller.*.updatePwdByEmail(..)) ")
 	public void loginPointcut()
 	{
 		

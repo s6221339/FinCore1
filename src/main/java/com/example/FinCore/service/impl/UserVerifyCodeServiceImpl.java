@@ -79,6 +79,12 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 	
+	/**
+	 * 使用者透過 Email 驗證後修改密碼。
+	 *
+	 * @param req 包含帳號與新密碼的請求物件
+	 * @return BasicResponse 返回執行結果，可能為帳號不存在、未驗證、密碼重複或成功
+	 */
 	@Override
 	public BasicResponse updatePwdByEmail(UpdatePwdByEmailRequest req) {
 	    User user = userDao.selectById(req.getAccount());
@@ -98,6 +104,13 @@ public class UserVerifyCodeServiceImpl implements UserVerifyCodeService {
 	    userDao.updatePassword(req.getAccount(), encoder.encode(req.getNewPassword()));
 	    // 5. 修改完密碼後，把 verified 設回 false(0)
 	    userDao.updateVerifiedFalse(req.getAccount());
+
+	    // 6. 發送通知信告知使用者密碼已被修改
+	    emailServiceImpl.sendVerificationCode(
+	        req.getAccount(),
+	        "【User系統】密碼已更改通知",
+	        "您的帳號密碼已於 " + LocalDateTime.now() + " 成功變更，若非您本人操作，請盡快聯絡客服。"
+	    );
 
 	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}

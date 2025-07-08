@@ -52,7 +52,7 @@ public class ConstantsMessage {
 
 	public final static String PARAM_PASSWORD_LENGTH_ERROR = "密碼長度不符：密碼長度需符合規範（例如 8~16 字元）";
 
-	public final static String PASSWORD_PATTERN = "";
+	public final static String PASSWORD_PATTERN = "\\w{8,16}";
 
 	public final static String PARAM_PASSWORD_COMPLEXITY_ERROR = "密碼複雜度不足：密碼太簡單，請提高安全性（建議加上特殊字元）";
 	

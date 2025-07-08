@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.FinCore.constants.ApiDocConstants;
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.service.itfc.UserService;
-import com.example.FinCore.vo.request.RregisterUserRequest;
+import com.example.FinCore.vo.request.RegisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
@@ -55,7 +55,7 @@ public class UserController {
 		    @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
 		    @ApiResponse(responseCode = "400", description = ApiDocConstants.ACCOUNT_EXIST),
 		})
-	public BasicResponse register(@Valid @RequestBody RregisterUserRequest req) {
+	public BasicResponse register(@Valid @RequestBody RegisterUserRequest req) {
 		return service.register(req);
 	}
 
@@ -250,6 +250,20 @@ public class UserController {
 	     * @return BasicResponse
 	     */
 	    @PostMapping(value = "updateSubscription")
+	    @Operation(
+	    	    summary = ApiDocConstants.USER_UPDATE_SUBSCRIPTION_SUMMARY,
+	    	    description = ApiDocConstants.USER_UPDATE_SUBSCRIPTION_DESC,
+	    	    method = "POST",
+	    	    parameters = {
+	    	        @Parameter(name = "account", description = "會員帳號（必填）"),
+	    	        @Parameter(name = "subscription", description = "是否訂閱（必填，true/false）")
+	    	    }
+	    	)
+	    	@ApiResponses({
+	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+	    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.USER_UPDATE_SUBSCRIPTION_RESPONSE_400),
+	    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+	    	})
 	    public BasicResponse updateSubscription(
 	            @RequestParam("account") String account,
 	            @RequestParam("subscription") Boolean subscription
@@ -263,6 +277,19 @@ public class UserController {
 	     * @return SubscriptionResponse
 	     */
 	    @PostMapping(value = "getSubscription")
+	    @Operation(
+	    	    summary = ApiDocConstants.USER_GET_SUBSCRIPTION_SUMMARY,
+	    	    description = ApiDocConstants.USER_GET_SUBSCRIPTION_DESC,
+	    	    method = "GET",
+	    	    parameters = {
+	    	        @Parameter(name = "account", description = "會員帳號（必填）")
+	    	    }
+	    	)
+	    	@ApiResponses({
+	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+	    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
+	    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
+	    	})
 	    public SubscriptionResponse getSubscription(@RequestParam("account") String account) {
 	        return service.getSubscription(account);
 	    }

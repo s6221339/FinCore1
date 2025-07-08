@@ -5,7 +5,7 @@ import com.example.FinCore.constants.ConstantsMessage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public class RregisterUserRequest {
+public class RegisterUserRequest {
 
     @NotBlank(message = ConstantsMessage.PARAM_ACCOUNT_ERROR)
     private String account;
@@ -14,7 +14,7 @@ public class RregisterUserRequest {
     private String name;
 
     @NotBlank(message = ConstantsMessage.PARAM_PASSWORD_ERROR)
-    @Pattern(regexp = "^[A-Za-z\\d\\W]{6,16}$", message = ConstantsMessage.PARAM_PASSWORD_FORMAT_ERROR)
+    @Pattern(regexp = ConstantsMessage.PASSWORD_PATTERN, message = ConstantsMessage.PARAM_PASSWORD_FORMAT_ERROR)
     private String password;
 
     @NotBlank(message = ConstantsMessage.PARAM_CODE_ERROR)

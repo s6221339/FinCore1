@@ -17,9 +17,6 @@ public class RegisterUserRequest {
     @Pattern(regexp = ConstantsMessage.PASSWORD_PATTERN, message = ConstantsMessage.PARAM_PASSWORD_FORMAT_ERROR)
     private String password;
 
-    @NotBlank(message = ConstantsMessage.PARAM_CODE_ERROR)
-    private String code;
-
     private String phone;
 
     public String getAccount() {
@@ -41,13 +38,6 @@ public class RegisterUserRequest {
     }
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getPhone() {

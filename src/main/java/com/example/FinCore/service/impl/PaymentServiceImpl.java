@@ -401,10 +401,7 @@ public class PaymentServiceImpl implements PaymentService
 //		如果月份指定 1~12 月，就針對該設定進行篩選
 //		如果不指定則僅篩選該年分的所有款項
 		List<Payment> filtedPaymentList = getFilterPaymentListForStatistics(paymentList, req.year(), req.month());
-		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year())
-				.stream()
-				.sorted((o1, o2) -> o1.month() - o2.month())
-				.toList();
+		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year());
 		statisticsVOZeroPadding(statisticsList);
 		return new StatisticsLookupPaymentTypeWithAllBalanceResponse(ResponseMessages.SUCCESS, statisticsList);
 	}
@@ -548,6 +545,7 @@ public class PaymentServiceImpl implements PaymentService
 				StatisticsVO zero = new StatisticsVO(year, month, new ArrayList<>());
 				voList.add(zero);
 			}
+			voList.sort((o1, o2) -> o1.month() - o2.month());
 		}
 	}
 	
@@ -562,6 +560,7 @@ public class PaymentServiceImpl implements PaymentService
 		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
 		var filterPaymentList = getFilterPaymentListForStatistics(paymentList, req.year(), req.month());
 		var result = StatisticsPaymentTypeVOFactory(req.year(), filterPaymentList);
+		statisticsPaymentTypeVOZeroPadding(result);
 		return new StatisticsPersonalBalanceWithPaymentTypeResponse(ResponseMessages.SUCCESS, result);
 	}
 	
@@ -596,6 +595,24 @@ public class PaymentServiceImpl implements PaymentService
 			result.add(vo);
 		}
 		return result;
+	}
+	
+	private void statisticsPaymentTypeVOZeroPadding(List<StatisticsPaymentTypeVO> voList)
+	{
+		if(voList.size() > 1)
+		{
+			Set<Integer> monthSet = Set.copyOf(voList.stream().map(t -> t.month()).toList());
+			final int year = voList.get(0).year();
+			for(int month = 1; month <= 12; month++)
+			{
+				if(monthSet.contains(month))
+					continue;
+				
+				StatisticsPaymentTypeVO zero = new StatisticsPaymentTypeVO(year, month, new ArrayList<>());
+				voList.add(zero);
+			}
+			voList.sort((o1, o2) -> o1.month() - o2.month());
+		}
 	}
 
 	@Override
@@ -701,6 +718,7 @@ public class PaymentServiceImpl implements PaymentService
 		var filterPaymentList = getFilterPaymentListForStatistics(rawPaymentList, req.year(), req.month());
 		var statisticsVOList = statisticsVOFactory(filterPaymentList, infoMap, req.year());
 		var result = statisticsIncomeAndOutlayWithBalanceInfoVOFactory(statisticsVOList, req.year());
+		statisticsIncomeAndOutlayWithBalanceInfoVOZeroPadding(result);
 		return new StatisticsIncomeAndOutlayWithBalanceInfoResponse(ResponseMessages.SUCCESS, result);
 	}
 	
@@ -746,6 +764,24 @@ public class PaymentServiceImpl implements PaymentService
 			result.add(statisticsVO);
 		}
 		return result;
+	}
+	
+	private void statisticsIncomeAndOutlayWithBalanceInfoVOZeroPadding(List<StatisticsIncomeAndOutlayWithBalanceInfoVO> voList)
+	{
+		if(voList.size() > 1)
+		{
+			Set<Integer> monthSet = Set.copyOf(voList.stream().map(t -> t.month()).toList());
+			final int year = voList.get(0).year();
+			for(int month = 1; month <= 12; month++)
+			{
+				if(monthSet.contains(month))
+					continue;
+				
+				StatisticsIncomeAndOutlayWithBalanceInfoVO zero = new StatisticsIncomeAndOutlayWithBalanceInfoVO(year, month, new ArrayList<>());
+				voList.add(zero);
+			}
+			voList.sort((o1, o2) -> o1.month() - o2.month());
+		}
 	}
 
 	/**

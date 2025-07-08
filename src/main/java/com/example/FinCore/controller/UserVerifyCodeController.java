@@ -81,5 +81,53 @@ public class UserVerifyCodeController {
 	public BasicResponse updatePwdByEmail(@Valid @RequestBody UpdatePwdByEmailRequest req) {
 		return service.updatePwdByEmail(req);
 	}
+	
+	/**
+     * 註冊會員發送驗證碼
+     * @param account 新會員帳號(Email)
+     */
+    @PostMapping("sendRegisterVerifyCode")
+    @Operation(
+    	    summary = ApiDocConstants.USER_SEND_REGISTER_VERIFY_CODE_SUMMARY,
+    	    description = ApiDocConstants.USER_SEND_REGISTER_VERIFY_CODE_DESC,
+    	    method = "POST",
+    	    parameters = {
+    	        @Parameter(
+    	            name = "account",
+    	            description = "會員註冊用電子郵件（必填）"
+    	        )
+    	    }
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEND_SUCCESS)
+    	})
+    public BasicResponse sendRegisterVerifyCode(@RequestParam("account") String account) {
+        return service.sendRegisterVerifyCode(account);
+    }
+
+    /**
+     * 註冊會員驗證驗證碼
+     * @param code 驗證碼
+     * @param account 新會員帳號(Email)
+     */
+    @PostMapping("checkRegisterVerifyCode")
+    @Operation(
+    	    summary = ApiDocConstants.USER_CHECK_REGISTER_VERIFY_CODE_SUMMARY,
+    	    description = ApiDocConstants.USER_CHECK_REGISTER_VERIFY_CODE_DESC,
+    	    method = "POST",
+    	    parameters = {
+    	        @Parameter(name = "code", description = "註冊驗證碼（必填）"),
+    	        @Parameter(name = "account", description = "會員註冊用電子郵件（必填）")
+    	    }
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.USER_CHECK_REGISTER_VERIFY_CODE_RESPONSE_200),
+    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.USER_CHECK_REGISTER_VERIFY_CODE_RESPONSE_400)
+    	})
+    public BasicResponse checkRegisterVerifyCode(//
+    		@RequestParam("code") String code,//
+    		@RequestParam("account") String account) {
+        return service.checkRegisterVerifyCode(code, account);
+    }
 
 }

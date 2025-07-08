@@ -17,14 +17,16 @@ import com.example.FinCore.dao.PaymentDao;
 import com.example.FinCore.dao.PaymentTypeDao;
 import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
+import com.example.FinCore.dao.UserVerifyCodeDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.User;
+import com.example.FinCore.entity.UserVerifyCode;
 import com.example.FinCore.service.itfc.UserService;
 import com.example.FinCore.vo.FamilyAvatarVO;
 import com.example.FinCore.vo.SimpleUserAvatarVO;
 import com.example.FinCore.vo.SubscriptionVO;
 import com.example.FinCore.vo.UserVO;
-import com.example.FinCore.vo.request.RregisterUserRequest;
+import com.example.FinCore.vo.request.RegisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
@@ -59,28 +61,51 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private PaymentTypeDao paymentTypeDao;
+	
+	@Autowired
+	private UserVerifyCodeDao userVerifyCodeDao;
+	
+	@Autowired
+	private EmailServiceImpl emailServiceImpl;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Override
 	@Transactional
-	public BasicResponse register(RregisterUserRequest req) {
-		// 1. 帳號不可重複
-		int exists = userDao.selectCountByAccount(req.getAccount());
-		if (exists > 0) {
-			return new BasicResponse(ResponseMessages.ACCOUNT_EXIST);
-		}
+	public BasicResponse register(RegisterUserRequest req) {
+	    // 1. 先檢查驗證碼是否正確（從 user_verify_code 表查）
+	    UserVerifyCode userVerifyCode = userVerifyCodeDao.selectById(req.getAccount());
+	    if (userVerifyCode == null) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
+	    }
+	    // 驗證碼錯誤
+	    if (!userVerifyCode.getCode().equals(req.getCode())) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_FAILED);
+	    }
+	    // 驗證碼過期
+	    if (LocalDateTime.now().isAfter(userVerifyCode.getExpireAt())) {
+	        return new BasicResponse(ResponseMessages.VERIFICATION_CODE_VALID);
+	    }
+	    // 驗證成功後，刪除驗證碼紀錄
+	    userVerifyCodeDao.deleteByAccount(req.getAccount());
 
-		// 2. 密碼加密
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    // 2. 帳號不可重複
+	    int exists = userDao.selectCountByAccount(req.getAccount());
+	    if (exists > 0) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_EXIST);
+	    }
 
-		String encodedPwd = encoder.encode(req.getPassword());
+	    // 3. 密碼已在 @Pattern 驗證（如果沒用 @Valid 要再寫手動正則）
+	    // 此處省略手動檢查，因為已經用 @Pattern 保證格式
 
-		// 3. 建立新帳號
-		userDao.register(req.getAccount(), req.getName(), encodedPwd, req.getPhone(), LocalDate.now());
+	    // 4. 密碼加密
+	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    String encodedPwd = encoder.encode(req.getPassword());
 
-		return new BasicResponse(ResponseMessages.SUCCESS);
+	    // 5. 建立新帳號
+	    userDao.register(req.getAccount(), req.getName(), encodedPwd, req.getPhone(), LocalDate.now());
 
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 	@Override
@@ -160,30 +185,40 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public BasicResponse updatePasswordUser(UpdatePasswordUserRequest req) {
-		// 1.查詢帳號
-		User user = userDao.selectById(req.account());
-		if (user == null) {
-			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
-		}
+	    // 1. 查詢帳號
+	    User user = userDao.selectById(req.account());
+	    if (user == null) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
 
-		// 2.比對舊密碼
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		if (!encoder.matches(req.oldPassword(), user.getPassword())) {
-			return new BasicResponse(ResponseMessages.PASSWORD_NOT_MATCH);
+	    // 2. 比對舊密碼
+	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    if (!encoder.matches(req.oldPassword(), user.getPassword())) {
+	        return new BasicResponse(ResponseMessages.PASSWORD_NOT_MATCH);
+	    }
 
-		}
-		// 3.新密碼加密再存回資料庫
-		String encodeNewPwd = encoder.encode(req.newPassword());
+	    // 3. 檢查新密碼是否與舊密碼相同（避免重複）
+	    if (encoder.matches(req.newPassword(), user.getPassword())) {
+	        return new BasicResponse(ResponseMessages.PASSWORD_DUPLICATE);
+	    }
 
-		// 更新密碼的 Dao 方法
-		int update = userDao.updatePassword(user.getAccount(), encodeNewPwd);
+	    // 4. 新密碼加密再存回資料庫
+	    String encodeNewPwd = encoder.encode(req.newPassword());
+	    int update = userDao.updatePassword(user.getAccount(), encodeNewPwd);
 
-		if (update > 0) {
-			return new BasicResponse(ResponseMessages.SUCCESS);
-		} else {
-			return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
-		}
+	    if (update > 0) {
+	        // 5. 修改成功後發送通知信給使用者
+	        emailServiceImpl.sendVerificationCode(
+	            user.getAccount(),
+	            "【User系統】密碼已更改通知",
+	            "您的帳號密碼已於 " + LocalDateTime.now() + " 成功變更，若非您本人操作，請盡快聯絡客服。"
+	        );
+	        return new BasicResponse(ResponseMessages.SUCCESS);
+	    } else {
+	        return new BasicResponse(ResponseMessages.UPDATE_USER_FAIL);
+	    }
 	}
+
 
 	@Override
 	public UserResponse getUser(String account) {

@@ -1,6 +1,6 @@
 package com.example.FinCore.service.itfc;
 
-import com.example.FinCore.vo.request.RregisterUserRequest;
+import com.example.FinCore.vo.request.RegisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
 import com.example.FinCore.vo.request.loginRequest;
@@ -18,7 +18,7 @@ public interface UserService {
 	 * @param req
 	 * @return
 	 */
-	public BasicResponse register(RregisterUserRequest req);
+	public BasicResponse register(RegisterUserRequest req);
 	
 	/**
 	 * 修改會員資料

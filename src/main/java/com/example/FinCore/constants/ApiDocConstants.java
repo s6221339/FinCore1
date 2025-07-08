@@ -112,15 +112,23 @@ public final class ApiDocConstants
     
     public static final String USER_LOGIN_SUMMARY = "會員登入";
     
-    public final static String USER_VERIFY_CODE_SEND_VERIFY_CODE_SUMMARY = "發送驗證信";
+    public final static String USER_VERIFY_CODE_SEND_VERIFY_CODE_SUMMARY = "忘記密碼發送驗證信";
     
-    public final static String USER_VERIFY_CODE_CHECK_VERIFY_CODE_SUMMARY = "認證驗證碼";
+    public final static String USER_VERIFY_CODE_CHECK_VERIFY_CODE_SUMMARY = "忘記密碼認證驗證碼";
     
     public final static String USER_VERIFY_CODE_UPDATE_PWD_BY_EMAIL_SUMMARY = "忘記密碼－重設密碼";
     
     public static final String USER_GET_NAME_BY_ACCOUNT_SUMMARY = "查詢會員名稱";
     
     public static final String USER_LOGOUT_SUMMARY = "會員登出";
+    
+    public static final String USER_SEND_REGISTER_VERIFY_CODE_SUMMARY = "註冊會員發送驗證信";
+    
+    public static final String USER_CHECK_REGISTER_VERIFY_CODE_SUMMARY = "註冊驗證碼認證";
+    
+    public static final String USER_UPDATE_SUBSCRIPTION_SUMMARY = "更新會員訂閱狀態";
+    
+    public static final String USER_GET_SUBSCRIPTION_SUMMARY = "查詢會員訂閱狀態";
     
     /* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
@@ -281,6 +289,14 @@ public final class ApiDocConstants
     public static final String USER_LOGOUT_DESC = "會員進行登出動作。RESTful 架構多為前端刪除 token，若需強制登出請配合 session 或 token blacklist。<br>";
 
     public static final String PARAM_ACCOUNT_DESC = "使用者帳號，用於比對群組成員身份";
+    
+    public static final String USER_SEND_REGISTER_VERIFY_CODE_DESC = "會員註冊時發送電子郵件驗證碼，驗證碼有效時間 10 分鐘。<br>";
+    
+    public static final String USER_CHECK_REGISTER_VERIFY_CODE_DESC = "註冊會員時，根據輸入驗證碼與帳號進行驗證。<br>";
+    
+    public static final String USER_UPDATE_SUBSCRIPTION_DESC = "根據會員帳號設定訂閱狀態，訂閱後到期日自動延展一個月。<br>";
+    
+    public static final String USER_GET_SUBSCRIPTION_DESC = "根據會員帳號查詢其目前的訂閱狀態與訂閱到期日。<br>";
     
     /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
@@ -464,6 +480,8 @@ public final class ApiDocConstants
 		    "<li>account：必填，使用者帳號</li>" +
 		    "<li>familyId：必填，家族群組ID</li>" +
 		    "</ul>";
+	
+	
 
 	/* === 各種錯誤訊息，多條同代碼訊息使用<li>或<ol>包覆 === 
 	 * === 同代碼訊息命名格式：「API名稱_方法_RESPONSE_代碼」格式 ===
@@ -624,6 +642,24 @@ public final class ApiDocConstants
 		    "<ul>" +
 		    "<li>家族群組不存在</li>" +
 		    "<li>查無此邀請紀錄！</li>" +
+		    "</ul>";
+	
+	public static final String USER_CHECK_REGISTER_VERIFY_CODE_RESPONSE_200 =
+		    "<ul>" +
+		    "<li>成功！</li>" +
+		    "<li>驗證碼有效！</li>" +
+		    "</ul>";
+	
+	public static final String USER_CHECK_REGISTER_VERIFY_CODE_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>操作失敗</li>" +
+		    "<li>驗證失敗：驗證碼錯誤或已過期</li>" +
+		    "</ul>";
+	
+	public static final String USER_UPDATE_SUBSCRIPTION_RESPONSE_400 =
+		    "<ul>" +
+		    "<li>缺少必要欄位</li>" +
+		    "<li>更新會員失敗</li>" +
 		    "</ul>";
 	
 	public static final String PASSWORD_NOT_MATCH = "密碼錯誤";

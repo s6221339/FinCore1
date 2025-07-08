@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -373,29 +374,23 @@ public class PaymentServiceImpl implements PaymentService
 		
 //		取得與群組關聯的所有帳戶
 		List<Family> allFamilyList = familyDao.findAll();
-		List<Family> familyList = new ArrayList<>();
-		List<Integer> familyIdList = new ArrayList<>();
-		allFamilyList.forEach(family -> {
-			if(family.isMember(req.account()))
-				familyList.add(family);
-		});
-		Map<Integer, String> familyMap = new HashMap<>();
-		familyList.forEach(t -> {
-			familyIdList.add(t.getId());
-			familyMap.put(t.getId(), t.getName());
-		});
+		List<Family> familyList = allFamilyList.stream()
+				.filter(t -> t.isMember(req.account()))
+				.toList();
+		List<Integer> familyIdList = familyList.stream()
+				.map(t -> t.getId())
+				.toList();
+		
 		List<Balance> balanceFromFamilyList = balanceDao.getAllBalanceByFamilyIdList(familyIdList);
 		var balanceList = personalbalanceList;
 		
 //		合併帳號與群組的帳戶，並依照帳戶編號排序
 		balanceList.addAll(balanceFromFamilyList);
 		balanceList.sort((o1, o2) -> o1.getBalanceId() - o2.getBalanceId());
-		List<Integer> balanceIdList = new ArrayList<>();
-		Map<Integer, String> balanceMap = new HashMap<>();
-		balanceList.forEach(balance -> {
-			balanceIdList.add(balance.getBalanceId());
-			balanceMap.put(balance.getBalanceId(), balance.getName());
-		});
+		List<Integer> balanceIdList = balanceList.stream()
+				.map(t -> t.getBalanceId())
+				.toList();
+
 //		綁定 BalanceInfoVO 和 FamilyInfoVO
 		Map<BalanceInfoVO, FamilyInfoVO> infoMap = new HashMap<>();
 		setInfoMap(infoMap, balanceList, familyList);
@@ -410,6 +405,7 @@ public class PaymentServiceImpl implements PaymentService
 				.stream()
 				.sorted((o1, o2) -> o1.month() - o2.month())
 				.toList();
+		statisticsVOZeroPadding(statisticsList);
 		return new StatisticsLookupPaymentTypeWithAllBalanceResponse(ResponseMessages.SUCCESS, statisticsList);
 	}
 	
@@ -538,6 +534,23 @@ public class PaymentServiceImpl implements PaymentService
 	    return result;
 	}
 	
+	private void statisticsVOZeroPadding(List<StatisticsVO> voList)
+	{
+		if(voList.size() > 1)
+		{
+			Set<Integer> monthSet = Set.copyOf(voList.stream().map(t -> t.month()).toList());
+			final int year = voList.get(0).year();
+			for(int month = 1; month <= 12; month++)
+			{
+				if(monthSet.contains(month))
+					continue;
+				
+				StatisticsVO zero = new StatisticsVO(year, month, new ArrayList<>());
+				voList.add(zero);
+			}
+		}
+	}
+	
 	@Override
 	public StatisticsPersonalBalanceWithPaymentTypeResponse statisticsLookupPaymentTypeSummarize(StatisticsRequest req) 
 	{
@@ -596,6 +609,7 @@ public class PaymentServiceImpl implements PaymentService
 		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
 		var filtedPaymentList = getFilterPaymentListForStatistics(paymentList, req.year(), req.month());
 		var result = incomeAndOutlayInfoVOFactory(req.year(), filtedPaymentList);
+		incomeAndOutlayInfoVOZeroPadding(result);
 		return new StatisticsIncomeAndOutlayResponse(ResponseMessages.SUCCESS, result);
 	}
 	
@@ -635,6 +649,24 @@ public class PaymentServiceImpl implements PaymentService
 		}
 		result.sort((o1, o2) -> o1.month() - o2.month());
 		return result;
+	}
+	
+	private void incomeAndOutlayInfoVOZeroPadding(List<StatisticsIncomeAndOutlayVO> voList)
+	{
+		if(voList.size() > 1)
+		{
+			Set<Integer> monthSet = Set.copyOf(voList.stream().map(t -> t.month()).toList());
+			final int year = voList.get(0).year();
+			for(int month = 1; month <= 12; month++)
+			{
+				if(monthSet.contains(month))
+					continue;
+				
+				StatisticsIncomeAndOutlayVO zero = new StatisticsIncomeAndOutlayVO(year, month, 0, 0);
+				voList.add(zero);
+			}
+			voList.sort((o1, o2) -> o1.month() - o2.month());
+		}
 	}
 	
 	@Override

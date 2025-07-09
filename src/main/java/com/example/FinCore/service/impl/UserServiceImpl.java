@@ -212,7 +212,7 @@ public class UserServiceImpl implements UserService {
 	    String role = user.isSuperAdmin() ? "admin" : "user";
 
 	    // 只要 isSubscription 判斷
-	    String subscription = user.isSubscription() ? "已訂閱" : "未訂閱";
+	    String subscription = user.isSubscription() ? "subscription" : "unSubscription";
 
 	    // 處理頭像 Base64（如你原本的寫法）
 	    String avatarBase64 = null;

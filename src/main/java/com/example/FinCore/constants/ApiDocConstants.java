@@ -306,15 +306,15 @@ public final class ApiDocConstants
     	    "<li>account：必填，會員帳號（不可重複）</li>" +
     	    "<li>name：必填，會員名稱</li>" +
     	    "<li>password：必填，會員密碼</li>" +
-    	    "<li>phone：必填，手機號碼</li>" +
+    	    "<li>phone：可選，手機號碼</li>" +
     	    "</ul>";
 	
     public static final String USER_UPDATE_REQUEST_BODY_RULE =
     	    "<ul>" +
     	    "<li>account：必填，會員帳號</li>" +
     	    "<li>name：必填，會員名稱</li>" +
-    	    "<li>phone：必填，手機號碼</li>" +
-    	    "<li>birthday：必填，生日（yyyy-MM-dd）</li>" +
+    	    "<li>phone：可選，手機號碼</li>" +
+    	    "<li>birthday：可選，生日（yyyy-MM-dd）</li>" +
     	    "<li>avatar：可選，頭像（byte[]）</li>" +
     	    "</ul>";
 	

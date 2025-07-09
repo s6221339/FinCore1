@@ -14,6 +14,10 @@ public record UserVO(
 		
 		String avatar,
 		
-		String role) {
+		String role,
+		
+		String subscription
+		) {
+	
 
 }

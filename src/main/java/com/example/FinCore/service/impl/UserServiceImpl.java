@@ -211,7 +211,10 @@ public class UserServiceImpl implements UserService {
 
 	    String role = user.isSuperAdmin() ? "admin" : "user";
 
-	    // 動態判斷圖片格式
+	    // 只要 isSubscription 判斷
+	    String subscription = user.isSubscription() ? "已訂閱" : "未訂閱";
+
+	    // 處理頭像 Base64（如你原本的寫法）
 	    String avatarBase64 = null;
 	    byte[] avatarBytes = user.getAvatar();
 	    if (avatarBytes != null && avatarBytes.length > 0) {
@@ -225,7 +228,8 @@ public class UserServiceImpl implements UserService {
 	        user.getPhone(),
 	        user.getBirthday(),
 	        avatarBase64,
-	        role
+	        role,
+	        subscription
 	    );
 	    return new UserResponse(ResponseMessages.SUCCESS, vo);
 	}

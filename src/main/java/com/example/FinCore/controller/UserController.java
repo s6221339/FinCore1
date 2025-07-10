@@ -1,5 +1,7 @@
 package com.example.FinCore.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -292,5 +294,21 @@ public class UserController {
 	    	})
 	    public SubscriptionResponse getSubscription(@RequestParam("account") String account) {
 	        return service.getSubscription(account);
+	    }
+	    
+	    @PostMapping(value = "getECPayForm")
+	    @Operation(
+	    	    summary = ApiDocConstants.USER_GET_ECPAY_FORM_SUMMARY,
+	    	    description = ApiDocConstants.USER_GET_ECPAY_FORM_DESC,
+	    	    method = "POST",
+	    	    parameters = {
+	    	        @Parameter(name = "account", description = "會員帳號（必填）")
+	    	    }
+	    	)
+	    	@ApiResponses({
+	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.ECPAY_FORM_FIXED_SUCCESS)
+	    	})
+	    public Map<String, String> getECPayForm(@RequestParam("account") String account) {
+	        return service.getECPayForm(account);
 	    }
 }

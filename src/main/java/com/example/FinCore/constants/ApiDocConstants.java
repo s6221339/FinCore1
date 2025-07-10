@@ -130,6 +130,8 @@ public final class ApiDocConstants
     
     public static final String USER_GET_SUBSCRIPTION_SUMMARY = "查詢會員訂閱狀態";
     
+    public static final String USER_GET_ECPAY_FORM_SUMMARY = "產生藍新金流訂單參數（固定商品/金額）";
+    
     /* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
     
@@ -297,6 +299,8 @@ public final class ApiDocConstants
     public static final String USER_UPDATE_SUBSCRIPTION_DESC = "根據會員帳號設定訂閱狀態，訂閱後到期日自動延展一個月。<br>";
     
     public static final String USER_GET_SUBSCRIPTION_DESC = "根據會員帳號查詢其目前的訂閱狀態與訂閱到期日。<br>";
+    
+    public static final String USER_GET_ECPAY_FORM_DESC = "產生藍新金流 ECPay 訂單參數，金額固定為 60 元，商品名稱固定為「VIP Subscription」。<br>主要提供前端直接提交金流表單用。";
     
     /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
@@ -701,6 +705,8 @@ public final class ApiDocConstants
 	public static final String LOGOUT_SUCCESS = "登出成功";
 	
 	public static final String LOGIN_SUCCESS = "登入成功";
+	
+	public static final String ECPAY_FORM_FIXED_SUCCESS = "產生表單參數成功";
 
 	/* === 測試狀態 === */
 

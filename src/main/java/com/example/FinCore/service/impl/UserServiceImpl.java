@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,6 +37,7 @@ import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 
 import jakarta.transaction.Transactional;
 
@@ -420,6 +422,88 @@ public class UserServiceImpl implements UserService {
         );
         // 4. 回傳查詢成功、帶訂閱資訊
         return new SubscriptionResponse(ResponseMessages.SUCCESS, vo);
+    }
+    
+    /**
+     * 產生藍新金流 ECPay 的訂單參數，用於前端提交到藍新付款。
+     * 金額固定為 60 元，商品名稱固定為 "VIP Subscription"。
+     * @param account 會員帳號（可用於未來記錄訂單使用）
+     * @return 回傳 ECPay 所需的表單欄位參數 (包含 CheckMacValue)
+     */
+    @Override
+    public Map<String, String> getECPayForm(String account) {
+        Map<String, String> params = new LinkedHashMap<>();
+        
+        // 藍新金流測試環境參數
+        String MerchantID = "2000132";
+        String HashKey = "5294y06JbISpM5x9";
+        String HashIV = "v77hoKGq4kWxNNIS";
+        
+        // 訂單固定資料
+        String MerchantTradeNo = "TEST" + System.currentTimeMillis();
+        String MerchantTradeDate = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+        String PaymentType = "aio";
+        String TradeDesc = "SubscriptionPayment";
+        String ItemName = "VIP Subscription";
+        String ReturnURL = "https://your-domain.com/ecpay/notify"; // TODO: 換成你的
+        String ChoosePayment = "ALL";
+        int amount = 60; // 固定 60 元
+
+        // 填入參數
+        params.put("MerchantID", MerchantID);
+        params.put("MerchantTradeNo", MerchantTradeNo);
+        params.put("MerchantTradeDate", MerchantTradeDate);
+        params.put("PaymentType", PaymentType);
+        params.put("TotalAmount", String.valueOf(amount));
+        params.put("TradeDesc", TradeDesc);
+        params.put("ItemName", ItemName);
+        params.put("ReturnURL", ReturnURL);
+        params.put("ChoosePayment", ChoosePayment);
+
+        // 組成待加密字串
+        String raw = "HashKey=" + HashKey + "&" +
+                     "ChoosePayment=" + ChoosePayment + "&" +
+                     "ItemName=" + ItemName + "&" +
+                     "MerchantID=" + MerchantID + "&" +
+                     "MerchantTradeDate=" + MerchantTradeDate + "&" +
+                     "MerchantTradeNo=" + MerchantTradeNo + "&" +
+                     "PaymentType=" + PaymentType + "&" +
+                     "ReturnURL=" + ReturnURL + "&" +
+                     "TotalAmount=" + amount + "&" +
+                     "TradeDesc=" + TradeDesc + "&" +
+                     "HashIV=" + HashIV;
+
+        // URL encode 並小寫
+        try {
+            raw = java.net.URLEncoder.encode(raw, "UTF-8")
+                     .replace("%21", "!")
+                     .replace("%28", "(")
+                     .replace("%29", ")")
+                     .replace("%2A", "*")
+                     .replace("%2D", "-")
+                     .replace("%2E", ".")
+                     .replace("%5F", "_")
+                     .toLowerCase();
+        } catch (Exception e) {
+            throw new RuntimeException("URLEncode error", e);
+        }
+
+        // 做 MD5 並轉大寫
+        String checkMacValue;
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(raw.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                sb.append(String.format("%02X", b));
+            }
+            checkMacValue = sb.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("MD5 error", e);
+        }
+
+        params.put("CheckMacValue", checkMacValue);
+        return params;
     }
 	
 }

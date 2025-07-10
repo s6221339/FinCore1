@@ -1,5 +1,7 @@
 package com.example.FinCore.service.itfc;
 
+import java.util.Map;
+
 import com.example.FinCore.vo.request.RegisterUserRequest;
 import com.example.FinCore.vo.request.UpdatePasswordUserRequest;
 import com.example.FinCore.vo.request.UpdateUserRequest;
@@ -85,4 +87,10 @@ public interface UserService {
 	 */
 	public SubscriptionResponse getSubscription(String account);
 	
+	/**
+	 * 產生藍新金流 ECPay 訂單參數
+	 * @param account 會員帳號（未來可用於記錄訂單）
+	 * @return ECPay 所需的表單欄位參數
+	 */
+	public Map<String, String> getECPayForm(String account);
 }

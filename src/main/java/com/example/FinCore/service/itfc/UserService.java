@@ -88,9 +88,17 @@ public interface UserService {
 	public SubscriptionResponse getSubscription(String account);
 	
 	/**
-	 * 產生藍新金流 ECPay 訂單參數
+	 * 產生綠界金流 ECPay 訂單參數
 	 * @param account 會員帳號（未來可用於記錄訂單）
 	 * @return ECPay 所需的表單欄位參數
 	 */
 	public Map<String, String> getECPayForm(String account);
+	
+	/**
+	 * 處理綠界回傳付款結果並更新訂閱
+	 * @param merchantTradeNo 訂單編號（內含 account）
+	 * @param rtnCode 藍新付款回傳代碼
+	 * @return 回傳給藍新的訊息
+	 */
+	public String handleECPayNotify(String merchantTradeNo, String rtnCode);
 }

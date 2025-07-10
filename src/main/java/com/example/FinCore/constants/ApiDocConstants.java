@@ -130,7 +130,9 @@ public final class ApiDocConstants
     
     public static final String USER_GET_SUBSCRIPTION_SUMMARY = "查詢會員訂閱狀態";
     
-    public static final String USER_GET_ECPAY_FORM_SUMMARY = "產生藍新金流訂單參數（固定商品/金額）";
+    public static final String USER_GET_ECPAY_FORM_SUMMARY = "產生綠界金流訂單參數（固定商品/金額）";
+    
+    public static final String USER_ECPAY_NOTIFY_SUMMARY = "綠界金流付款通知（notify）";
     
     /* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
@@ -300,7 +302,9 @@ public final class ApiDocConstants
     
     public static final String USER_GET_SUBSCRIPTION_DESC = "根據會員帳號查詢其目前的訂閱狀態與訂閱到期日。<br>";
     
-    public static final String USER_GET_ECPAY_FORM_DESC = "產生藍新金流 ECPay 訂單參數，金額固定為 60 元，商品名稱固定為「VIP Subscription」。<br>主要提供前端直接提交金流表單用。";
+    public static final String USER_GET_ECPAY_FORM_DESC = "產生綠界金流 ECPay 訂單參數，金額固定為 60 元，商品名稱固定為「VIP Subscription」。<br>主要提供前端直接提交金流表單用。";
+    
+    public static final String USER_ECPAY_NOTIFY_DESC = "綠界付款完成後由金流平台回呼，訂單編號請帶入會員帳號與時間戳。付款成功（RtnCode=1）即自動啟用訂閱。<br>需回傳 \"1|OK\" 給藍新以完成通知流程。";
     
     /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
@@ -707,6 +711,8 @@ public final class ApiDocConstants
 	public static final String LOGIN_SUCCESS = "登入成功";
 	
 	public static final String ECPAY_FORM_FIXED_SUCCESS = "產生表單參數成功";
+	
+	public static final String ECPAY_NOTIFY_SUCCESS = "回傳 1|OK 代表處理成功";
 
 	/* === 測試狀態 === */
 

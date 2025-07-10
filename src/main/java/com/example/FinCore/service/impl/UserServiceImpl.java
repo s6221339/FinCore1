@@ -211,12 +211,18 @@ public class UserServiceImpl implements UserService {
 	        return new UserResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 	    }
 
+	    // 自動檢查訂閱到期：如果已過期就設為未訂閱
+	    boolean isSub = user.isSubscription();
+	    LocalDateTime exp = user.getExpirationDate();
+	    if (isSub && exp != null && exp.isBefore(LocalDateTime.now())) {
+	        userDao.updateSubscription(user.getAccount(), false, null);
+	        isSub = false;
+	    }
+
 	    String role = user.isSuperAdmin() ? "admin" : "user";
+	    String subscription = isSub ? "subscribed" : "unsubscribed";
 
-	    // 只要 isSubscription 判斷
-	    String subscription = user.isSubscription() ? "subscription" : "unSubscription";
-
-	    // 處理頭像 Base64（如你原本的寫法）
+	    // 處理頭像 Base64
 	    String avatarBase64 = null;
 	    byte[] avatarBytes = user.getAvatar();
 	    if (avatarBytes != null && avatarBytes.length > 0) {
@@ -382,14 +388,32 @@ public class UserServiceImpl implements UserService {
 	        return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
 	    }
 	    // 2. 檢查帳號是否存在
-	    int exists = userDao.selectCountByAccount(account);
-	    if (exists == 0) {
+	    User user = userDao.selectById(account);
+	    if (user == null) {
 	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 	    }
-	    // 3. 訂閱到期日設為現在起一個月
-	    LocalDateTime expirationDate = LocalDateTime.now().plusMonths(1);
 
-	    // 4. 更新資料庫（DAO方法要對應LocalDateTime）
+	    LocalDateTime now = LocalDateTime.now();
+	    LocalDateTime expirationDate = null;
+
+	    // 3. 如果是訂閱（subscription = true）
+	    if (Boolean.TRUE.equals(subscription)) {
+	        if (user.getExpirationDate() != null && user.getExpirationDate().isAfter(now)) {
+	            // 尚未到期 → 續約從 expirationDate 再加一個月
+	            expirationDate = user.getExpirationDate().plusMonths(1);
+	        } else {
+	            // 沒有訂閱或已過期 → 從現在起算一個月
+	            expirationDate = now.plusMonths(1);
+	        }
+	        // 訂閱欄位設為 1
+	        subscription = true;
+	    } else {
+	        // 取消訂閱：直接設為未訂閱，expirationDate 設 null
+	        subscription = false;
+	        expirationDate = null;
+	    }
+
+	    // 4. 更新資料庫
 	    int updated = userDao.updateSubscription(account, subscription, expirationDate);
 	    if (updated > 0) {
 	        return new BasicResponse(ResponseMessages.SUCCESS);
@@ -403,29 +427,29 @@ public class UserServiceImpl implements UserService {
      * @param account 會員帳號
      * @return SubscriptionResponse，data 為 SubscriptionVO
      */
-    @Override
-    public SubscriptionResponse getSubscription(String account) {
-        // 1. 檢查帳號參數是否有填寫
-        if (account == null || account.isEmpty()) {
-            return new SubscriptionResponse(ResponseMessages.MISSING_REQUIRED_FIELD, null);
-        }
-        // 2. 依帳號查詢會員資料
-        User user = userDao.selectById(account);
-        if (user == null) {
-            // 找不到該帳號，回傳錯誤
-            return new SubscriptionResponse(ResponseMessages.ACCOUNT_NOT_FOUND, null);
-        }
-        // 3. 組裝訂閱資訊回傳物件
-        SubscriptionVO vo = new SubscriptionVO(
-            user.isSubscription(),           // 是否訂閱
-            user.getExpirationDate()         // 到期時間
-        );
-        // 4. 回傳查詢成功、帶訂閱資訊
-        return new SubscriptionResponse(ResponseMessages.SUCCESS, vo);
-    }
+	@Override
+	public SubscriptionResponse getSubscription(String account) {
+	    if (account == null || account.isEmpty()) {
+	        return new SubscriptionResponse(ResponseMessages.MISSING_REQUIRED_FIELD, null);
+	    }
+	    User user = userDao.selectById(account);
+	    if (user == null) {
+	        return new SubscriptionResponse(ResponseMessages.ACCOUNT_NOT_FOUND, null);
+	    }
+	    // 判斷訂閱是否過期（這段可加可不加，防止過期還顯示true）
+	    boolean isSub = user.isSubscription();
+	    LocalDateTime exp = user.getExpirationDate();
+	    if (isSub && exp != null && exp.isBefore(LocalDateTime.now())) {
+	        // 過期了就直接在回傳前顯示 false（資料庫不自動寫入，僅回傳結果正確）
+	        isSub = false;
+	    }
+	    // 建立回傳物件
+	    SubscriptionVO vo = new SubscriptionVO(isSub, user.getExpirationDate());
+	    return new SubscriptionResponse(ResponseMessages.SUCCESS, vo);
+	}
     
     /**
-     * 產生藍新金流 ECPay 的訂單參數，用於前端提交到藍新付款。
+     * 產生綠界金流 ECPay 的訂單參數，用於前端提交到藍新付款。
      * 金額固定為 60 元，商品名稱固定為 "VIP Subscription"。
      * @param account 會員帳號（可用於未來記錄訂單使用）
      * @return 回傳 ECPay 所需的表單欄位參數 (包含 CheckMacValue)
@@ -440,12 +464,12 @@ public class UserServiceImpl implements UserService {
         String HashIV = "v77hoKGq4kWxNNIS";
         
         // 訂單固定資料
-        String MerchantTradeNo = "TEST" + System.currentTimeMillis();
+        String MerchantTradeNo = account + "_" + System.currentTimeMillis();
         String MerchantTradeDate = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
         String PaymentType = "aio";
         String TradeDesc = "SubscriptionPayment";
         String ItemName = "VIP Subscription";
-        String ReturnURL = "https://your-domain.com/ecpay/notify"; // TODO: 換成你的
+        String ReturnURL = "http://localhost:8080/finbook/user/handleECPayNotify"; // TODO: 換成你的
         String ChoosePayment = "ALL";
         int amount = 60; // 固定 60 元
 
@@ -504,6 +528,30 @@ public class UserServiceImpl implements UserService {
 
         params.put("CheckMacValue", checkMacValue);
         return params;
+    }
+    
+    /**
+     * 處理綠界 notify，收到付款成功即啟用訂閱
+     * @param merchantTradeNo 訂單編號（格式: account_時間戳）
+     * @param rtnCode 藍新付款結果 (1=成功)
+     * @return 回傳給藍新的字串，需固定 "1|OK"
+     */
+    @Override
+    @Transactional
+    public String handleECPayNotify(String merchantTradeNo, String rtnCode) {
+        // 從訂單編號拆出帳號
+        String account = merchantTradeNo.split("_")[0];
+
+        // rtnCode=1 表示付款成功
+        if ("1".equals(rtnCode)) {
+            updateSubscription(account, true);
+        }
+        
+        System.out.println("[ECPay Notify] merchantTradeNo: " + merchantTradeNo + ", rtnCode: " + rtnCode);
+        
+        // 根據藍新文件規定，需回傳 "1|OK"
+        return "1|OK";
+        
     }
 	
 }

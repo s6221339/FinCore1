@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -282,17 +283,19 @@ public class UserController {
 	    @Operation(
 	    	    summary = ApiDocConstants.USER_GET_SUBSCRIPTION_SUMMARY,
 	    	    description = ApiDocConstants.USER_GET_SUBSCRIPTION_DESC,
-	    	    method = "GET",
+	    	    method = "POST",
 	    	    parameters = {
 	    	        @Parameter(name = "account", description = "會員帳號（必填）")
 	    	    }
 	    	)
 	    	@ApiResponses({
-	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
+	    		@ApiResponse(responseCode = "200", 
+						description = ApiDocConstants.SEARCH_SUCCESS, 
+						content = {@Content(mediaType = "application/json", schema = @Schema(implementation = SubscriptionResponse.class))}),
 	    	    @ApiResponse(responseCode = "400", description = ApiDocConstants.MISSING_REQUIRED_FIELD),
 	    	    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND),
 	    	})
-	    public SubscriptionResponse getSubscription(@RequestParam("account") String account) {
+	    public BasicResponse getSubscription(@RequestParam("account") String account) {
 	        return service.getSubscription(account);
 	    }
 	    
@@ -310,5 +313,24 @@ public class UserController {
 	    	})
 	    public Map<String, String> getECPayForm(@RequestParam("account") String account) {
 	        return service.getECPayForm(account);
+	    }
+	    
+	    @PostMapping(value = "handleECPayNotify")
+	    @Operation(
+	    	    summary = ApiDocConstants.USER_ECPAY_NOTIFY_SUMMARY,
+	    	    description = ApiDocConstants.USER_ECPAY_NOTIFY_DESC,
+	    	    method = "POST",
+	    	    parameters = {
+	    	        @Parameter(name = "MerchantTradeNo", description = "訂單編號（格式: account_時間戳，必填）"),
+	    	        @Parameter(name = "RtnCode", description = "綠界付款結果代碼（必填，1=付款成功）")
+	    	    }
+	    	)
+	    	@ApiResponses({
+	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.ECPAY_NOTIFY_SUCCESS)
+	    	})
+	    public String handleECPayNotify(HttpServletRequest request) {
+	        String merchantTradeNo = request.getParameter("MerchantTradeNo");
+	        String rtnCode = request.getParameter("RtnCode");
+	        return service.handleECPayNotify(merchantTradeNo, rtnCode);
 	    }
 }

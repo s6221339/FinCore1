@@ -20,6 +20,7 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyAvatarListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
+import com.example.FinCore.vo.response.NotifyResponse;
 import com.example.FinCore.vo.response.SubscriptionResponse;
 
 import com.example.FinCore.vo.response.UserResponse;
@@ -328,9 +329,9 @@ public class UserController {
 	    	@ApiResponses({
 	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.ECPAY_NOTIFY_SUCCESS)
 	    	})
-	    public String handleECPayNotify(HttpServletRequest request) {
+	    public BasicResponse handleECPayNotify(HttpServletRequest request) {
 	        String merchantTradeNo = request.getParameter("MerchantTradeNo");
 	        String rtnCode = request.getParameter("RtnCode");
-	        return service.handleECPayNotify(merchantTradeNo, rtnCode);
+	        return new NotifyResponse(ResponseMessages.SUCCESS, service.handleECPayNotify(merchantTradeNo, rtnCode));
 	    }
 }

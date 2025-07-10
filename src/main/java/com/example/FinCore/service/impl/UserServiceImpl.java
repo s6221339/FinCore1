@@ -2,6 +2,7 @@ package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -465,7 +466,7 @@ public class UserServiceImpl implements UserService {
         
         // 訂單固定資料
         String MerchantTradeNo = account + "_" + System.currentTimeMillis();
-        String MerchantTradeDate = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+        String MerchantTradeDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
         String PaymentType = "aio";
         String TradeDesc = "SubscriptionPayment";
         String ItemName = "VIP Subscription";

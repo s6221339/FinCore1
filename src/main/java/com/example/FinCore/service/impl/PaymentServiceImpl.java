@@ -29,11 +29,15 @@ import com.example.FinCore.vo.BalanceWithPaymentVO;
 import com.example.FinCore.vo.FamilyInfoVO;
 import com.example.FinCore.vo.IncomeAndOutlayWithBalanceInfoVO;
 import com.example.FinCore.vo.PaymentAmountVO;
+import com.example.FinCore.vo.PaymentDetailVO;
+import com.example.FinCore.vo.PaymentDetailsInfoVO;
+import com.example.FinCore.vo.PaymentDetailsWithBalanceInfoVO;
 import com.example.FinCore.vo.PaymentInfoVO;
 import com.example.FinCore.vo.RecurringPeriodVO;
 import com.example.FinCore.vo.StatisticsIncomeAndOutlayVO;
 import com.example.FinCore.vo.StatisticsIncomeAndOutlayWithBalanceInfoVO;
 import com.example.FinCore.vo.StatisticsInfoVO;
+import com.example.FinCore.vo.StatisticsPaymentDetailsVO;
 import com.example.FinCore.vo.StatisticsPaymentTypeVO;
 import com.example.FinCore.vo.StatisticsVO;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
@@ -47,6 +51,7 @@ import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayWithBalanceInfoResponse;
 import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
 import com.example.FinCore.vo.response.StatisticsLookupPaymentTypeWithAllBalanceResponse;
+import com.example.FinCore.vo.response.StatisticsPaymentDetailsWithBalanceResponse;
 
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
@@ -369,38 +374,22 @@ public class PaymentServiceImpl implements PaymentService
 		/* 最終統計列表 */
 		List<StatisticsVO> statisticsList = new ArrayList<>();
 		
-//		取得與帳號關聯的所有帳戶
-		List<Balance> personalbalanceList = balanceDao.getAllBalanceByAccount(req.account());
+//		個人帳戶
+		List<Balance> personalBalanceList = balanceDao.getAllBalanceByAccount(req.account());
 		
-//		取得與群組關聯的所有帳戶
-		List<Family> allFamilyList = familyDao.findAll();
-		List<Family> familyList = allFamilyList.stream()
+//		群組帳戶
+		List<Family> allFamily = familyDao.findAll();
+		List<Family> familyList = allFamily.stream()
 				.filter(t -> t.isMember(req.account()))
 				.toList();
-		List<Integer> familyIdList = familyList.stream()
-				.map(t -> t.getId())
-				.toList();
-		
-		List<Balance> balanceFromFamilyList = balanceDao.getAllBalanceByFamilyIdList(familyIdList);
-		var balanceList = personalbalanceList;
-		
-//		合併帳號與群組的帳戶，並依照帳戶編號排序
-		balanceList.addAll(balanceFromFamilyList);
-		balanceList.sort((o1, o2) -> o1.getBalanceId() - o2.getBalanceId());
-		List<Integer> balanceIdList = balanceList.stream()
-				.map(t -> t.getBalanceId())
-				.toList();
-
-//		綁定 BalanceInfoVO 和 FamilyInfoVO
 		Map<BalanceInfoVO, FamilyInfoVO> infoMap = new HashMap<>();
-		setInfoMap(infoMap, balanceList, familyList);
+		setInfoMap(infoMap, personalBalanceList, familyList);
 		
-//		取得這些帳戶保存的所有款項
-		List<Payment> paymentList = paymentDao.getPaymentListByBalanceIdList(balanceIdList);
+		List<Payment> rawPaymentList = getAllRelatedPayments(personalBalanceList, familyList);
 		
 //		如果月份指定 1~12 月，就針對該設定進行篩選
 //		如果不指定則僅篩選該年分的所有款項
-		List<Payment> filtedPaymentList = getFilterPaymentListForStatistics(paymentList, req.year(), req.month());
+		List<Payment> filtedPaymentList = getFilterPaymentListForStatistics(rawPaymentList, req.year(), req.month());
 		statisticsList = statisticsVOFactory(filtedPaymentList, infoMap, req.year());
 		statisticsVOZeroPadding(statisticsList);
 		return new StatisticsLookupPaymentTypeWithAllBalanceResponse(ResponseMessages.SUCCESS, statisticsList);
@@ -700,25 +689,14 @@ public class PaymentServiceImpl implements PaymentService
 		List<Family> familyList = allFamily.stream()
 				.filter(t -> t.isMember(req.account()))
 				.toList();
-		List<Integer> familyJoinedIdList = familyList.stream()
-				.map(t -> t.getId())
-				.toList();
-		List<Balance> familyBalanceList = balanceDao.getAllBalanceByFamilyIdList(familyJoinedIdList);
-//		帳戶結合
-		var combinedBalanceList = personalBalanceList;
-		combinedBalanceList.addAll(familyBalanceList);
 		Map<BalanceInfoVO, FamilyInfoVO> infoMap = new HashMap<>();
 		setInfoMap(infoMap, personalBalanceList, familyList);
-		List<Integer> combinedBalanceIdList = combinedBalanceList.stream()
-				.map(t -> t.getBalanceId())
-				.toList();
 		
-//		取得帳款
-		List<Payment> rawPaymentList = paymentDao.getPaymentListByBalanceIdList(combinedBalanceIdList);
+		List<Payment> rawPaymentList = getAllRelatedPayments(personalBalanceList, familyList);
 		var filterPaymentList = getFilterPaymentListForStatistics(rawPaymentList, req.year(), req.month());
 		var statisticsVOList = statisticsVOFactory(filterPaymentList, infoMap, req.year());
 		var result = statisticsIncomeAndOutlayWithBalanceInfoVOFactory(statisticsVOList, req.year());
-		statisticsIncomeAndOutlayWithBalanceInfoVOZeroPadding(result);
+		statisticsIncomeAndOutlayWithBalanceInfoVOZeroPadding(result, infoMap);
 		return new StatisticsIncomeAndOutlayWithBalanceInfoResponse(ResponseMessages.SUCCESS, result);
 	}
 	
@@ -766,7 +744,10 @@ public class PaymentServiceImpl implements PaymentService
 		return result;
 	}
 	
-	private void statisticsIncomeAndOutlayWithBalanceInfoVOZeroPadding(List<StatisticsIncomeAndOutlayWithBalanceInfoVO> voList)
+	private void statisticsIncomeAndOutlayWithBalanceInfoVOZeroPadding(
+			List<StatisticsIncomeAndOutlayWithBalanceInfoVO> voList, 
+			Map<BalanceInfoVO, FamilyInfoVO> infoMap
+			)
 	{
 		if(voList.size() > 1)
 		{
@@ -782,6 +763,16 @@ public class PaymentServiceImpl implements PaymentService
 			}
 			voList.sort((o1, o2) -> o1.month() - o2.month());
 		}
+		for(var vo : voList)
+		{
+			List<IncomeAndOutlayWithBalanceInfoVO> infoList = vo.incomeAndOutlayInfoVOList();
+			var balanceInfoSet = Set.copyOf(infoList.stream().map(t -> t.balanceInfo()).toList());
+			for(var info : infoMap.entrySet())
+			{
+				
+			}
+		}
+		
 	}
 
 	/**
@@ -807,6 +798,194 @@ public class PaymentServiceImpl implements PaymentService
 					else
 						return t.isOnTime(year);
 		}).toList();
+	}
+
+	@Override
+	public StatisticsPaymentDetailsWithBalanceResponse statisticsIncomeDetailsWithAllBalance(StatisticsRequest req) 
+	{
+		if(!userDao.existsById(req.account()))
+			return new StatisticsPaymentDetailsWithBalanceResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+		
+//		個人帳戶
+		List<Balance> personalBalanceList = balanceDao.getAllBalanceByAccount(req.account());
+		
+//		群組帳戶
+		List<Family> allFamily = familyDao.findAll();
+		List<Family> familyList = allFamily.stream()
+				.filter(t -> t.isMember(req.account()))
+				.toList();
+		Map<BalanceInfoVO, FamilyInfoVO> infoMap = new HashMap<>();
+		setInfoMap(infoMap, personalBalanceList, familyList);
+		
+		List<Payment> rawPaymentList = getAllRelatedPayments(personalBalanceList, familyList);
+		var incomePaymentList = rawPaymentList.stream().filter(t -> t.isIncome()).toList();
+		var filtedPaymentList = getFilterPaymentListForStatistics(incomePaymentList, req.year(), req.month());
+		var result = statisticsPaymentDetailsVOFactory(req.year(), filtedPaymentList, infoMap);
+		statisticsPaymentDetailsVOZeroPadding(result, infoMap);
+		return new StatisticsPaymentDetailsWithBalanceResponse(ResponseMessages.SUCCESS, result);
+	}
+	
+	private List<StatisticsPaymentDetailsVO> statisticsPaymentDetailsVOFactory(
+			int year, 
+			List<Payment> paymentList, 
+			Map<BalanceInfoVO, FamilyInfoVO> infoMap)
+	{
+		List<StatisticsPaymentDetailsVO> result = new ArrayList<>();
+		Map<Integer, Map<Integer, PaymentDetailsWithBalanceInfoVO>> statisticsMap = new HashMap<>();
+		for(Payment payment : paymentList)
+		{
+			final int month = payment.getMonth();
+			final int amount = payment.getAmount();
+			final String type = payment.getType();
+			final String item = payment.getItem();
+			final int balanceId = payment.getBalanceId();
+			
+			BalanceInfoVO bInfo = null;
+	        FamilyInfoVO fInfo = null;
+	        for (Entry<BalanceInfoVO, FamilyInfoVO> entry : infoMap.entrySet()) 
+	        {
+	            if (entry.getKey().id() == balanceId) 
+	            {
+	                bInfo = entry.getKey();
+	                fInfo = entry.getValue();
+	                break;
+	            }
+	        }
+	        if (bInfo == null) continue;
+
+	        Map<Integer, PaymentDetailsWithBalanceInfoVO> monthMap = statisticsMap.computeIfAbsent(month, k -> new HashMap<>());
+
+	        PaymentDetailsWithBalanceInfoVO sInfo = monthMap.get(balanceId);
+	        List<PaymentDetailsInfoVO> pdInfoList = null;
+	        if(sInfo == null)
+	        {
+	        	pdInfoList = new ArrayList<>();
+	        	List<PaymentDetailVO> detailList = new ArrayList<>();
+	        	
+	        	PaymentDetailVO detail = new PaymentDetailVO(item, amount);
+	        	detailList.add(detail);
+	        	
+	        	PaymentDetailsInfoVO pdInfoVO = new PaymentDetailsInfoVO(type, detailList);
+	        	pdInfoList.add(pdInfoVO);
+	        }
+	        else
+	        {
+	        	pdInfoList = sInfo.paymentInfo();
+	        	boolean pdInfoFound = false;
+	        	for(int i = 0; i < pdInfoList.size(); i++)
+	        	{
+	        		PaymentDetailsInfoVO pdInfo = pdInfoList.get(i);
+	        		if(pdInfo.type().equals(type))
+	        		{
+	        			List<PaymentDetailVO> details = pdInfo.details();
+	        			boolean detailFound = false;
+	        			for(int j = 0; j < details.size(); j++)
+	        			{
+	        				PaymentDetailVO detail = details.get(j);
+	        				if(detail.item().equals(item))
+	        				{
+	        					int newAmount = detail.amount() + amount;
+	        					detail = new PaymentDetailVO(item, newAmount);
+	        					details.set(j, detail);
+	        					detailFound = true;
+	        					break;
+	        				}
+	        			}
+	        			if(!detailFound)
+        					details.add(new PaymentDetailVO(item, amount));
+	        			
+	        			PaymentDetailsInfoVO newPDInfo = new PaymentDetailsInfoVO(type, details);
+	        			pdInfoList.set(i, newPDInfo);
+	        			pdInfoFound = true;
+	        			break;
+	        		}
+	        	}
+	        	if(!pdInfoFound)
+	        	{
+	        		List<PaymentDetailVO> details = new ArrayList<>();
+	        		details.add(new PaymentDetailVO(item, amount));
+	        		pdInfoList.add(new PaymentDetailsInfoVO(type, details));
+	        	}
+	        }
+	        sInfo = new PaymentDetailsWithBalanceInfoVO(bInfo, fInfo, pdInfoList);
+        	monthMap.put(balanceId, sInfo);
+		}
+		for(var entry : statisticsMap.entrySet())
+		{
+			final int month = entry.getKey();
+			List<PaymentDetailsWithBalanceInfoVO> infoList = new ArrayList<>(entry.getValue().values());
+			infoList.sort((o1, o2) -> o1.balanceInfo().id() - o2.balanceInfo().id());
+			StatisticsPaymentDetailsVO vo = new StatisticsPaymentDetailsVO(year, month, infoList);
+			result.add(vo);
+		}
+		result.sort((o1, o2) -> o1.month() - o2.month());
+		return result;
+	}
+	
+	private void statisticsPaymentDetailsVOZeroPadding(
+			List<StatisticsPaymentDetailsVO> voList, 
+			Map<BalanceInfoVO, FamilyInfoVO> infoMap
+			)
+	{
+//		如果使用者無指定查找月份才執行
+		if(voList.size() > 1)
+		{
+			Set<Integer> monthSet = Set.copyOf(voList.stream().map(t -> t.month()).toList());
+			final int year = voList.get(0).year();
+//			月份填補
+			for(int month = 1; month <= 12; month++)
+			{
+				if(monthSet.contains(month))
+					continue;
+				
+				StatisticsPaymentDetailsVO zero = new StatisticsPaymentDetailsVO(year, month, new ArrayList<>());
+				voList.add(zero);
+			}
+		}
+//		帳戶資料填補
+		for(var vo : voList)
+		{
+//			取得所有已存在的帳戶對帳款資訊
+			List<PaymentDetailsWithBalanceInfoVO> infoList = vo.infoList();
+			var balanceInfoSet = Set.copyOf(infoList.stream().map(t -> t.balanceInfo()).toList());
+			for(var infoEntry : infoMap.entrySet())
+			{
+				if(balanceInfoSet.contains(infoEntry.getKey()))
+					continue;
+				
+				PaymentDetailsWithBalanceInfoVO emptyInfo = new PaymentDetailsWithBalanceInfoVO(
+						infoEntry.getKey(), 
+						infoEntry.getValue(), 
+						new ArrayList<>()
+						);
+				infoList.add(emptyInfo);
+			}
+			infoList.sort((o1, o2) -> o1.balanceInfo().id() - o2.balanceInfo().id());
+		}
+		voList.sort((o1, o2) -> o1.month() - o2.month());
+	}
+	
+	/**
+	 * 取得與個人帳戶和群組相關的所有帳款資料
+	 * @param balanceList 帳戶列表
+	 * @param familyList 群組列表
+	 * @return 與個人帳戶和群組相關的帳款資料
+	 */
+	private List<Payment> getAllRelatedPayments(List<Balance> balanceList, List<Family> familyList)
+	{
+		List<Integer> familyJoinedIdList = familyList.stream()
+				.map(t -> t.getId())
+				.toList();
+		List<Balance> familyBalanceList = balanceDao.getAllBalanceByFamilyIdList(familyJoinedIdList);
+//		帳戶結合
+		var combinedBalanceList = balanceList;
+		combinedBalanceList.addAll(familyBalanceList);
+		List<Integer> combinedBalanceIdList = combinedBalanceList.stream()
+				.map(t -> t.getBalanceId())
+				.toList();
+		
+//		取得帳款
+		return paymentDao.getPaymentListByBalanceIdList(combinedBalanceIdList);
 	}
 
 	/**

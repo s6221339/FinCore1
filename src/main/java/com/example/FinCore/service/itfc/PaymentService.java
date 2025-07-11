@@ -11,6 +11,7 @@ import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayWithBalanceInfoResponse;
 import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
 import com.example.FinCore.vo.response.StatisticsLookupPaymentTypeWithAllBalanceResponse;
+import com.example.FinCore.vo.response.StatisticsPaymentDetailsWithBalanceResponse;
 
 public interface PaymentService 
 {
@@ -108,5 +109,12 @@ public interface PaymentService
 	 * @return 支出與收入的統計數據列表，每個帳戶將分開統計，包含群組帳戶
 	 */
 	public StatisticsIncomeAndOutlayWithBalanceInfoResponse statisticsIncomeAndOutlayWithAllBalance(StatisticsRequest req);
+	
+	/**
+	 * 取得帳號在指定時間的所有帳戶收入與其細項的統計數據。（帳戶分開統計）
+	 * @param req 統計專用請求資料
+	 * @return 收入的細項統計數據列表，每個帳戶將分開統計，包含群組帳戶
+	 */
+	public StatisticsPaymentDetailsWithBalanceResponse statisticsIncomeDetailsWithAllBalance(StatisticsRequest req);
 	
 }

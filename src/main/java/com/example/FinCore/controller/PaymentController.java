@@ -19,8 +19,8 @@ import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.SearchPaymentResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayWithBalanceInfoResponse;
-import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
 import com.example.FinCore.vo.response.StatisticsLookupPaymentTypeWithAllBalanceResponse;
+import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -299,6 +299,12 @@ public class PaymentController
 	public BasicResponse statisticsIncomeAndOutlayWithAllBalance(@Valid @RequestBody StatisticsRequest req) 
 	{
 		return service.statisticsIncomeAndOutlayWithAllBalance(req);
+	}
+	
+	@PostMapping(value = "statistics/incomeDetailsWithAllBalance")
+	public BasicResponse statisticsIncomeDetailsWithAllBalance(@Valid @RequestBody StatisticsRequest req) 
+	{
+		return service.statisticsIncomeDetailsWithAllBalance(req);
 	}
 	
 	@PostMapping(value = "disable/scheduledCreate")

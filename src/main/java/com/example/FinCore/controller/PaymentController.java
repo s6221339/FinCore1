@@ -94,6 +94,7 @@ public class PaymentController
 				description = ApiDocConstants.SEARCH_SUCCESS, 
 				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsLookupPaymentTypeWithAllBalanceResponse.class))}),
 		@ApiResponse(responseCode = "404", description = ApiDocConstants.PAYMENT_NOT_FOUND),
+		@ApiResponse(responseCode = "403", description = ApiDocConstants.NO_PAYMENT_MODIFING_PERMISSION),
 		@ApiResponse(responseCode = "400", description = ApiDocConstants.PAYMENT_UPDATE_RESPONSE_400),
 	})
 	public BasicResponse update(@Valid @RequestBody UpdatePaymentRequest req) 

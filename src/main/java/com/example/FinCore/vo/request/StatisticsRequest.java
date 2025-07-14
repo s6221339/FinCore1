@@ -11,7 +11,7 @@ public record StatisticsRequest(
 		String account,
 		
 		@Max(value = 9999, message = ConstantsMessage.INVALID_DATE_ERROR)
-		@Min(value = 0, message = ConstantsMessage.INVALID_DATE_ERROR)
+		@Min(value = 2001, message = ConstantsMessage.INVALID_DATE_ERROR)
 		int year,
 		
 		@Max(value = 12, message = ConstantsMessage.INVALID_DATE_ERROR)

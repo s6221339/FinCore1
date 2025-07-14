@@ -78,6 +78,8 @@ public class PaymentServiceImpl implements PaymentService
 	
 	@Autowired
 	private FamilyDao familyDao;
+	
+	private final static LocalDate MINIMUN_DATE = LocalDate.of(2001, 1, 1);
 
 	@Override
 	@Transactional(rollbackOn = Exception.class)
@@ -148,6 +150,9 @@ public class PaymentServiceImpl implements PaymentService
 		var period = req.recurringPeriod();
 		LocalDate recordDate = req.recordDate();
 		LocalDate today = LocalDate.now();
+		if(recordDate.isBefore(MINIMUN_DATE))
+			return new BasicResponse(ResponseMessages.INVALID_PAYMENT_DATE);
+		
 		if(recordDate.isAfter(today))
 			return new BasicResponse(ResponseMessages.FUTURE_RECORD_DATE);
 		
@@ -188,6 +193,9 @@ public class PaymentServiceImpl implements PaymentService
 	private BasicResponse checkDate(LocalDate date, RecurringPeriodVO period)
 	{
 		LocalDate today = LocalDate.now();
+		if(date.isBefore(MINIMUN_DATE))
+			return new BasicResponse(ResponseMessages.INVALID_PAYMENT_DATE);
+		
 		if(period.hasPeriod() && !date.isAfter(today))
 			return new BasicResponse(ResponseMessages.PAST_RECORD_DATE);
 		

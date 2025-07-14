@@ -535,11 +535,16 @@ public final class ApiDocConstants
 	
 	public final static String PAYMENT_HAS_BEEN_DELETED = "該帳款已刪除";
 	
+	public final static String NO_PAYMENT_MODIFING_PERMISSION = "無法修改他人的帳款資料";
+	
 	public final static String DELETED_PAYMENT_CANNOT_UPDATE = "無法更新已刪除的款項資料";
 	
 	public final static String PAYMENT_PERIOD_UNABLE_MODIFYING = "無法變更該款項的週期";
 	
+	public final static String INVALID_PAYMENT_DATE = "無效的記帳日期";
+	
 	public final static String PAYMENT_UPDATE_RESPONSE_400 = ""
+			+ "<li>" + INVALID_PAYMENT_DATE + "</li>"
 			+ "<li>" + DELETED_PAYMENT_CANNOT_UPDATE + "</li>"
 			+ "<li>" + PAYMENT_PERIOD_UNABLE_MODIFYING + "</li>";
 	

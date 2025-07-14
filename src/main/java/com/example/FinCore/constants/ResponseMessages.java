@@ -44,6 +44,7 @@ public enum ResponseMessages
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),
+    NO_PAYMENT_MODIFING_PERMISSION(403, "無法修改他人的帳款資料"),
 	
     NOT_FOUND(404, "查無資料"),
 	ACCOUNT_NOT_FOUND(404, "查無此帳號！"),

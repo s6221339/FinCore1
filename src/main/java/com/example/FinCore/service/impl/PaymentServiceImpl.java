@@ -785,7 +785,6 @@ public class PaymentServiceImpl implements PaymentService
 				StatisticsIncomeAndOutlayWithBalanceInfoVO zero = new StatisticsIncomeAndOutlayWithBalanceInfoVO(year, month, new ArrayList<>());
 				voList.add(zero);
 			}
-			voList.sort((o1, o2) -> o1.month() - o2.month());
 		}
 		for(var vo : voList)
 		{
@@ -793,10 +792,18 @@ public class PaymentServiceImpl implements PaymentService
 			var balanceInfoSet = Set.copyOf(infoList.stream().map(t -> t.balanceInfo()).toList());
 			for(var info : infoMap.entrySet())
 			{
+				if(balanceInfoSet.contains(info.getKey()))
+					continue;
 				
+				IncomeAndOutlayWithBalanceInfoVO emptyInfo = new IncomeAndOutlayWithBalanceInfoVO(
+						info.getKey(), 
+						info.getValue(), 
+						0, 0);
+				infoList.add(emptyInfo);
 			}
+			infoList.sort((o1, o2) -> o1.balanceInfo().id() - o2.familyInfo().id());
 		}
-		
+		voList.sort((o1, o2) -> o1.month() - o2.month());
 	}
 
 	/**

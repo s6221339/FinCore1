@@ -790,18 +790,18 @@ public class PaymentServiceImpl implements PaymentService
 		{
 			List<IncomeAndOutlayWithBalanceInfoVO> infoList = vo.incomeAndOutlayInfoVOList();
 			var balanceInfoSet = Set.copyOf(infoList.stream().map(t -> t.balanceInfo()).toList());
-			for(var info : infoMap.entrySet())
+			for(var infoEntry : infoMap.entrySet())
 			{
-				if(balanceInfoSet.contains(info.getKey()))
+				if(balanceInfoSet.contains(infoEntry.getKey()))
 					continue;
 				
 				IncomeAndOutlayWithBalanceInfoVO emptyInfo = new IncomeAndOutlayWithBalanceInfoVO(
-						info.getKey(), 
-						info.getValue(), 
+						infoEntry.getKey(), 
+						infoEntry.getValue(), 
 						0, 0);
 				infoList.add(emptyInfo);
 			}
-			infoList.sort((o1, o2) -> o1.balanceInfo().id() - o2.familyInfo().id());
+			infoList.sort((o1, o2) -> o1.balanceInfo().id() - o2.balanceInfo().id());
 		}
 		voList.sort((o1, o2) -> o1.month() - o2.month());
 	}

@@ -118,6 +118,6 @@ public interface PaymentService
 	public StatisticsPaymentDetailsWithBalanceResponse statisticsIncomeDetailsWithAllBalance(StatisticsRequest req);
 	
 	
-	public void statisticsIncomeDetailsSummarize(StatisticsRequest req);
+//	public void statisticsIncomeDetailsSummarize(StatisticsRequest req);
 	
 }

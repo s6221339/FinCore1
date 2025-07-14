@@ -100,7 +100,7 @@ public class LoginAspect
 						return (String) requestMap.get("account");
 				}
 				catch (Exception e) {
-					logger.warn("轉換物件時發生例外事件。");
+					logger.info("轉換物件時發生例外事件。");
 					return null;
 				}
 			}

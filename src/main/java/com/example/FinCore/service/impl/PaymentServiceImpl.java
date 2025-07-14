@@ -151,6 +151,12 @@ public class PaymentServiceImpl implements PaymentService
 		if(!period.hasPeriod() && recordDate.isAfter(today))
 			return new BasicResponse(ResponseMessages.FUTURE_RECORD_DATE);
 		
+		if(payment.hasPeriod())
+		{
+			if(!payment.getRecordDate().isEqual(req.recordDate()))
+				return new BasicResponse(ResponseMessages.RECURRING_PAYMENT_UPDATE_FAILED);
+		}
+		
 		if(!payment.isFuture() && !period.equals(payment.getPeriod()))
 			return new BasicResponse(ResponseMessages.PAYMENT_PERIOD_UNABLE_MODIFYING);
 		

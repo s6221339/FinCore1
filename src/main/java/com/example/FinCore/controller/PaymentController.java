@@ -20,6 +20,7 @@ import com.example.FinCore.vo.response.SearchPaymentResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayWithBalanceInfoResponse;
 import com.example.FinCore.vo.response.StatisticsLookupPaymentTypeWithAllBalanceResponse;
+import com.example.FinCore.vo.response.StatisticsPaymentDetailsWithBalanceResponse;
 import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -302,6 +303,20 @@ public class PaymentController
 	}
 	
 	@PostMapping(value = "statistics/incomeDetailsWithAllBalance")
+	@Operation(
+		    summary = ApiDocConstants.PAYMENT_STATISTICS_INCOME_DETAILS_WITH_ALL_BALANCE_SUMMARY,
+		    description = ApiDocConstants.PAYMENT_STATISTICS_INCOME_DETAILS_WITH_ALL_BALANCE_DESC,
+		    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		        description = ApiDocConstants.PAYMENT_STATISTICS_REQUEST_BODY_RULE,
+		        required = true
+		    )
+		)
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsPaymentDetailsWithBalanceResponse.class))}),
+			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+	})
 	public BasicResponse statisticsIncomeDetailsWithAllBalance(@Valid @RequestBody StatisticsRequest req) 
 	{
 		return service.statisticsIncomeDetailsWithAllBalance(req);

@@ -46,6 +46,8 @@ public final class ApiDocConstants
 	
 	public static final String PAYMENT_STATISTICS_INCOME_AND_OUTLAY_WITH_ALL_BALANCE_SUMMARY = "統計個人與群組帳戶的收支資訊";
 
+	public static final String PAYMENT_STATISTICS_INCOME_DETAILS_WITH_ALL_BALANCE_SUMMARY = "統計個人與群組帳戶的收入明細";
+
 	public static final String PAYMENT_SCHEDULED_CREATE_SUMMARY = "排程建立下一筆循環帳款（內部任務）";
 	
 	public static final String PAYMENT_SCHEDULED_DELETE_SUMMARY = "排程永久刪除帳款資料（內部任務）";
@@ -204,6 +206,9 @@ public final class ApiDocConstants
 	
 	public static final String PAYMENT_STATISTICS_INCOME_AND_OUTLAY_WITH_ALL_BALANCE_DESC = 
 		    "根據指定帳號取得其個人帳戶與所屬群組帳戶，在指定年月的收入與支出統計資訊，資料會依照帳戶分開列出，並標示其來源。<br>";
+	
+	public static final String PAYMENT_STATISTICS_INCOME_DETAILS_WITH_ALL_BALANCE_DESC = 
+		    "根據指定帳號與年月，統計該使用者在個人與所屬群組帳戶中的所有收入資料，依月份、帳戶、類別與項目進行分類與加總，並補全無資料月份與帳戶欄位。<br>";
 	
 	public static final String PAYMENT_SCHEDULED_CREATE_DESC =
     		"每天凌晨自動執行的排程任務，根據循環帳款規則建立下一筆尚未記錄的款項。<br>"

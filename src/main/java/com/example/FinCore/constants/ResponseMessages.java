@@ -41,6 +41,7 @@ public enum ResponseMessages
 	UNABLE_TRANSFERS_TO_FAMILY_BALANCE(400, "群組帳戶不支援轉帳功能"),
 	PASSWORD_DUPLICATE(400, "新舊密碼不可相同！"),
 	PASSWORD_INVALID(400, "密碼無效，請確認格式或內容正確！"),
+	RECURRING_PAYMENT_UPDATE_FAILED(400, "固定帳款更新失敗（請檢查更新資料是否包含記帳日期）"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),

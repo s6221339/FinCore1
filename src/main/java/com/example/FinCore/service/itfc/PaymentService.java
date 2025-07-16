@@ -11,6 +11,7 @@ import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayResponse;
 import com.example.FinCore.vo.response.StatisticsIncomeAndOutlayWithBalanceInfoResponse;
 import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
 import com.example.FinCore.vo.response.StatisticsLookupPaymentTypeWithAllBalanceResponse;
+import com.example.FinCore.vo.response.StatisticsPaymentDetailsSummarizeResponse;
 import com.example.FinCore.vo.response.StatisticsPaymentDetailsWithBalanceResponse;
 
 public interface PaymentService 
@@ -117,7 +118,11 @@ public interface PaymentService
 	 */
 	public StatisticsPaymentDetailsWithBalanceResponse statisticsIncomeDetailsWithAllBalance(StatisticsRequest req);
 	
-	
-//	public void statisticsIncomeDetailsSummarize(StatisticsRequest req);
+	/**
+	 * 取得帳號在指定時間的收入與其細項的統計數據。（帳戶合併統計）
+	 * @param req 統計專用請求資料
+	 * @return 收入的細項統計數據列表，每個帳戶將合併統計，不包含群組帳戶
+	 */
+	public StatisticsPaymentDetailsSummarizeResponse statisticsIncomeDetailsSummarize(StatisticsRequest req);
 	
 }

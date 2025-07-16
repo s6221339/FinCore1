@@ -5,7 +5,7 @@ import java.util.List;
 public record PaymentDetailsWithBalanceInfoVO(
 		BalanceInfoVO balanceInfo,
 		FamilyInfoVO familyInfo,
-		List<PaymentDetailsInfoVO> paymentInfo
+		List<PaymentDetailsInfoVO> paymentInfoList
 		) {
 
 }

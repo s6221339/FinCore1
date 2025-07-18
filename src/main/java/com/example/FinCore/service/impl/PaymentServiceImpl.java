@@ -696,7 +696,6 @@ public class PaymentServiceImpl implements PaymentService
 				voList.add(zero);
 			}
 			voList.sort((o1, o2) -> o1.month() - o2.month());
-			voList.stream().sorted().collect(Collectors.toList());
 		}
 	}
 	

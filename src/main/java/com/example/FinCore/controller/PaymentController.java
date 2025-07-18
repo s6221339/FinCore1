@@ -334,10 +334,12 @@ public class PaymentController
 		    )
 		)
 	@ApiResponses(value = {
-	    @ApiResponse(responseCode = "200", description = ApiDocConstants.SEARCH_SUCCESS),
-	    @ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
+			@ApiResponse(responseCode = "200", 
+					description = ApiDocConstants.SEARCH_SUCCESS, 
+					content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StatisticsPaymentDetailsSummarizeResponse.class))}),
+			@ApiResponse(responseCode = "404", description = ApiDocConstants.ACCOUNT_NOT_FOUND)
 	})
-	public StatisticsPaymentDetailsSummarizeResponse statisticsIncomeDetailsSummarize(@Valid @RequestBody StatisticsRequest req) 
+	public BasicResponse statisticsIncomeDetailsSummarize(@Valid @RequestBody StatisticsRequest req) 
 	{
 		return service.statisticsIncomeDetailsSummarize(req);
 	}

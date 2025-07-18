@@ -1,11 +1,16 @@
 package com.example.FinCore.service.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -457,7 +462,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Map<String, String> getECPayForm(String account) {
-        Map<String, String> params = new LinkedHashMap<>();
+        Map<String, String> params = new TreeMap<>();
         
         // 藍新金流測試環境參數
         String MerchantID = "2000132";
@@ -465,70 +470,54 @@ public class UserServiceImpl implements UserService {
         String HashIV = "v77hoKGq4kWxNNIS";
         
         // 訂單固定資料
-        String MerchantTradeNo = account + "_" + System.currentTimeMillis();
+        String shortAccount = account.contains("@") ? account.split("@")[0] : account;
+        shortAccount = shortAccount.replaceAll("[^A-Za-z0-9]", "");
+        String MerchantTradeNo = shortAccount + System.currentTimeMillis();
+        if(MerchantTradeNo.length() > 20) {
+        	MerchantTradeNo = MerchantTradeNo.substring(0, 20);
+        }
+        
         String MerchantTradeDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
-        String PaymentType = "aio";
-        String TradeDesc = "SubscriptionPayment";
-        String ItemName = "VIP Subscription";
-        String ReturnURL = "http://localhost:8080/finbook/user/handleECPayNotify"; // TODO: 換成你的
-        String ChoosePayment = "ALL";
-        int amount = 60; // 固定 60 元
 
         // 填入參數
         params.put("MerchantID", MerchantID);
         params.put("MerchantTradeNo", MerchantTradeNo);
         params.put("MerchantTradeDate", MerchantTradeDate);
-        params.put("PaymentType", PaymentType);
-        params.put("TotalAmount", String.valueOf(amount));
-        params.put("TradeDesc", TradeDesc);
-        params.put("ItemName", ItemName);
-        params.put("ReturnURL", ReturnURL);
-        params.put("ChoosePayment", ChoosePayment);
+        params.put("PaymentType", "aio");
+        params.put("TotalAmount", "60");
+        params.put("TradeDesc", URLEncoder.encode("SubscriptionPayment", StandardCharsets.UTF_8));
+        params.put("ItemName", "VIP Subscription");
+        params.put("ReturnURL", "https://fdeba8534ddf.ngrok-free.app/finbook/user/handleECPayNotify");
+        params.put("ChoosePayment", "ALL");
 
         // 組成待加密字串
-        String raw = "HashKey=" + HashKey + "&" +
-                     "ChoosePayment=" + ChoosePayment + "&" +
-                     "ItemName=" + ItemName + "&" +
-                     "MerchantID=" + MerchantID + "&" +
-                     "MerchantTradeDate=" + MerchantTradeDate + "&" +
-                     "MerchantTradeNo=" + MerchantTradeNo + "&" +
-                     "PaymentType=" + PaymentType + "&" +
-                     "ReturnURL=" + ReturnURL + "&" +
-                     "TotalAmount=" + amount + "&" +
-                     "TradeDesc=" + TradeDesc + "&" +
-                     "HashIV=" + HashIV;
-
-        // URL encode 並小寫
-        try {
-            raw = java.net.URLEncoder.encode(raw, "UTF-8")
-                     .replace("%21", "!")
-                     .replace("%28", "(")
-                     .replace("%29", ")")
-                     .replace("%2A", "*")
-                     .replace("%2D", "-")
-                     .replace("%2E", ".")
-                     .replace("%5F", "_")
-                     .toLowerCase();
-        } catch (Exception e) {
-            throw new RuntimeException("URLEncode error", e);
+        StringBuilder raw = new StringBuilder("HashKey=" + HashKey);
+        for(Map.Entry<String, String> entry : params.entrySet()) {
+        	raw.append("&").append(entry.getKey()).append("=").append(entry.getValue());
         }
+        raw.append("&HashIV=").append(HashIV);
+        System.out.println("🔧 原始字串（每個 value 已 encode）: " + raw);
 
-        // 做 MD5 並轉大寫
+        // 做 MD5 加密
         String checkMacValue;
         try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] digest = md.digest(raw.getBytes("UTF-8"));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest) {
-                sb.append(String.format("%02X", b));
-            }
-            checkMacValue = sb.toString();
+        	MessageDigest md = MessageDigest.getInstance("MD5");
+        	byte[] digest = md.digest(raw.toString().getBytes(StandardCharsets.UTF_8));
+        	StringBuilder sb = new StringBuilder();
+        	for (byte b : digest) {
+        		sb.append(String.format("%02X", b));
+        	}
+        	checkMacValue = sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("MD5 error", e);
+        	throw new RuntimeException("MD5 Error", e);
         }
-
+        
+        System.out.println("CheckMacValue: " + checkMacValue);
+        //	加入 CheckMacValue
         params.put("CheckMacValue", checkMacValue);
-        return params;
+        
+        //	維持順序送回前端
+        return new LinkedHashMap<>(params);
     }
     
     /**
@@ -541,7 +530,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public String handleECPayNotify(String merchantTradeNo, String rtnCode) {
         // 從訂單編號拆出帳號
-        String account = merchantTradeNo.split("_")[0];
+    	String account = merchantTradeNo.replaceAll("\\d+$", "");
 
         // rtnCode=1 表示付款成功
         if ("1".equals(rtnCode)) {
@@ -555,4 +544,15 @@ public class UserServiceImpl implements UserService {
         
     }
 	
+    private static String urlEncodeRFC3986(String raw) {
+    	try {
+    		return URLEncoder.encode(raw, "UTF-8")
+    				.replace("+", "%20")
+    				.replace("*", "%2A")
+    				.replace("%7E", "~");
+    	} catch (UnsupportedEncodingException e) {
+    		throw new RuntimeException("URLEncode error", e);
+    	}
+    }
+    
 }

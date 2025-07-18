@@ -35,7 +35,8 @@ public class LoginAspect
 			+ "&& !execution (public * com.example.FinCore.controller.*.checkVerifyCode(..)) "
 			+ "&& !execution (public * com.example.FinCore.controller.*.updatePwdByEmail(..)) "
 			+ "&& !execution (public * com.example.FinCore.controller.*.sendRegisterVerifyCode(..)) "
-			+ "&& !execution (public * com.example.FinCore.controller.*.checkRegisterVerifyCode(..)) ")
+			+ "&& !execution (public * com.example.FinCore.controller.*.checkRegisterVerifyCode(..)) "
+			+ "&& !execution (public * com.example.FinCore.controller.*.handleECPayNotify(..)) ")
 	public void loginPointcut()
 	{
 		

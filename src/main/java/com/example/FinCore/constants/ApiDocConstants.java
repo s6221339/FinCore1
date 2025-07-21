@@ -706,6 +706,8 @@ public final class ApiDocConstants
 	public static final String INVALID_SESSION = "無效的 SESSION";
 	
 	public static final String BALANCE_GET_BUDGET_RESPONSE_400 = "無法搜尋未來的時間";
+	
+	public static final String ECPAY_NOTIFY_RESPONSE_FAIL = "查無帳號，回傳 0|FAIL";
     
 	/* === 成功訊息 === */
 	

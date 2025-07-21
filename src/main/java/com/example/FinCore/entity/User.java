@@ -51,6 +51,9 @@ public class User {
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
     
+    @Column(name = "order_id")
+    private String orderId;
+    
     public String getAccount() {
         return account;
     }
@@ -138,6 +141,16 @@ public class User {
 	public void setExpirationDate(LocalDateTime expirationDate) {
 		this.expirationDate = expirationDate;
 	}
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+	
+	
 	
 	
 }

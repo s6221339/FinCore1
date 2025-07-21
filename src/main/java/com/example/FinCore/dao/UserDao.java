@@ -190,4 +190,24 @@ public interface UserDao extends JpaRepository<User, String> {
 	@Query(value = "update user set verified = 0 where account = :account", nativeQuery = true)
 	public int updateVerifiedFalse(@Param("account") String account);
 	
+	/**
+	 * 根據訂單編號查詢帳號
+	 * 
+	 * @param orderId 綠界訂單編號
+	 * @return 對應的會員帳號（找不到則回傳 null）
+	 */
+	@Query(value = "select account from user where order_id = :orderId", nativeQuery = true)
+	public String findAccountByOrderId(@Param("orderId") String orderId);
+	
+	/**
+	 * 根據帳號更新對應的訂單編號（order_id）
+	 * @param account 會員帳號
+	 * @param orderId 訂單編號
+	 * @return 更新筆數（1=成功, 0=失敗）
+	 */
+	@Modifying
+	@Transactional
+	@Query(value = "update user set order_id = :orderId where account = :account", nativeQuery = true)
+	int updateOrderIdByAccount(@Param("account") String account, @Param("orderId") String orderId);
+	
 }

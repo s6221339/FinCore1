@@ -454,95 +454,97 @@ public class UserServiceImpl implements UserService {
 	    return new SubscriptionResponse(ResponseMessages.SUCCESS, vo);
 	}
     
-    /**
-     * 產生綠界金流 ECPay 的訂單參數，用於前端提交到藍新付款。
-     * 金額固定為 60 元，商品名稱固定為 "VIP Subscription"。
-     * @param account 會員帳號（可用於未來記錄訂單使用）
-     * @return 回傳 ECPay 所需的表單欄位參數 (包含 CheckMacValue)
-     */
-    @Override
-    public Map<String, String> getECPayForm(String account) {
-        Map<String, String> params = new TreeMap<>();
-        
-        // 藍新金流測試環境參數
-        String MerchantID = "2000132";
-        String HashKey = "5294y06JbISpM5x9";
-        String HashIV = "v77hoKGq4kWxNNIS";
-        
-        // 訂單固定資料
-        String shortAccount = account.contains("@") ? account.split("@")[0] : account;
-        shortAccount = shortAccount.replaceAll("[^A-Za-z0-9]", "");
-        String MerchantTradeNo = shortAccount + System.currentTimeMillis();
-        if(MerchantTradeNo.length() > 20) {
-        	MerchantTradeNo = MerchantTradeNo.substring(0, 20);
-        }
-        
-        String MerchantTradeDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+	/**
+	 * 產生綠界金流 ECPay 的訂單參數，用於前端提交付款。
+	 * 金額固定為 60 元，商品名稱固定為 "VIP Subscription"。
+	 * 同時在資料庫中記錄訂單編號與帳號對應。
+	 * 
+	 * @param account 會員帳號
+	 * @return 回傳 ECPay 所需的表單欄位參數（包含 CheckMacValue）
+	 */
+	@Override
+	@Transactional
+	public Map<String, String> getECPayForm(String account) {
+	    Map<String, String> params = new TreeMap<>();
 
-        // 填入參數
-        params.put("MerchantID", MerchantID);
-        params.put("MerchantTradeNo", MerchantTradeNo);
-        params.put("MerchantTradeDate", MerchantTradeDate);
-        params.put("PaymentType", "aio");
-        params.put("TotalAmount", "60");
-        params.put("TradeDesc", URLEncoder.encode("SubscriptionPayment", StandardCharsets.UTF_8));
-        params.put("ItemName", "VIP Subscription");
-        params.put("ReturnURL", "https://fdeba8534ddf.ngrok-free.app/finbook/user/handleECPayNotify");
-        params.put("ChoosePayment", "ALL");
+	    // 綠界金流測試環境參數
+	    String MerchantID = "2000132";
+	    String HashKey = "5294y06JbISpM5x9";
+	    String HashIV = "v77hoKGq4kWxNNIS";
 
-        // 組成待加密字串
-        StringBuilder raw = new StringBuilder("HashKey=" + HashKey);
-        for(Map.Entry<String, String> entry : params.entrySet()) {
-        	raw.append("&").append(entry.getKey()).append("=").append(entry.getValue());
-        }
-        raw.append("&HashIV=").append(HashIV);
-        System.out.println("🔧 原始字串（每個 value 已 encode）: " + raw);
+	    // 產生 13 碼訂單編號（純數字，符合綠界規範）
+	    String MerchantTradeNo = String.valueOf(System.currentTimeMillis()); // 13碼
 
-        // 做 MD5 加密
-        String checkMacValue;
-        try {
-        	MessageDigest md = MessageDigest.getInstance("MD5");
-        	byte[] digest = md.digest(raw.toString().getBytes(StandardCharsets.UTF_8));
-        	StringBuilder sb = new StringBuilder();
-        	for (byte b : digest) {
-        		sb.append(String.format("%02X", b));
-        	}
-        	checkMacValue = sb.toString();
-        } catch (Exception e) {
-        	throw new RuntimeException("MD5 Error", e);
-        }
-        
-        System.out.println("CheckMacValue: " + checkMacValue);
-        //	加入 CheckMacValue
-        params.put("CheckMacValue", checkMacValue);
-        
-        //	維持順序送回前端
-        return new LinkedHashMap<>(params);
-    }
+	    String MerchantTradeDate = LocalDateTime.now()
+	            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+
+	    // 組成參數
+	    params.put("MerchantID", MerchantID);
+	    params.put("MerchantTradeNo", MerchantTradeNo);
+	    params.put("MerchantTradeDate", MerchantTradeDate);
+	    params.put("PaymentType", "aio");
+	    params.put("TotalAmount", "60");
+	    params.put("TradeDesc", URLEncoder.encode("SubscriptionPayment", StandardCharsets.UTF_8));
+	    params.put("ItemName", "VIP Subscription");
+	    params.put("ReturnURL", "https://3697b28483b1.ngrok-free.app/finbook/user/handleECPayNotify");
+	    params.put("ChoosePayment", "ALL");
+
+	    // 組成 CheckMacValue 待加密字串 
+	    StringBuilder raw = new StringBuilder("HashKey=" + HashKey);
+	    for (Map.Entry<String, String> entry : params.entrySet()) {
+	        raw.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+	    }
+	    raw.append("&HashIV=").append(HashIV);
+
+	    // 做 MD5 加密產生 CheckMacValue
+	    String checkMacValue;
+	    try {
+	        MessageDigest md = MessageDigest.getInstance("MD5");
+	        byte[] digest = md.digest(raw.toString().getBytes(StandardCharsets.UTF_8));
+	        StringBuilder sb = new StringBuilder();
+	        for (byte b : digest) {
+	            sb.append(String.format("%02X", b));
+	        }
+	        checkMacValue = sb.toString();
+	    } catch (Exception e) {
+	        throw new RuntimeException("MD5 Error", e);
+	    }
+
+	    params.put("CheckMacValue", checkMacValue);
+
+	    // 👉 將訂單編號寫入 user 資料表（order_id 欄位）
+	    userDao.updateOrderIdByAccount(account, MerchantTradeNo);
+
+	    return new LinkedHashMap<>(params);
+	}
     
-    /**
-     * 處理綠界 notify，收到付款成功即啟用訂閱
-     * @param merchantTradeNo 訂單編號（格式: account_時間戳）
-     * @param rtnCode 藍新付款結果 (1=成功)
-     * @return 回傳給藍新的字串，需固定 "1|OK"
-     */
-    @Override
-    @Transactional
-    public String handleECPayNotify(String merchantTradeNo, String rtnCode) {
-        // 從訂單編號拆出帳號
-    	String account = merchantTradeNo.replaceAll("\\d+$", "");
+	/**
+	 * 處理綠界付款通知，確認付款成功後啟用訂閱
+	 * @param merchantTradeNo 訂單編號（13 碼數字）
+	 * @param rtnCode 綠界付款結果（1=成功）
+	 * @return 回傳給綠界固定字串 "1|OK"
+	 */
+	@Override
+	@Transactional
+	public String handleECPayNotify(String merchantTradeNo, String rtnCode) {
+	    // 根據訂單編號查詢會員帳號
+	    String account = userDao.findAccountByOrderId(merchantTradeNo);
 
-        // rtnCode=1 表示付款成功
-        if ("1".equals(rtnCode)) {
-            updateSubscription(account, true);
-        }
-        
-        System.out.println("[ECPay Notify] merchantTradeNo: " + merchantTradeNo + ", rtnCode: " + rtnCode);
-        
-        // 根據藍新文件規定，需回傳 "1|OK"
-        return "1|OK";
-        
-    }
+	    if (account == null || account.isBlank()) {
+	        System.err.println("[ECPay Notify] 查無對應帳號，orderId: " + merchantTradeNo);
+	        return "0|FAIL";
+	    }
+
+	    // 綠界 rtnCode = 1 表示付款成功
+	    if ("1".equals(rtnCode)) {
+	        updateSubscription(account, true);
+	        System.out.println("[ECPay Notify] 會員 " + account + " 已升級為VIP！");
+	    }
+
+	    System.out.println("[ECPay Notify] orderId: " + merchantTradeNo + ", account: " + account + ", rtnCode: " + rtnCode);
+
+	    return "1|OK";
+	}
 	
     private static String urlEncodeRFC3986(String raw) {
     	try {

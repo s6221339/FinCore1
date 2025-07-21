@@ -2,8 +2,10 @@ package com.example.FinCore.controller;
 
 import java.util.Map;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,9 +24,7 @@ import com.example.FinCore.vo.request.loginRequest;
 import com.example.FinCore.vo.response.BasicResponse;
 import com.example.FinCore.vo.response.FamilyAvatarListResponse;
 import com.example.FinCore.vo.response.MemberNameResponse;
-import com.example.FinCore.vo.response.NotifyResponse;
 import com.example.FinCore.vo.response.SubscriptionResponse;
-
 import com.example.FinCore.vo.response.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -38,10 +38,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
 @CrossOrigin
 @RestController

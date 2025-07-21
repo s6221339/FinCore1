@@ -322,40 +322,48 @@ public class UserController {
 	        return service.getECPayForm(account);
 	    }
 	    
-	    @PostMapping(value = "handleECPayNotify", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//	    @Operation(
-//	    	    summary = ApiDocConstants.USER_ECPAY_NOTIFY_SUMMARY,
-//	    	    description = ApiDocConstants.USER_ECPAY_NOTIFY_DESC,
-//	    	    method = "POST",
-//	    	    parameters = {
-//	    	        @Parameter(name = "MerchantTradeNo", description = "訂單編號（格式: account_時間戳，必填）"),
-//	    	        @Parameter(name = "RtnCode", description = "綠界付款結果代碼（必填，1=付款成功）")
-//	    	    }
-//	    	)
-//	    	@ApiResponses({
-//	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.ECPAY_NOTIFY_SUCCESS)
-//	    	})
-	    @ResponseBody
-	    public ResponseEntity<String> handleECPayNotify(HttpServletRequest request) {
-	        try {
-	        	String merchantTradeNo = request.getParameter("MerchantTradeNo");
-		        String rtnCode = request.getParameter("RtnCode");
-		        
-		        System.out.println("MerchantTradeNo: " + merchantTradeNo);
-		        System.out.println("RtnCode: " + rtnCode);
-		        System.out.println("merchantTradeNo.isBlank = " + (merchantTradeNo == null ? "null" : merchantTradeNo.isBlank()));
-		        
-		        if (merchantTradeNo == null || rtnCode == null || merchantTradeNo.isBlank()) {
-		            return ResponseEntity.ok("0|FAIL");
-		        }
-		        
-		        return ResponseEntity.ok("1|OK");
-	        } catch (Exception e) {
-	        	e.printStackTrace(); // 看 console 錯在哪裡
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                    .contentType(MediaType.TEXT_PLAIN)
-	                    .body("0|FAIL");
-	        }
+//	    @PostMapping(value = "handleECPayNotify", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//	    @ResponseBody
+//	    public ResponseEntity<String> handleECPayNotify(HttpServletRequest request) {
+//	        try {
+//	        	String merchantTradeNo = request.getParameter("MerchantTradeNo");
+//		        String rtnCode = request.getParameter("RtnCode");
+//		        
+//		        System.out.println("MerchantTradeNo: " + merchantTradeNo);
+//		        System.out.println("RtnCode: " + rtnCode);
+//		        System.out.println("merchantTradeNo.isBlank = " + (merchantTradeNo == null ? "null" : merchantTradeNo.isBlank()));
+//		        
+//		        if (merchantTradeNo == null || rtnCode == null || merchantTradeNo.isBlank()) {
+//		            return ResponseEntity.ok("0|FAIL");
+//		        }
+//		        
+//		        return ResponseEntity.ok("1|OK");
+//	        } catch (Exception e) {
+//	        	e.printStackTrace(); // 看 console 錯在哪裡
+//	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//	                    .contentType(MediaType.TEXT_PLAIN)
+//	                    .body("0|FAIL");
+//	        }
+//	    }
+	    
+	    @PostMapping(value = "handleECPayNotify")
+	    @Operation(
+	    	    summary = ApiDocConstants.USER_ECPAY_NOTIFY_SUMMARY,
+	    	    description = ApiDocConstants.USER_ECPAY_NOTIFY_DESC,
+	    	    method = "POST",
+	    	    parameters = {
+	    	        @Parameter(name = "MerchantTradeNo", description = "訂單編號（必填，13碼數字）"),
+	    	        @Parameter(name = "RtnCode", description = "綠界付款結果（必填，1=成功）")
+	    	    }
+	    	)
+	    	@ApiResponses({
+	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.ECPAY_NOTIFY_SUCCESS),
+	    	    @ApiResponse(responseCode = "200", description = ApiDocConstants.ECPAY_NOTIFY_RESPONSE_FAIL)
+	    	})
+	    public String handleECPayNotify(HttpServletRequest request) {
+	        String merchantTradeNo = request.getParameter("MerchantTradeNo");
+	        String rtnCode = request.getParameter("RtnCode");
+	        return service.handleECPayNotify(merchantTradeNo, rtnCode);
 	    }
 	    
 }

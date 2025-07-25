@@ -486,7 +486,7 @@ public class UserServiceImpl implements UserService {
 	    params.put("TotalAmount", "60");
 	    params.put("TradeDesc", URLEncoder.encode("SubscriptionPayment", StandardCharsets.UTF_8));
 	    params.put("ItemName", "VIP Subscription");
-	    params.put("ReturnURL", "https://3697b28483b1.ngrok-free.app/finbook/user/handleECPayNotify");
+	    params.put("ReturnURL", "https://a36fbdce76ea.ngrok-free.app/finbook/user/handleECPayNotify");
 	    params.put("ChoosePayment", "ALL");
 
 	    // 組成 CheckMacValue 待加密字串 
@@ -535,10 +535,19 @@ public class UserServiceImpl implements UserService {
 	        return "0|FAIL";
 	    }
 
-	    // 綠界 rtnCode = 1 表示付款成功
+	 // 綠界 rtnCode = 1 表示付款成功
 	    if ("1".equals(rtnCode)) {
 	        updateSubscription(account, true);
 	        System.out.println("[ECPay Notify] 會員 " + account + " 已升級為VIP！");
+
+	        // ====== 新增寄送 email 通知 ======
+	        // 你可以自訂信件標題與內容
+	        String subject = "【VIP訂閱成功通知】";
+	        String content = "親愛的用戶，您的VIP訂閱已付款成功，感謝您的支持！\n"
+	                       + "訂單編號：" + merchantTradeNo + "\n"
+	                       + "如有問題請聯絡客服。";
+	        
+	        emailServiceImpl.sendVerificationCode(account, subject, content);
 	    }
 
 	    System.out.println("[ECPay Notify] orderId: " + merchantTradeNo + ", account: " + account + ", rtnCode: " + rtnCode);
@@ -546,15 +555,15 @@ public class UserServiceImpl implements UserService {
 	    return "1|OK";
 	}
 	
-    private static String urlEncodeRFC3986(String raw) {
-    	try {
-    		return URLEncoder.encode(raw, "UTF-8")
-    				.replace("+", "%20")
-    				.replace("*", "%2A")
-    				.replace("%7E", "~");
-    	} catch (UnsupportedEncodingException e) {
-    		throw new RuntimeException("URLEncode error", e);
-    	}
-    }
+//    private static String urlEncodeRFC3986(String raw) {
+//    	try {
+//    		return URLEncoder.encode(raw, "UTF-8")
+//    				.replace("+", "%20")
+//    				.replace("*", "%2A")
+//    				.replace("%7E", "~");
+//    	} catch (UnsupportedEncodingException e) {
+//    		throw new RuntimeException("URLEncode error", e);
+//    	}
+//    }
     
 }

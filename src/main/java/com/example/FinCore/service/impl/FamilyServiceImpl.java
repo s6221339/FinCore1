@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.example.FinCore.constants.ResponseMessages;
+import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.FamilyInvitationDao;
 import com.example.FinCore.dao.UserDao;
@@ -59,6 +60,9 @@ public class FamilyServiceImpl implements FamilyService {
 	
 	@Autowired
 	private FamilyInvitationDao familyInvitationDao;
+	
+	@Autowired
+	private BalanceDao balanceDao;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -102,6 +106,10 @@ public class FamilyServiceImpl implements FamilyService {
 	    // 儲存資料庫
 	    familyDao.save(family);
 	    int familyId = family.getId();
+	    
+	    // >>>>>> 新增家庭帳戶 <<<<<<
+	    // 使用家庭名稱作為帳戶名稱
+	    balanceDao.createByFamliyId(familyId, family.getName(), LocalDate.now());
 
 	    // 幫所有受邀成員建立 FamilyInvitation（邀請中狀態）
 	    for (String invitee : req.getInvitor()) {

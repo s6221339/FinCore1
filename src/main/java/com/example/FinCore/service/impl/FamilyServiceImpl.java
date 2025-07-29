@@ -16,6 +16,9 @@ import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
 import com.example.FinCore.dao.FamilyDao;
 import com.example.FinCore.dao.FamilyInvitationDao;
+import com.example.FinCore.dao.PaymentDao;
+import com.example.FinCore.dao.PaymentTypeDao;
+import com.example.FinCore.dao.SavingsDao;
 import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.FamilyInvitation;
@@ -63,6 +66,15 @@ public class FamilyServiceImpl implements FamilyService {
 	
 	@Autowired
 	private BalanceDao balanceDao;
+	
+	@Autowired
+	private PaymentDao paymentDao;
+	
+	@Autowired
+	private SavingsDao savingsDao;
+	
+	@Autowired
+	private PaymentTypeDao paymentTypeDao;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -335,13 +347,39 @@ public class FamilyServiceImpl implements FamilyService {
 	        return new BasicResponse(ResponseMessages.FORBIDDEN);
 	    }
 
-	    // 3. 刪除該群組所有邀請資料（family_invitation）
-	    familyInvitationDao.deleteAllByFamilyId(req.getFamilyId());
+	    try {
+	        // 3. 查詢這個 family_id 對應的 balance（帳本）id
+	        List<Integer> balanceIdList = balanceDao.getBalanceIdListByFamilyId(req.getFamilyId());
 
-	    // 4. 執行刪除 Family
-	    familyDao.delete(family);
+	        // 4. 再查所有 payment（消費/收入）id
+	        List<Integer> paymentIdList = paymentDao.getPaymentIdListByBalanceIdList(balanceIdList);
 
-	    // 5. 回傳成功訊息
+	        // 5. 先刪除所有 payment
+	        paymentDao.deleteAllById(paymentIdList);
+
+	        // 6. 再刪除 savings（儲蓄），同樣要查 family_id 關聯的 balance
+	        savingsDao.deleteByBalanceIdList(balanceIdList);
+
+	        // 7. 刪除 family 的 balance（帳本）
+	        balanceDao.deleteAllById(balanceIdList);
+
+	        // 8. 刪除這個家族所有 paymentType（如果有設計家庭群組的收支分類）
+	        paymentTypeDao.deleteByFamilyId(req.getFamilyId());
+
+	        // 9. 刪除 family_invitation
+	        familyInvitationDao.deleteAllByFamilyId(req.getFamilyId());
+
+	        // 10. 刪除 Family 主資料
+	        familyDao.delete(family);
+
+	        // 11.（未來預留）如有其他與 family_id 關聯的擴充資料表，也在這裡刪
+	        // TODO: AI查詢資料...（預留註解）
+	    } catch (Exception e) {
+	        // 任何一個步驟出錯就丟 Exception，讓 Transaction 回滾
+	        throw e;
+	    }
+
+	    // 12. 全部刪除成功
 	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 

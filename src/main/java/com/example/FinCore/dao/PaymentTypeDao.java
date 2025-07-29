@@ -65,4 +65,13 @@ public interface PaymentTypeDao extends JpaRepository<PaymentType, PaymentTypePK
 	@Query(value = "select COUNT(type) from payment_type where type = ?1 and item = ?2 and (account = ?3 or account = 'default')", nativeQuery = true)
 	public int selectCount(String type, String item, String account);
 	
+	/**
+	 * 刪除指定 familyId 建立的所有類別與細項（家庭群組用）。
+	 * @param familyId 家庭群組ID
+	 */
+	@Transactional
+	@Modifying
+	@Query(value = "delete from payment_type where family_id = ?1", nativeQuery = true)
+	public void deleteByFamilyId(int familyId);
+	
 }

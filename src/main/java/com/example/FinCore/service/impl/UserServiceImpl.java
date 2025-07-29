@@ -137,36 +137,51 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public BasicResponse cancel(String account) throws Exception {
-		// 1. 檢查必要欄位
-		if (!StringUtils.hasText(account)) {
-			return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
-		}
+	    // 1. 檢查必要欄位：account 是否有填寫，不然直接回傳錯誤（參數檢查）
+	    if (!StringUtils.hasText(account)) {
+	        return new BasicResponse(ResponseMessages.MISSING_REQUIRED_FIELD);
+	    }
 
-		// 2. 確認帳號存在
-		int exists = userDao.selectCountByAccount(account);
-		if (exists == 0) {
-			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
-		}
+	    // 2. 確認帳號存在：資料庫查詢該帳號，查無資料直接回傳錯誤（避免亂刪）
+	    int exists = userDao.selectCountByAccount(account);
+	    if (exists == 0) {
+	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+	    }
 
-		// 3. 執行刪除
-		List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(account);
-		List<Integer> paymentIdList = paymentDao.getPaymentIdListByBalanceIdList(balanceIdList);
-		try
-		{
-			paymentDao.deleteAllById(paymentIdList);
-			savingsDao.deleteByBalanceIdList(balanceIdList);
-			
-//			TODO：AI查詢資料也要刪除
-			
-			balanceDao.deleteAllById(balanceIdList);
-			paymentTypeDao.deleteByAccount(account);
-			userDao.cancel(account);
-		}
-		catch(Exception e)
-		{
-			throw e;
-		}
-		return new BasicResponse(ResponseMessages.SUCCESS);
+	    // 3. 執行刪除
+	    // 3-1. 先查出所有該帳號關聯的 balance（帳本）id
+	    List<Integer> balanceIdList = balanceDao.getBalanceIdListByAccount(account);
+
+	    // 3-2. 再查出所有與這些 balance 有關的 payment（消費/收入）id
+	    List<Integer> paymentIdList = paymentDao.getPaymentIdListByBalanceIdList(balanceIdList);
+
+	    try
+	    {
+	        // 3-3. 先刪除所有 payment（因為這些資料有關聯，需要先刪）
+	        paymentDao.deleteAllById(paymentIdList);
+
+	        // 3-4. 再刪除 savings（儲蓄），同樣是與 balance 有關的
+	        savingsDao.deleteByBalanceIdList(balanceIdList);
+
+	        // 3-5. TODO：AI查詢相關資料如有也一併刪除（註解提示，未實作）
+
+	        // 3-6. 再刪除所有 balance（帳本本體）
+	        balanceDao.deleteAllById(balanceIdList);
+
+	        // 3-7. 刪除這個帳號的所有 paymentType（自訂分類）
+	        paymentTypeDao.deleteByAccount(account);
+
+	        // 3-8. 最後刪除會員本身
+	        userDao.cancel(account);
+	    }
+	    catch(Exception e)
+	    {
+	        // 任一筆刪除失敗，會直接把 Exception 往上拋，讓上層捕捉，這樣可以讓事務回滾（資料不會只刪一半）
+	        throw e;
+	    }
+
+	    // 4. 全部刪除成功，回傳成功訊息
+	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package com.example.FinCore.entity;
 
 import java.time.LocalDate;
 
+import com.example.FinCore.vo.TransfersVO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,8 +21,14 @@ public class Transfers
 	@Column(name = "id")
 	private int id;
 	
+	@Column(name = "from_account")
+	private String fromAccount;
+	
 	@Column(name = "from_balance")
 	private int fromBalance;
+	
+	@Column(name = "to_account")
+	private String toAccount;
 	
 	@Column(name = "to_balance")
 	private int toBalance;
@@ -39,6 +47,29 @@ public class Transfers
 	
 	@Column(name = "month")
 	private int month;
+	
+	@Column(name = "confirmed")
+	private boolean confirmed;
+	
+	public Transfers() {
+		super();
+	}
+
+	public Transfers(int id, String fromAccount, int fromBalance, String toAccount, int toBalance, int amount,
+			String description, LocalDate createDate, int year, int month, boolean confirmed) {
+		super();
+		this.id = id;
+		this.fromAccount = fromAccount;
+		this.fromBalance = fromBalance;
+		this.toAccount = toAccount;
+		this.toBalance = toBalance;
+		this.amount = amount;
+		this.description = description;
+		this.createDate = createDate;
+		this.year = year;
+		this.month = month;
+		this.confirmed = confirmed;
+	}
 
 	public int getId() {
 		return id;
@@ -48,12 +79,28 @@ public class Transfers
 		this.id = id;
 	}
 
+	public String getFromAccount() {
+		return fromAccount;
+	}
+
+	public void setFromAccount(String fromAccount) {
+		this.fromAccount = fromAccount;
+	}
+
 	public int getFromBalance() {
 		return fromBalance;
 	}
 
 	public void setFromBalance(int fromBalance) {
 		this.fromBalance = fromBalance;
+	}
+
+	public String getToAccount() {
+		return toAccount;
+	}
+
+	public void setToAccount(String toAccount) {
+		this.toAccount = toAccount;
 	}
 
 	public int getToBalance() {
@@ -103,7 +150,27 @@ public class Transfers
 	public void setMonth(int month) {
 		this.month = month;
 	}
+
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+
+	public void setConfirmed(boolean confirmed) {
+		this.confirmed = confirmed;
+	}
 	
-	
+	public TransfersVO toVO()
+	{
+		return new TransfersVO(
+				id, 
+				fromAccount, 
+				fromBalance, 
+				toAccount, 
+				toBalance, 
+				amount, 
+				description, 
+				createDate
+				);
+	}
 	
 }

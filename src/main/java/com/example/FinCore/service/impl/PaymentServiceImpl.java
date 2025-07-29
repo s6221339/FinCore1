@@ -13,8 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.example.FinCore.constants.ResponseMessages;
 import com.example.FinCore.dao.BalanceDao;
@@ -60,7 +58,6 @@ import com.example.FinCore.vo.response.StatisticsPaymentDetailsWithBalanceRespon
 import com.example.FinCore.vo.response.StatisticsPersonalBalanceWithPaymentTypeResponse;
 
 import jakarta.annotation.Nullable;
-import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 
 @EnableScheduling
@@ -145,12 +142,6 @@ public class PaymentServiceImpl implements PaymentService
 		if(payment.isDeleted())
 			return new BasicResponse(ResponseMessages.DELETED_PAYMENT_CANNOT_UPDATE);
 		
-		String modifiedPaymentOwner = balanceDao.getBalanceOwner(payment.getBalanceId());
-		HttpSession session = getSession();
-		String loginAccount = (String) session.getAttribute("account");
-		if(!loginAccount.equals(modifiedPaymentOwner))
-			return new BasicResponse(ResponseMessages.NO_PAYMENT_MODIFING_PERMISSION);
-		
 		var period = req.recurringPeriod();
 		LocalDate recordDate = req.recordDate();
 		LocalDate today = LocalDate.now();
@@ -207,13 +198,6 @@ public class PaymentServiceImpl implements PaymentService
 			return new BasicResponse(ResponseMessages.FUTURE_RECORD_DATE);
 		
 		return null;
-	}
-	
-	private HttpSession getSession()
-	{
-		return ((ServletRequestAttributes) RequestContextHolder
-				.getRequestAttributes())
-				.getRequest().getSession();
 	}
 
 	@Override

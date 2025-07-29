@@ -117,4 +117,16 @@ public class TransfersController
 		return service.getAllByBalanceId(balanceId);
 	}
 	
+	@PostMapping(value = "confirm")
+	public BasicResponse confirm(@RequestParam("tId") int transfersId, @RequestParam("bId") int balanceId)
+	{
+		return service.confirm(transfersId, balanceId);
+	}
+	
+	@PostMapping(value = "getNotConfirm")
+	public BasicResponse getNotConfirmTransfers()
+	{
+		return service.getNotConfirmTransfers();
+	}
+	
 }

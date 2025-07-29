@@ -215,6 +215,10 @@ public interface PaymentDao extends JpaRepository<Payment, Integer>
 	@Query(value = "update payment set delete_date = null where payment_id in (?1)", nativeQuery = true)
 	public void undoDeleted(List<Integer> paymentIdList);
 	
+	/**
+	 * 取得當前資料庫最新一筆變動資料的編號。
+	 * @return 資料編號
+	 */
 	@Query(value = "select MAX(payment_id) from payment", nativeQuery = true)
 	public int getLastedId();
 	

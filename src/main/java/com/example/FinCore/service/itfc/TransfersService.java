@@ -37,4 +37,14 @@ public interface TransfersService
 	 */
 	public TransfersListResponse getAllByBalanceId(int balanceId);
 	
+	/**
+	 * 確認轉帳紀錄將要匯入到哪一個帳戶。
+	 * @param transfersId 指定轉帳紀錄
+	 * @param balanceId 指定帳戶
+	 * @return 基本回應封裝資料
+	 */
+	public BasicResponse confirm(int transfersId, int balanceId);
+	
+	public TransfersListResponse getNotConfirmTransfers();
+	
 }

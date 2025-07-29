@@ -3,6 +3,7 @@ package com.example.FinCore.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,9 @@ import com.example.FinCore.dao.UserDao;
 import com.example.FinCore.entity.Balance;
 import com.example.FinCore.entity.Family;
 import com.example.FinCore.entity.Payment;
+import com.example.FinCore.entity.Transfers;
 import com.example.FinCore.entity.User;
+import com.example.FinCore.service.itfc.LoginService;
 import com.example.FinCore.service.itfc.TransfersService;
 import com.example.FinCore.vo.TransfersVO;
 import com.example.FinCore.vo.request.CreateTransfersRequest;
@@ -43,55 +46,47 @@ public class TransfersServiceImpl implements TransfersService
 	
 	@Autowired
 	private FamilyDao familyDao;
+	
+	@Autowired
+	private LoginService loginService;
 
-	@Transactional(rollbackOn = Exception.class)
 	@Override
 	public BasicResponse create(CreateTransfersRequest req) throws Exception
 	{
-		if(req.fromBalance() == req.toBalance())
-			return new BasicResponse(ResponseMessages.SAME_BALANCE_OPERATION);
+		User currentLogin = loginService.getData();
+		if(currentLogin == null)
+			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
 		
-		Balance from = balanceDao.getReferenceById(req.fromBalance());
-		Balance to = balanceDao.getReferenceById(req.toBalance());
-		if(from == null || to == null)
+		Optional<User> toAccOpt = userDao.findById(req.toAccount());
+		if(toAccOpt.isEmpty())
+			return new BasicResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
+					
+		List<Family> allFamilies = familyDao.findAll();
+		boolean flag = false;
+		for(Family f : allFamilies)
+			if(f.isMember(currentLogin, toAccOpt.get()))
+			{
+				flag = true;
+				break;
+			}
+		if(!flag)
+			return new BasicResponse(ResponseMessages.UNABLE_TRANSFERS_TO_DIFF_FAMILY_ACCOUNT);
+		
+		List<Balance> fromBlcList = balanceDao.getAllBalanceByAccount(currentLogin.getAccount());
+		if(!fromBlcList.stream().map(t -> t.getBalanceId()).toList().contains(req.fromBalance()))
 			return new BasicResponse(ResponseMessages.BALANCE_NOT_FOUND);
 		
-		if(from.belongToFamily() || to.belongToFamily())
-			return new BasicResponse(ResponseMessages.UNABLE_TRANSFERS_TO_FAMILY_BALANCE);
-		
-		if(from.belongToAccount() && to.belongToAccount() && from.getAccount() != to.getAccount())
-		{
-			List<Family> allFamilyList = familyDao.findAll();
-			/* 用來確認是否找到同一個群組的旗標 */
-			boolean flag = false;
-			for(Family f : allFamilyList)
-				if(f.isMember(from.getAccount(), to.getAccount()))
-				{
-					flag = true;
-					break;
-				}
-			
-			if(!flag)
-				return new BasicResponse(ResponseMessages.UNABLE_TRANSFERS_TO_DIFF_FAMILY_ACCOUNT);
-		}
-		
 		LocalDate today = LocalDate.now();
-		transfersDao.create(
-				req.fromBalance(), 
-				req.toBalance(), 
+		Transfers transfers = new Transfers(
+				0, 
+				currentLogin.getAccount(), req.fromBalance(), 
+				req.toAccount(), 0, 
 				req.amount(), 
 				req.description(), 
-				today, today.getYear(), today.getMonthValue()
+				today, today.getYear(), today.getMonthValue(), 
+				false
 				);
-		
-		Payment p_in = Payment.ofTransfersIn(req.toBalance(), req.description(), req.amount());
-		paymentDao.save(p_in);
-		
-		Payment p_out = Payment.ofTransfersOut(req.fromBalance(), req.description(), req.amount());
-//		必須要手動設定 PaymentId，否則會併發「NonUniqueObjectException」
-//		參照：https://www.cnblogs.com/xiaotiaosi/p/6489573.html
-		p_out.setPaymentId(paymentDao.getLastedId() + 1);
-		paymentDao.save(p_out);
+		transfersDao.save(transfers);
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
@@ -134,16 +129,64 @@ public class TransfersServiceImpl implements TransfersService
 		var transfersList = transfersDao.getAllTransfersByBalanceId(balanceId);
 		List<TransfersVO> voList = new ArrayList<>();
 		transfersList.forEach(transfers -> {
-			voList.add(new TransfersVO(
-					transfers.getId(), 
-					transfers.getFromBalance(), 
-					transfers.getToBalance(), 
-					transfers.getAmount(), 
-					transfers.getDescription(), 
-					transfers.getCreateDate()
-					));
+			voList.add(transfers.toVO());
 		});
 		return new TransfersListResponse(ResponseMessages.SUCCESS, voList);
+	}
+	
+	@Transactional(rollbackOn = Exception.class)
+	public BasicResponse confirm(int transfersId, int balanceId)
+	{
+		User currentUser = loginService.getData();
+		if(currentUser == null)
+			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
+		
+		Optional<Transfers> transOpt = transfersDao.findById(transfersId);
+		if(transOpt.isEmpty())
+			return new BasicResponse(ResponseMessages.TRANSFERS_NOT_FOUND);
+		
+		List<Balance> balanceList = balanceDao.getAllBalanceByAccount(currentUser.getAccount());
+		if(!balanceList.stream().map(t -> t.getBalanceId()).toList().contains(balanceId))
+			return new BasicResponse(ResponseMessages.FORBIDDEN);
+		
+		Transfers transfers = transOpt.get();
+		if(transfers.isConfirmed())
+			return new BasicResponse(ResponseMessages.TRANSFERS_ALREADY_SET);
+		
+		transfers.setToBalance(balanceId);
+		transfers.setConfirmed(true);
+		transfersDao.save(transfers);
+		
+		Payment p_in = Payment.ofTransfersIn(balanceId, transfers.getDescription(), transfers.getAmount());
+		paymentDao.save(p_in);
+		
+		Payment p_out = Payment.ofTransfersOut(transfers.getFromBalance(), transfers.getDescription(), transfers.getAmount());
+		p_out.setPaymentId(paymentDao.getLastedId() + 1);
+		paymentDao.save(p_out);
+		return new BasicResponse(ResponseMessages.SUCCESS);
+	}
+	
+	public TransfersListResponse getNotConfirmTransfers()
+	{
+		User currentUser = loginService.getData();
+		if(currentUser == null)
+			return new TransfersListResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
+		
+//		List<Transfers> test = transfersDao.findAll();
+//		List<Transfers> temp = new ArrayList<>();
+//		for(Transfers t : test)
+//		{
+//			String to = t.getToAccount();
+//			String userAcc = currentUser.getAccount();
+//			if()
+//		}
+		List<TransfersVO> result = transfersDao.findAll().stream()
+				.filter(t -> t.getToAccount() != null)
+				.filter(t -> t.getToAccount().equals(currentUser.getAccount()) && !t.isConfirmed())
+				.map(t -> t.toVO())
+				.toList();
+		
+		return new TransfersListResponse(ResponseMessages.SUCCESS, result);
 	}
 
 }

@@ -147,5 +147,11 @@ public class Family {
 		return memberList.containsAll(List.of(accountList));
 	}
 	
+	public boolean isMember(User... users)
+	{
+		List<String> accountList = List.of(users).stream().map(t -> t.getAccount()).toList();
+		return isMember(accountList.stream().toArray(String[]::new));
+	}
+	
 
 }

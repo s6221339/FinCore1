@@ -363,23 +363,20 @@ public class FamilyServiceImpl implements FamilyService {
 	        // 7. 刪除 family 的 balance（帳本）
 	        balanceDao.deleteAllById(balanceIdList);
 
-	        // 8. 刪除這個家族所有 paymentType（如果有設計家庭群組的收支分類）
-	        paymentTypeDao.deleteByFamilyId(req.getFamilyId());
-
-	        // 9. 刪除 family_invitation
+	        // 8. 刪除 family_invitation
 	        familyInvitationDao.deleteAllByFamilyId(req.getFamilyId());
 
-	        // 10. 刪除 Family 主資料
+	        // 9. 刪除 Family 主資料
 	        familyDao.delete(family);
 
-	        // 11.（未來預留）如有其他與 family_id 關聯的擴充資料表，也在這裡刪
+	        // 10.（未來預留）如有其他與 family_id 關聯的擴充資料表，也在這裡刪
 	        // TODO: AI查詢資料...（預留註解）
 	    } catch (Exception e) {
 	        // 任何一個步驟出錯就丟 Exception，讓 Transaction 回滾
 	        throw e;
 	    }
 
-	    // 12. 全部刪除成功
+	    // 11. 全部刪除成功
 	    return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 

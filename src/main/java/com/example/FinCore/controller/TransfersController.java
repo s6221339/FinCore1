@@ -44,8 +44,8 @@ public class TransfersController
 			)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS),
-		@ApiResponse(responseCode = "400", description = ApiDocConstants.SAME_BALANCE_OPERATION),
-		@ApiResponse(responseCode = "404", description = ApiDocConstants.BALANCE_NOT_FOUND + "（任一不存在皆會觸發）")
+		@ApiResponse(responseCode = "400", description = ApiDocConstants.TRANSFERS_CREATE_RESPONSE_400),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.TRANSFERS_CREATE_RESPONSE_404)
 	})
 	public BasicResponse create(@Valid @RequestBody CreateTransfersRequest req)
 			throws Exception
@@ -118,12 +118,38 @@ public class TransfersController
 	}
 	
 	@PostMapping(value = "confirm")
+	@Operation(
+			summary = ApiDocConstants.TRANSFERS_CONFIRM_SUMMARY,
+			description = ApiDocConstants.TRANSFERS_CONFIRM_DESC,
+			parameters = {
+				@Parameter(name = "tId", description = "轉帳紀錄 ID"),
+				@Parameter(name = "bId", description = "目標帳戶 ID")
+			}
+		)
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ApiDocConstants.UPDATE_SUCCESS),
+		@ApiResponse(responseCode = "400", description = ApiDocConstants.TRANSFERS_CONFIRM_RESPONSE_400),
+		@ApiResponse(responseCode = "403", description = ApiDocConstants.FORBIDDEN),
+		@ApiResponse(responseCode = "404", description = ApiDocConstants.TRANSFERS_CONFIRM_RESPONSE_404)
+	})
 	public BasicResponse confirm(@RequestParam("tId") int transfersId, @RequestParam("bId") int balanceId)
 	{
 		return service.confirm(transfersId, balanceId);
 	}
 	
 	@PostMapping(value = "getNotConfirm")
+	@Operation(
+			summary = ApiDocConstants.TRANSFERS_GET_NOT_CONFIRM_SUMMARY,
+			description = ApiDocConstants.TRANSFERS_GET_NOT_CONFIRM_DESC
+		)
+	@ApiResponses(value = {
+		@ApiResponse(
+			responseCode = "200",
+			description = ApiDocConstants.SEARCH_SUCCESS,
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransfersListResponse.class))
+		),
+		@ApiResponse(responseCode = "400", description = ApiDocConstants.PLEASE_LOGIN_FIRST)
+	})
 	public BasicResponse getNotConfirmTransfers()
 	{
 		return service.getNotConfirmTransfers();

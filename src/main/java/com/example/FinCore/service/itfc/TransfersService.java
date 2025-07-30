@@ -45,6 +45,10 @@ public interface TransfersService
 	 */
 	public BasicResponse confirm(int transfersId, int balanceId);
 	
+	/**
+	 * 取得尚未被登入者確認的所有轉帳紀錄資料。
+	 * @return 尚未被確認的所有轉帳紀錄資料
+	 */
 	public TransfersListResponse getNotConfirmTransfers();
 	
 }

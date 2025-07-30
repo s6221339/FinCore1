@@ -171,15 +171,7 @@ public class TransfersServiceImpl implements TransfersService
 		User currentUser = loginService.getData();
 		if(currentUser == null)
 			return new TransfersListResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
-		
-//		List<Transfers> test = transfersDao.findAll();
-//		List<Transfers> temp = new ArrayList<>();
-//		for(Transfers t : test)
-//		{
-//			String to = t.getToAccount();
-//			String userAcc = currentUser.getAccount();
-//			if()
-//		}
+
 		List<TransfersVO> result = transfersDao.findAll().stream()
 				.filter(t -> t.getToAccount() != null)
 				.filter(t -> t.getToAccount().equals(currentUser.getAccount()) && !t.isConfirmed())

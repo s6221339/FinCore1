@@ -51,4 +51,11 @@ public interface TransfersService
 	 */
 	public TransfersListResponse getNotConfirmTransfers();
 	
+	/**
+	 * 讓發送帳款轉移的對象將紀錄撤回。
+	 * @param transfersId 指定轉帳紀錄
+	 * @return 基本回應封裝資料
+	 */
+	public BasicResponse retract(int transfersId);
+	
 }

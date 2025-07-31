@@ -128,9 +128,10 @@ public class TransfersServiceImpl implements TransfersService
 		
 		var transfersList = transfersDao.getAllTransfersByBalanceId(balanceId);
 		List<TransfersVO> voList = new ArrayList<>();
-		transfersList.forEach(transfers -> {
-			voList.add(transfers.toVO());
-		});
+		transfersList.stream()
+		.filter(t -> t.isConfirmed())
+		.toList()
+		.forEach(transfers -> voList.add(transfers.toVO()));
 		return new TransfersListResponse(ResponseMessages.SUCCESS, voList);
 	}
 	
@@ -179,6 +180,27 @@ public class TransfersServiceImpl implements TransfersService
 				.toList();
 		
 		return new TransfersListResponse(ResponseMessages.SUCCESS, result);
+	}
+	
+	public BasicResponse retract(int transfersId)
+	{
+		User currentUser = loginService.getData();
+		if(currentUser == null)
+			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
+
+		Optional<Transfers> transfersOpt = transfersDao.findById(transfersId);
+		if(transfersOpt.isEmpty())
+			return new BasicResponse(ResponseMessages.TRANSFERS_NOT_FOUND);
+		
+		Transfers transfers = transfersOpt.get();
+		if(transfers.isConfirmed())
+			return new BasicResponse(ResponseMessages.TRANSFERS_ALREADY_SET);
+		
+		if(!transfers.getFromAccount().equals(currentUser.getAccount()))
+			return new BasicResponse(ResponseMessages.NO_PERMISSION);
+		
+		transfersDao.delete(transfers);
+		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
 
 }

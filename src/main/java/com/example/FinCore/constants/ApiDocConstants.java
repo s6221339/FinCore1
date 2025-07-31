@@ -22,6 +22,8 @@ public final class ApiDocConstants
 	
 	public static final String TRANSFERS_GET_NOT_CONFIRM_SUMMARY = "取得尚未確認之轉帳紀錄";
 
+	public static final String TRANSFERS_RETRACT_SUMMARY = "撤回帳款轉移";
+	
 	public final static String SAVINGS_GET_ALL_SUMMARY = "取得帳號的所有儲蓄設定";
 	
 	public final static String PAYMENT_CREATE_SUMMARY = "新增帳款";
@@ -161,6 +163,8 @@ public final class ApiDocConstants
 	public static final String TRANSFERS_CONFIRM_DESC = "確認一筆帳款轉移紀錄，並生成雙邊付款紀錄。<br>";
 
 	public static final String TRANSFERS_GET_NOT_CONFIRM_DESC = "取得所有尚未被登入使用者確認的轉帳紀錄資料<br>";
+	
+	public static final String TRANSFERS_RETRACT_DESC = "帳款轉移_撤回_DESC<br>";
 	
 	public final static String SAVINGS_GET_ALL_DESC = "取得帳號的所有儲蓄設定<br>";
 	
@@ -528,6 +532,8 @@ public final class ApiDocConstants
 	
 	public static final String MEMBER_NOT_FOUND = "家族成員不存在";
 	
+	public static final String TRANSFERS_NOT_FOUND = "查無此轉帳紀錄";
+	
 	public final static String TRANSFERS_CREATE_RESPONSE_400 = 
 			"""
 			<ol>
@@ -560,6 +566,14 @@ public final class ApiDocConstants
 			查無此轉帳紀錄！
 			""";
 	
+	public static final String TRANSFERS_RETRACT_RESPONSE_400 =
+			"""
+			<ol>
+				<li>請先登入！</li>
+				<li>轉帳資料已被設定</li>
+			</ol>
+			""";
+
 	public final static String SAME_BALANCE_OPERATION = "無法對同一個帳戶進行操作";
 	
 	public final static String NOT_SUPER_ADMIN = "執行者不是超級管理員";

@@ -155,4 +155,27 @@ public class TransfersController
 		return service.getNotConfirmTransfers();
 	}
 	
+	@PostMapping(value = "retract")
+	@Operation(
+			summary = ApiDocConstants.TRANSFERS_RETRACT_SUMMARY,
+			description = ApiDocConstants.TRANSFERS_RETRACT_DESC,
+			parameters = {
+				@Parameter(name = "tId", description = "指定轉帳紀錄 ID")
+			},
+			responses = {
+				@ApiResponse(
+					responseCode = "200",
+					description = ApiDocConstants.DELETE_SUCCESS,
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BasicResponse.class))
+				),
+				@ApiResponse(responseCode = "400", description = ApiDocConstants.TRANSFERS_RETRACT_RESPONSE_400),
+				@ApiResponse(responseCode = "403", description = ApiDocConstants.FORBIDDEN),
+				@ApiResponse(responseCode = "404", description = ApiDocConstants.TRANSFERS_NOT_FOUND)
+			}
+		)
+	public BasicResponse retract(@RequestParam("tId") int transfersId)
+	{
+		return service.retract(transfersId);
+	}
+	
 }

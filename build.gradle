@@ -33,6 +33,7 @@ dependencies {
  	implementation 'org.springframework.boot:spring-boot-starter-mail'
  	//avatar 頭像
  	implementation 'net.coobird:thumbnailator:0.4.20'
+ 	implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.0'
  	// 智譜AI
  	// implementation 'org.springframework.ai:spring-ai-starter-model-zhipuai'
 	

@@ -169,13 +169,36 @@ public class TransfersController
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BasicResponse.class))
 				),
 				@ApiResponse(responseCode = "400", description = ApiDocConstants.TRANSFERS_RETRACT_RESPONSE_400),
-				@ApiResponse(responseCode = "403", description = ApiDocConstants.FORBIDDEN),
+				@ApiResponse(responseCode = "403", description = ApiDocConstants.FORBIDDEN + "：如果執行者不是發送方"),
 				@ApiResponse(responseCode = "404", description = ApiDocConstants.TRANSFERS_NOT_FOUND)
 			}
 		)
 	public BasicResponse retract(@RequestParam("tId") int transfersId)
 	{
 		return service.retract(transfersId);
+	}
+	
+	@PostMapping(value = "reject")
+	@Operation(
+			summary = ApiDocConstants.TRANSFERS_REJECT_SUMMARY,
+			description = ApiDocConstants.TRANSFERS_REJECT_DESC,
+			parameters = {
+				@Parameter(name = "tId", description = "指定轉帳紀錄 ID")
+			},
+			responses = {
+				@ApiResponse(
+					responseCode = "200",
+					description = ApiDocConstants.DELETE_SUCCESS,
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BasicResponse.class))
+				),
+				@ApiResponse(responseCode = "400", description = ApiDocConstants.TRANSFERS_REJECT_RESPONSE_400),
+				@ApiResponse(responseCode = "403", description = ApiDocConstants.FORBIDDEN + "：如果執行者不是接收方"),
+				@ApiResponse(responseCode = "404", description = ApiDocConstants.TRANSFERS_NOT_FOUND)
+			}
+		)
+	public BasicResponse reject(int transfersId)
+	{
+		return service.reject(transfersId);
 	}
 	
 }

@@ -202,5 +202,26 @@ public class TransfersServiceImpl implements TransfersService
 		transfersDao.delete(transfers);
 		return new BasicResponse(ResponseMessages.SUCCESS);
 	}
+	
+	public BasicResponse reject(int transfersId)
+	{
+		User currentUser = loginService.getData();
+		if(currentUser == null)
+			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
+
+		Optional<Transfers> transfersOpt = transfersDao.findById(transfersId);
+		if(transfersOpt.isEmpty())
+			return new BasicResponse(ResponseMessages.TRANSFERS_NOT_FOUND);
+		
+		Transfers transfers = transfersOpt.get();
+		if(transfers.isConfirmed())
+			return new BasicResponse(ResponseMessages.TRANSFERS_ALREADY_SET);
+		
+		if(!transfers.getToAccount().equals(currentUser.getAccount()))
+			return new BasicResponse(ResponseMessages.FORBIDDEN);
+		
+		transfersDao.delete(transfers);
+		return new BasicResponse(ResponseMessages.SUCCESS);
+	}
 
 }

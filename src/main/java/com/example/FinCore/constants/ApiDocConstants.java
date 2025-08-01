@@ -16,13 +16,15 @@ public final class ApiDocConstants
 	
 	public final static String TRANSFERS_DELETE_BY_BALANCE_ID_SUMMARY = "刪除帳戶的轉帳紀錄";
 	
-	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_SUMMARY = "取得帳戶的轉帳紀錄資料";
+	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_SUMMARY = "取得帳戶的所有帳款轉移紀錄";
 	
-	public static final String TRANSFERS_CONFIRM_SUMMARY = "確認轉帳";
+	public static final String TRANSFERS_CONFIRM_SUMMARY = "同意接收帳款轉移";
 	
-	public static final String TRANSFERS_GET_NOT_CONFIRM_SUMMARY = "取得尚未確認之轉帳紀錄";
+	public static final String TRANSFERS_GET_NOT_CONFIRM_SUMMARY = "取得尚未確認之帳款轉移紀錄";
 
 	public static final String TRANSFERS_RETRACT_SUMMARY = "撤回帳款轉移";
+	
+	public static final String TRANSFERS_REJECT_SUMMARY = "拒絕接收帳款轉移";
 	
 	public final static String SAVINGS_GET_ALL_SUMMARY = "取得帳號的所有儲蓄設定";
 	
@@ -158,13 +160,15 @@ public final class ApiDocConstants
 	public final static String TRANSFERS_DELETE_BY_BALANCE_ID_DESC = "刪除所有關聯兩個帳戶的轉帳紀錄，注意該操作會永久刪除資料。"
 			+ "該操作必須在兩個帳戶均不存在才可執行，否則操作失敗。<br>";
 	
-	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_DESC = "取得指定帳戶的所有轉帳紀錄資料。<br>";
+	public final static String TRANSFERS_GET_ALL_BY_BALANCE_ID_DESC = "取得指定帳戶的所有轉帳紀錄資料，沒有被接收方同意的紀錄不會顯示<br>";
 	
 	public static final String TRANSFERS_CONFIRM_DESC = "確認一筆帳款轉移紀錄，並生成雙邊付款紀錄。<br>";
 
 	public static final String TRANSFERS_GET_NOT_CONFIRM_DESC = "取得所有尚未被登入使用者確認的轉帳紀錄資料<br>";
 	
-	public static final String TRANSFERS_RETRACT_DESC = "帳款轉移_撤回_DESC<br>";
+	public static final String TRANSFERS_RETRACT_DESC = "由<b>「發送」</b>帳款轉移請求的使用者<b>「撤回」</b>該請求<br>";
+	
+	public static final String TRANSFERS_REJECT_DESC = "由<b>「接收」</b>帳款轉移請求的使用者<b>「拒絕」</b>該請求<br>";
 	
 	public final static String SAVINGS_GET_ALL_DESC = "取得帳號的所有儲蓄設定<br>";
 	
@@ -567,6 +571,14 @@ public final class ApiDocConstants
 			""";
 	
 	public static final String TRANSFERS_RETRACT_RESPONSE_400 =
+			"""
+			<ol>
+				<li>請先登入！</li>
+				<li>轉帳資料已被設定</li>
+			</ol>
+			""";
+
+	public static final String TRANSFERS_REJECT_RESPONSE_400 =
 			"""
 			<ol>
 				<li>請先登入！</li>

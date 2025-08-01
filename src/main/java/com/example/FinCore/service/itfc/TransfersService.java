@@ -58,4 +58,11 @@ public interface TransfersService
 	 */
 	public BasicResponse retract(int transfersId);
 	
+	/**
+	 * 讓接收帳款轉移的對象拒絕請求。
+	 * @param transfersId 指定轉帳紀錄
+	 * @return 基本回應封裝資料
+	 */
+	public BasicResponse reject(int transfersId);
+	
 }

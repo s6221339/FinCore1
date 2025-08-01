@@ -82,7 +82,7 @@ public class TransfersServiceImpl implements TransfersService
 				currentLogin.getAccount(), req.fromBalance(), 
 				req.toAccount(), 0, 
 				req.amount(), 
-				req.description(), 
+				req.description() == null ? "" : req.description(), 
 				today, today.getYear(), today.getMonthValue(), 
 				false
 				);
@@ -197,7 +197,7 @@ public class TransfersServiceImpl implements TransfersService
 			return new BasicResponse(ResponseMessages.TRANSFERS_ALREADY_SET);
 		
 		if(!transfers.getFromAccount().equals(currentUser.getAccount()))
-			return new BasicResponse(ResponseMessages.NO_PERMISSION);
+			return new BasicResponse(ResponseMessages.FORBIDDEN);
 		
 		transfersDao.delete(transfers);
 		return new BasicResponse(ResponseMessages.SUCCESS);

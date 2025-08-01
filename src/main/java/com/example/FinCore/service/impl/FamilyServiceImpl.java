@@ -648,16 +648,13 @@ public class FamilyServiceImpl implements FamilyService {
 	        return new BasicResponse(ResponseMessages.FAMILY_NOT_FOUND);
 	    }
 	    Family family = familyOpt.get();
-
 	    String memberAccount = req.getMemberAccount();
 
-	    // 2. 檢查欲退出成員是否在家族中（owner 或 invitor）
+	    // 2. 檢查成員是否在家族（owner或invitor）
 	    boolean inFamily = false;
 	    String invitorStr = family.getInvitor();
 	    List<String> invitorList = null;
-	    if (family.getOwner().equals(memberAccount)) {
-	        inFamily = true;
-	    }
+	    if (family.getOwner().equals(memberAccount)) inFamily = true;
 	    if (invitorStr != null && !invitorStr.isEmpty()) {
 	        try {
 	            invitorList = family.toMemberList();
@@ -672,45 +669,62 @@ public class FamilyServiceImpl implements FamilyService {
 	        return new BasicResponse(ResponseMessages.ACCOUNT_NOT_IN_FAMILY);
 	    }
 
-	    // 3. 判斷是否為 owner
+	    // 3. 判斷是否為owner，處理退出邏輯
 	    if (family.getOwner().equals(memberAccount)) {
-	        // 檢查是否只有 owner 一人
-	        if (invitorList == null || invitorList.isEmpty()) {
-	            // 只剩 owner，直接解散群組（包含刪除 family_invitation）
-	            familyInvitationDao.deleteAllByFamilyId(req.getFamilyId());
-	            familyDao.delete(family);
+	        // 檢查是否「只剩owner一人」
+	        boolean onlyOwner = (invitorList == null || invitorList.isEmpty());
+
+	        if (onlyOwner) {
+	            // ===【1. 最後一人退出，等同於解散家庭，刪除全部相關資料】===
+	            try {
+	                // 查出family_id下所有balance（帳戶）id
+	                List<Integer> balanceIdList = balanceDao.getBalanceIdListByFamilyId(req.getFamilyId());
+	                // 查出所有payment（消費/收入）id
+	                List<Integer> paymentIdList = paymentDao.getPaymentIdListByBalanceIdList(balanceIdList);
+	                // 先刪所有payment
+	                paymentDao.deleteAllById(paymentIdList);
+	                // 再刪儲蓄（savings）
+	                savingsDao.deleteByBalanceIdList(balanceIdList);
+	                // 再刪帳戶（balance）
+	                balanceDao.deleteAllById(balanceIdList);
+	                // 刪除所有邀請（family_invitation）
+	                familyInvitationDao.deleteAllByFamilyId(req.getFamilyId());
+	                // 刪除主資料
+	                familyDao.delete(family);
+	                // 預留：若有其它相關資料，記得加在這裡
+	            } catch (Exception e) {
+	                throw e; // 任一失敗就rollback
+	            }
 	            return new BasicResponse(ResponseMessages.SUCCESS);
 	        } else {
-	            // 有成員可指派，owner 退出並升級第一位成員為新 owner
+	            // ===【2. 還有成員，owner退出→指派新owner】===
 	            String newOwner = invitorList.get(0);
 	            invitorList.remove(0);
 
 	            try {
-	    	    	family.toInvitor(invitorList);
-//	    	    	family.setInvitor(mapper.writeValueAsString(invitorList));
-	    	    } catch (Exception e) {
-	    	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
-	    	    }
+	                // 更新invitor欄位
+	                family.toInvitor(invitorList); // 你的toInvitor應該是set方法
+	            } catch (Exception e) {
+	                return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	            }
 
 	            family.setOwner(newOwner);
 	            familyDao.save(family);
 
-	            // owner 退出 → 刪除原 owner 在邀請表的紀錄（若有）
+	            // owner退出 → 刪除原owner在邀請表的紀錄（若有）
 	            familyInvitationDao.deleteByAccountAndFamilyId(memberAccount, req.getFamilyId());
 	            return new BasicResponse(ResponseMessages.SUCCESS);
 	        }
 	    } else {
-	        // 4. 一般成員退出
+	        // ===【3. 一般成員退出】===
 	        if (invitorList == null || !invitorList.remove(memberAccount)) {
 	            return new BasicResponse(ResponseMessages.MEMBER_NOT_FOUND);
 	        }
-
 	        try {
-    	    	family.toInvitor(invitorList);
-//    	    	family.setInvitor(mapper.writeValueAsString(invitorList));
-    	    } catch (Exception e) {
-    	        return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
-    	    }
+	            family.toInvitor(invitorList);
+	        } catch (Exception e) {
+	            return new BasicResponse(ResponseMessages.UPDATE_FAMILY_FAIL);
+	        }
 	        familyDao.save(family);
 
 	        // 刪除 family_invitation 紀錄
@@ -718,8 +732,6 @@ public class FamilyServiceImpl implements FamilyService {
 	        return new BasicResponse(ResponseMessages.SUCCESS);
 	    }
 	}
-	
-	
 
 	@Override
 	public BasicResponse renameFamily(RenameFamilyRequest req) {

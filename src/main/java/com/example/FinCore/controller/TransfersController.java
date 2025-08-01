@@ -196,7 +196,7 @@ public class TransfersController
 				@ApiResponse(responseCode = "404", description = ApiDocConstants.TRANSFERS_NOT_FOUND)
 			}
 		)
-	public BasicResponse reject(int transfersId)
+	public BasicResponse reject(@RequestParam("tId") int transfersId)
 	{
 		return service.reject(transfersId);
 	}

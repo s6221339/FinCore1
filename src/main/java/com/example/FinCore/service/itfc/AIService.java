@@ -16,17 +16,21 @@ public final class AIService
 	
 	private final ChatClient chatClient;
 	
-	@Value("classpath::code.st")
-	private Resource templateResourceFromCodest;
+	@Value("classpath::ai_analysis.st")
+	private Resource templateResourceFromAIAnalysis;
 	
 	public AIService(ChatClient.Builder builder)
 	{
 		this.chatClient = builder.build();
 	}
 	
-	public String templateFromFileCode(String language, String methodName) {
-		PromptTemplate promptTemplate = new PromptTemplate(templateResourceFromCodest);
-		Prompt prompt = promptTemplate.create(Map.of("language", language, "methodName", methodName));
+	public String templateFromFileCode(String balances, String payments, String statistics) {
+		PromptTemplate promptTemplate = new PromptTemplate(templateResourceFromAIAnalysis);
+		Prompt prompt = promptTemplate.create(Map.of(
+				"balances", balances, 
+				"payments", payments,
+				"statistics", statistics
+				));
 		ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
 		return response.getResult().getOutput().getText();
 	}

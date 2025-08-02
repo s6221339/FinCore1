@@ -44,10 +44,12 @@ public enum ResponseMessages
 	RECURRING_PAYMENT_UPDATE_FAILED(400, "固定帳款更新失敗（請檢查更新資料是否包含記帳日期）"),
 	INVALID_PAYMENT_DATE(400, "無效的記帳日期"),
 	TRANSFERS_ALREADY_SET(400, "轉帳資料已被設定"),
+	DATA_HAS_BEEN_ANALYSED(400, "資料已分析，無法再次分析（請啟用 forcedWrite）"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),
     NO_PAYMENT_MODIFING_PERMISSION(403, "無法修改他人的帳款資料"),
+    TEST_API_ONLY(403, "此 API 僅供測試時使用！"),
 	
     NOT_FOUND(404, "查無資料"),
 	ACCOUNT_NOT_FOUND(404, "查無此帳號！"),
@@ -60,7 +62,8 @@ public enum ResponseMessages
 	FAMLIY_NOT_FOUND(404, "查無此群組（家庭）！"),
 	TRANSFERS_NOT_FOUND(404, "查無此轉帳紀錄！"),
 	INVITATION_NOT_FOUND(404, "查無此邀請紀錄！"),
-
+	NO_PAYMENT_DATA(404, "沒有帳款資料"),
+	
 	NULL_ACCOUNT(500, "account 傳參空白！"),
 	NULL_SAVINGS_VALUE(500, "Savings取值錯誤。原因：該帳戶不存在 Savings 設定"),
 	INVALID_SESSION(500, "無效的 SESSION");

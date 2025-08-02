@@ -184,26 +184,21 @@ public class TransfersServiceImpl implements TransfersService
 	
 	public BasicResponse retract(int transfersId)
 	{
-		User currentUser = loginService.getData();
-		if(currentUser == null)
-			return new BasicResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
-
-		Optional<Transfers> transfersOpt = transfersDao.findById(transfersId);
-		if(transfersOpt.isEmpty())
-			return new BasicResponse(ResponseMessages.TRANSFERS_NOT_FOUND);
-		
-		Transfers transfers = transfersOpt.get();
-		if(transfers.isConfirmed())
-			return new BasicResponse(ResponseMessages.TRANSFERS_ALREADY_SET);
-		
-		if(!transfers.getFromAccount().equals(currentUser.getAccount()))
-			return new BasicResponse(ResponseMessages.FORBIDDEN);
-		
-		transfersDao.delete(transfers);
-		return new BasicResponse(ResponseMessages.SUCCESS);
+		return runRetractOrReject(transfersId, true);
 	}
 	
 	public BasicResponse reject(int transfersId)
+	{
+		return runRetractOrReject(transfersId, false);
+	}
+	
+	/**
+	 * retract() 和 reject() 的共同方法，用 switcher 切換模式
+	 * @param transfersId 帳款轉移編號
+	 * @param switcher 設為 true 時執行 retract()
+	 * @return 基本回應資料
+	 */
+	private BasicResponse runRetractOrReject(int transfersId, boolean switcher)
 	{
 		User currentUser = loginService.getData();
 		if(currentUser == null)
@@ -217,7 +212,10 @@ public class TransfersServiceImpl implements TransfersService
 		if(transfers.isConfirmed())
 			return new BasicResponse(ResponseMessages.TRANSFERS_ALREADY_SET);
 		
-		if(!transfers.getToAccount().equals(currentUser.getAccount()))
+		if(switcher && !transfers.getFromAccount().equals(currentUser.getAccount()))
+			return new BasicResponse(ResponseMessages.FORBIDDEN);
+		
+		if(!switcher && !transfers.getToAccount().equals(currentUser.getAccount()))
 			return new BasicResponse(ResponseMessages.FORBIDDEN);
 		
 		transfersDao.delete(transfers);

@@ -59,5 +59,7 @@ public class ConstantsMessage {
 	public final static String PARAM_PASSWORD_FORMAT_ERROR = "密碼格式錯誤，請確認符合長度與複雜度要求！";
 	
 	public final static String PARAM_CODE_ERROR = "驗證碼錯誤，請重新輸入！";
-
+	
+	public final static String API_NOT_ALLOWED = "此 API 無法被呼叫！";
+	
 }

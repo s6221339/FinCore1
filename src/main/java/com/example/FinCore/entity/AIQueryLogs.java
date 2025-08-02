@@ -5,22 +5,26 @@ import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 @Table(name = "ai_query_logs")
 @Entity
+@IdClass(value = AIQueryLogsPK.class)
 public class AIQueryLogs 
 {
 	
 	@Id
-	@Column(name = "id")
-	private int id;
+	@Column(name = "account")
+	private String account;
 	
-	@Column(name = "balance_id")
-	private int balanceId;
+	@Id
+	@Column(name = "year")
+	private int year;
 	
-	@Column(name = "query_text")
-	private String queryText;
+	@Id
+	@Column(name = "month")
+	private int month;
 	
 	@Column(name = "response_text")
 	private String responseText;
@@ -28,34 +32,41 @@ public class AIQueryLogs
 	@Column(name = "create_date")
 	private LocalDate createDate;
 	
-	@Column(name = "year")
-	private int year;
-	
-	@Column(name = "month")
-	private int month;
-
-	public int getId() {
-		return id;
+	public AIQueryLogs() {
+		super();
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public AIQueryLogs(String account, int year, int month, String responseText, LocalDate createDate) {
+		super();
+		this.account = account;
+		this.year = year;
+		this.month = month;
+		this.responseText = responseText;
+		this.createDate = createDate;
 	}
 
-	public int getBalanceId() {
-		return balanceId;
+	public String getAccount() {
+		return account;
 	}
 
-	public void setBalanceId(int balanceId) {
-		this.balanceId = balanceId;
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
-	public String getQueryText() {
-		return queryText;
+	public int getYear() {
+		return year;
 	}
 
-	public void setQueryText(String queryText) {
-		this.queryText = queryText;
+	public void setYear(int year) {
+		this.year = year;
+	}
+
+	public int getMonth() {
+		return month;
+	}
+
+	public void setMonth(int month) {
+		this.month = month;
 	}
 
 	public String getResponseText() {
@@ -74,20 +85,4 @@ public class AIQueryLogs
 		this.createDate = createDate;
 	}
 
-	public int getYear() {
-		return year;
-	}
-
-	public void setYear(int year) {
-		this.year = year;
-	}
-
-	public int getMonth() {
-		return month;
-	}
-
-	public void setMonth(int month) {
-		this.month = month;
-	}
-	
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.FinCore.constants.ApiDocConstants;
+import com.example.FinCore.constants.ConstantsMessage;
 import com.example.FinCore.service.itfc.PaymentService;
 import com.example.FinCore.vo.request.AccountWithDateFilterRequest;
 import com.example.FinCore.vo.request.CreatePaymentRequest;
@@ -347,25 +348,31 @@ public class PaymentController
 	@PostMapping(value = "disable/scheduledCreate")
 	@Operation(
 			summary = ApiDocConstants.PAYMENT_SCHEDULED_CREATE_SUMMARY,
-			description = ApiDocConstants.PAYMENT_SCHEDULED_CREATE_DESC + ApiDocConstants.INTERNAL_ONLY,
+			description = ApiDocConstants.PAYMENT_SCHEDULED_CREATE_DESC,
 			method = "POST",
-			hidden = true
+			hidden = true,
+			responses = {
+					@ApiResponse(responseCode = "500", description = ApiDocConstants.INTERNAL_ONLY)
+			}
 		)
 	public final void scheduledCreate() throws Exception
 	{
-		throw new UnsupportedOperationException("此 API 無法被呼叫！");
+		throw new UnsupportedOperationException(ConstantsMessage.API_NOT_ALLOWED);
 	}
 	
 	@PostMapping(value = "disable/scheduledDelete")
 	@Operation(
 			summary = ApiDocConstants.PAYMENT_SCHEDULED_DELETE_SUMMARY,
-			description = ApiDocConstants.PAYMENT_SCHEDULED_DELETE_DESC + ApiDocConstants.INTERNAL_ONLY,
+			description = ApiDocConstants.PAYMENT_SCHEDULED_DELETE_DESC,
 			method = "POST",
-			hidden = true
+			hidden = true,
+			responses = {
+					@ApiResponse(responseCode = "500", description = ApiDocConstants.INTERNAL_ONLY)
+			}
 		)
 	public final void scheduledDelete() throws Exception
 	{
-		throw new UnsupportedOperationException("此 API 無法被呼叫！");
+		throw new UnsupportedOperationException(ConstantsMessage.API_NOT_ALLOWED);
 	}
 	
 }

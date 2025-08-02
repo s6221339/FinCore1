@@ -146,6 +146,12 @@ public final class ApiDocConstants
     
     public static final String USER_ECPAY_NOTIFY_SUMMARY = "綠界金流付款通知（notify）";
     
+    public static final String AI_QUERY_LOGS_CALL_SUMMARY = "測試呼叫 AI 分析指定月份資料";
+
+    public static final String AI_QUERY_LOGS_CREATE_SUMMARY = "建立 AI 消費分析資料（指定年月）";
+    
+    public static final String AI_QUERY_LOGS_ANALYSIS_SUMMARY = "建立 AI 消費分析資料（排程）";
+    
     /* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
     
@@ -331,6 +337,20 @@ public final class ApiDocConstants
     
     public static final String USER_ECPAY_NOTIFY_DESC = "綠界付款完成後由金流平台回呼，訂單編號請帶入會員帳號與時間戳。付款成功（RtnCode=1）即自動啟用訂閱。<br>需回傳 \"1|OK\" 給藍新以完成通知流程。";
     
+    public static final String AI_QUERY_LOGS_CALL_DESC =
+    		"使用測試 API 呼叫 AI 模型，分析指定帳號在指定年月的收支資料。" +
+    		"若該年月已分析過，且未啟用 forcedWrite，將不會再次分析。" +
+    		"此操作不會將分析結果寫入資料庫。<br><b>僅供開發或測試用途使用</b>。";
+    
+    public static final String AI_QUERY_LOGS_CREATE_DESC = 
+    		"""
+    		會根據指定的年份與月份，對系統中所有帳號的記帳資料進行 AI 分析。<br>
+    		若同一帳號在同一年月已有分析資料，預設不會重複寫入。可以透過參數 forcedWrite 強制覆蓋。<br>
+    		<b>此 API 僅供測試或排程時使用，請勿於一般前台操作中呼叫。</b>
+    		""";
+    
+    public static final String AI_QUERY_LOGS_ANALYSIS_DESC = "此 API 為每月自動分析使用者記帳資料之排程功能，禁止手動觸發";
+
     /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
 
@@ -518,8 +538,15 @@ public final class ApiDocConstants
 		    "<li>familyId：必填，家族群組ID</li>" +
 		    "</ul>";
 	
+	public static final String AI_QUERY_LOGS_CREATE_REQUEST_BODY_RULE =
+			"""
+			<ul>
+				<li><b>year：</b>欲分析之記帳年份，最小限制為 2001</li>
+				<li><b>month：</b>欲分析之記帳月份，範圍為 1~12</li>
+				<li><b>forcedWrite：</b>是否強制覆蓋原先資料，預設為 false</li>
+			</ul>
+			""";
 	
-
 	/* === 各種錯誤訊息，多條同代碼訊息使用<li>或<ol>包覆 === 
 	 * === 同代碼訊息命名格式：「API名稱_方法_RESPONSE_代碼」格式 ===
 	 * === 其他訊息格式：「任意，建議與 ResponseMessages 的變數名稱一致」 === */
@@ -749,6 +776,18 @@ public final class ApiDocConstants
 		    "<li>更新會員失敗</li>" +
 		    "</ul>";
 	
+	public static final String AI_QUERY_LOGS_CALL_RESPONSE_400 =
+			"已分析過此年月的資料，除非啟用 forcedWrite 否則無法再次分析。";
+	
+	public static final String AI_QUERY_LOGS_CALL_RESPONSE_404 =
+			"""
+			<ol>
+				<li>查無該帳號</li>
+				<li>該帳號在指定年月無任何帳款資料</li>
+			</ol>
+			""";
+
+	
 	public static final String PASSWORD_NOT_MATCH = "密碼錯誤";
 
 	public final static String PARAM_FORMAT_ERROR = "參數格式錯誤";
@@ -799,6 +838,8 @@ public final class ApiDocConstants
 	
 	public static final String ECPAY_NOTIFY_SUCCESS = "回傳 1|OK 代表處理成功";
 
+	public static final String ANALYSIS_SUCCESS = "AI 分析成功";
+	
 	/* === 測試狀態 === */
 
 	public final static String NOT_TEST = "⚠️尚未進行任何測試";

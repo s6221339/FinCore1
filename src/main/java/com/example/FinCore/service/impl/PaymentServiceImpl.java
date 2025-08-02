@@ -686,7 +686,7 @@ public class PaymentServiceImpl implements PaymentService
 	public StatisticsIncomeAndOutlayWithBalanceInfoResponse statisticsIncomeAndOutlayWithAllBalance(StatisticsRequest req) 
 	{
 		if(!userDao.existsById(req.account()))
-			return new StatisticsIncomeAndOutlayWithBalanceInfoResponse();
+			return new StatisticsIncomeAndOutlayWithBalanceInfoResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
 //		個人帳戶
 		List<Balance> personalBalanceList = balanceDao.getAllBalanceByAccount(req.account());

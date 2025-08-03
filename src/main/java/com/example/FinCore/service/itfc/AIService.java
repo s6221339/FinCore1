@@ -16,7 +16,7 @@ public final class AIService
 	
 	private final ChatClient chatClient;
 	
-	@Value("classpath::ai_analysis.st")
+	@Value("classpath:ai_analysis.st")
 	private Resource templateResourceFromAIAnalysis;
 	
 	public AIService(ChatClient.Builder builder)

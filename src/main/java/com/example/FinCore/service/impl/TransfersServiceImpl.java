@@ -156,6 +156,7 @@ public class TransfersServiceImpl implements TransfersService
 		
 		transfers.setToBalance(balanceId);
 		transfers.setConfirmed(true);
+		transfers.setCreateDate(LocalDate.now());
 		transfersDao.save(transfers);
 		
 		Payment p_in = Payment.ofTransfersIn(balanceId, transfers.getDescription(), transfers.getAmount());

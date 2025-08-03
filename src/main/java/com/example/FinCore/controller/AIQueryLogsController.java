@@ -47,7 +47,7 @@ public class AIQueryLogsController
                 @ApiResponse(responseCode = "200", description = ApiDocConstants.CREATE_SUCCESS)
             }
         )
-	public BasicResponse create(AICreateRequest req) throws Exception 
+	public BasicResponse create(@Valid @RequestBody AICreateRequest req) throws Exception 
 	{
 		return service.create(req);
 	}

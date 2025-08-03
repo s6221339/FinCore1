@@ -74,18 +74,24 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 		for(String account : allAccounts)
 		{
 			var res = call(new AICallRequest(account, year, month, forcedWrite));
-			if(forcedWrite)
+			// 如果強制寫入被開啟，則無條件寫入
+			// 如果強制寫入被關閉，則僅在無資料時寫入
+			if(forcedWrite || !aiQueryLogsDao.existsById(new AIQueryLogsPK(account, year, month)))
 			{
 				if(res.getCode() != 200)
 				{
-					logger.error("帳號「" + account + "」的 AI 分析失敗！原因：" + res.getCode() + "（" + res.getMessage() + "）");
+					logger.error("帳號「" + account + "」分析失敗！原因：" + res.getCode() + "（" + res.getMessage() + "）");
 					aiQueryLogsDao.save(new AIQueryLogs(account, year, month, null, LocalDate.now()));
 				}
 				else
+				{
+					logger.info("帳號「" + account + "」分析成功！");
 					aiQueryLogsDao.save(new AIQueryLogs(account, year, month, res.getText(), LocalDate.now()));
+				}
+					
 			}
 			else
-				logger.warn("帳號「" + account + "」無法寫入分析資料，因為資料已分析。如有需要請啟用 forcedWrite 來強制寫入資料。");
+				logger.warn("帳號「" + account + "」無法寫入分析內容，因為該月帳號已被分析。如有需要請啟用 forcedWrite 來強制寫入資料。");
 			
 		}
 		return new BasicResponse(ResponseMessages.SUCCESS);

@@ -2,6 +2,8 @@ package com.example.FinCore.service.itfc;
 
 import com.example.FinCore.vo.request.AICallRequest;
 import com.example.FinCore.vo.request.AICreateRequest;
+import com.example.FinCore.vo.request.GetAnalysisRequest;
+import com.example.FinCore.vo.response.AIAnalysisResponse;
 import com.example.FinCore.vo.response.AICallbackResponse;
 import com.example.FinCore.vo.response.BasicResponse;
 
@@ -36,5 +38,7 @@ public interface AIQueryLogsService
 	 * @throws Exception 取得統計資料的過程出現錯誤時拋出
 	 */
 	public AICallbackResponse call(AICallRequest req) throws Exception;
+	
+	public AIAnalysisResponse getAnalysis(GetAnalysisRequest req);
 	
 }

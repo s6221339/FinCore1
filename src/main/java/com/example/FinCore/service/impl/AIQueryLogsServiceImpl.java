@@ -1,10 +1,13 @@
 package com.example.FinCore.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +25,18 @@ import com.example.FinCore.entity.AIQueryLogs;
 import com.example.FinCore.entity.AIQueryLogsPK;
 import com.example.FinCore.entity.Balance;
 import com.example.FinCore.entity.Payment;
+import com.example.FinCore.entity.User;
 import com.example.FinCore.service.itfc.AIQueryLogsService;
 import com.example.FinCore.service.itfc.AIService;
+import com.example.FinCore.service.itfc.LoginService;
 import com.example.FinCore.service.itfc.PaymentService;
+import com.example.FinCore.vo.AIAnalysisVO;
 import com.example.FinCore.vo.StatisticsIncomeAndOutlayWithBalanceInfoVO;
 import com.example.FinCore.vo.request.AICallRequest;
 import com.example.FinCore.vo.request.AICreateRequest;
+import com.example.FinCore.vo.request.GetAnalysisRequest;
 import com.example.FinCore.vo.request.StatisticsRequest;
+import com.example.FinCore.vo.response.AIAnalysisResponse;
 import com.example.FinCore.vo.response.AICallbackResponse;
 import com.example.FinCore.vo.response.BasicResponse;
 
@@ -56,6 +64,9 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 	
 	@Autowired
 	private PaymentService paymentService;
+	
+	@Autowired
+	private LoginService loginService;
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -225,6 +236,59 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 		 * 帳戶：羊羊（bId：1） | 支出：100 | 收入：100
 		 */
 		return sb.toString();
+	}
+
+	@Override
+	public AIAnalysisResponse getAnalysis(GetAnalysisRequest req) 
+	{
+		User currentUser = loginService.getData();
+		if(currentUser == null)
+			return new AIAnalysisResponse(ResponseMessages.PLEASE_LOGIN_FIRST);
+		
+		var fromDate = req.from();
+		var toDate = req.to();
+		if(fromDate.year() == null || fromDate.month() == null)
+			return new AIAnalysisResponse(ResponseMessages.DATE_REQUEST_ERROR);
+					
+		if(toDate.year() == null || toDate.month() == null)
+			return new AIAnalysisResponse(ResponseMessages.DATE_REQUEST_ERROR);
+		
+		final int fromYear = fromDate.year();
+		final int fromMonth = fromDate.month();
+		final int toYear = toDate.year();
+		final int toMonth = toDate.month();
+		LocalDate from = LocalDate.of(fromYear, fromMonth, 1);
+		LocalDate to = LocalDate.of(toYear, toMonth, 1);
+		if(fromMonth == 0 || toMonth == 0)
+			return new AIAnalysisResponse(ResponseMessages.DATE_REQUEST_ERROR);
+		
+		if(from.isAfter(to))
+			return new AIAnalysisResponse(ResponseMessages.DATE_REQUEST_ERROR);
+		
+		// 取得登入者在指定日期區間的所有分析資料
+		List<AIQueryLogs> logs = aiQueryLogsDao.findByYearRange(currentUser.getAccount(), fromYear, toYear)
+				.stream()
+				.filter(t -> {
+					LocalDate analysisDate = LocalDate.of(t.getYear(), t.getMonth(), 1);
+					return !analysisDate.isBefore(from) && !analysisDate.isAfter(to);
+				})
+				.toList();
+		List<AIAnalysisVO> result = logs.stream().map(t -> t.toVO()).collect(Collectors.toCollection(ArrayList::new));
+		var looper = from;
+		while(!looper.isAfter(to))
+		{
+			int lpy = looper.getYear();
+			int lpm = looper.getMonthValue();
+			if(!result.stream().anyMatch(t -> t.year() == lpy && t.month() == lpm))
+				result.add(new AIAnalysisVO(lpy, lpm, ""));
+			
+			looper = looper.plusMonths(1);
+		}
+		result.sort(Comparator
+				.comparing(AIAnalysisVO::year)
+				.thenComparing(AIAnalysisVO::month)
+				);
+		return new AIAnalysisResponse(ResponseMessages.SUCCESS, result);
 	}
 
 }

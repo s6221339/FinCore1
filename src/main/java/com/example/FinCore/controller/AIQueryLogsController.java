@@ -13,6 +13,8 @@ import com.example.FinCore.constants.ConstantsMessage;
 import com.example.FinCore.service.itfc.AIQueryLogsService;
 import com.example.FinCore.vo.request.AICallRequest;
 import com.example.FinCore.vo.request.AICreateRequest;
+import com.example.FinCore.vo.request.GetAnalysisRequest;
+import com.example.FinCore.vo.response.AIAnalysisResponse;
 import com.example.FinCore.vo.response.AICallbackResponse;
 import com.example.FinCore.vo.response.BasicResponse;
 
@@ -56,7 +58,11 @@ public class AIQueryLogsController
 	@PostMapping(value = "call")
 	@Operation(
 			summary = ApiDocConstants.AI_QUERY_LOGS_CALL_SUMMARY,
-			description = ApiDocConstants.AI_QUERY_LOGS_CALL_DESC
+			description = ApiDocConstants.AI_QUERY_LOGS_CALL_DESC,
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+	                description = ApiDocConstants.AI_QUERY_LOGS_CALL_REQUEST_BODY_RULE,
+	                required = true
+	            )
 		)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", 
@@ -68,6 +74,26 @@ public class AIQueryLogsController
 	public BasicResponse call(@Valid @RequestBody AICallRequest req) throws Exception
 	{
 		return service.call(req);
+	}
+	
+	@PostMapping(value = "getAnalysis")
+	@Operation(
+			summary = ApiDocConstants.AI_QUERY_LOGS_GET_ANALYSIS_SUMMARY,
+			description = ApiDocConstants.AI_QUERY_LOGS_GET_ANALYSIS_DESC,
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+	                description = ApiDocConstants.AI_QUERY_LOGS_GET_ANALYSIS_REQUEST_BODY_RULE,
+	                required = true
+	            )
+		)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", 
+				description = ApiDocConstants.SEARCH_SUCCESS, 
+				content = {@Content(mediaType = "application/json", schema = @Schema(implementation = AIAnalysisResponse.class))}),
+		@ApiResponse(responseCode = "400", description = ApiDocConstants.AI_QUERY_LOGS_GET_ANALYSIS_RESPONSE_400),
+		})
+	public BasicResponse getAnalysis(@Valid @RequestBody GetAnalysisRequest req) 
+	{
+		return service.getAnalysis(req);
 	}
 	
 	@PostMapping(value = "disable/analysis")

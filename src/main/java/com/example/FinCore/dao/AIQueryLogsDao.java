@@ -1,6 +1,7 @@
 package com.example.FinCore.dao;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,5 +32,8 @@ public interface AIQueryLogsDao extends JpaRepository<AIQueryLogs, AIQueryLogsPK
 	
 	@Query(value = "select COUNT(*) from ai_query_logs where account = ?1 and year = ?2 and month = ?3", nativeQuery = true)
 	public int existsByParam(String account, int year, int month);
+	
+	@Query(value = "select * from ai_query_logs where account = ?1 and year between ?2 and ?3", nativeQuery = true)
+	public List<AIQueryLogs> findByYearRange(String account, int fromYear, int toYear);
 	
 }

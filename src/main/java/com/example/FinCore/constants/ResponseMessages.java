@@ -45,6 +45,7 @@ public enum ResponseMessages
 	INVALID_PAYMENT_DATE(400, "無效的記帳日期"),
 	TRANSFERS_ALREADY_SET(400, "轉帳資料已被設定"),
 	DATA_HAS_BEEN_ANALYSED(400, "資料已分析，無法再次分析（請啟用 forcedWrite）"),
+	DATE_REQUEST_ERROR(400, "日期資料請求無效"),
 	
 	FORBIDDEN(403, "無權限"),
     NO_PERMISSION(403, "沒有 owner 權限"),

@@ -2,6 +2,8 @@ package com.example.FinCore.entity;
 
 import java.time.LocalDate;
 
+import com.example.FinCore.vo.AIAnalysisVO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -83,6 +85,11 @@ public class AIQueryLogs
 
 	public void setCreateDate(LocalDate createDate) {
 		this.createDate = createDate;
+	}
+	
+	public AIAnalysisVO toVO()
+	{
+		return new AIAnalysisVO(year, month, responseText);
 	}
 
 }

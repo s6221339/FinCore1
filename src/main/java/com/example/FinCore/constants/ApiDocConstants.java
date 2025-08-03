@@ -152,6 +152,8 @@ public final class ApiDocConstants
     
     public static final String AI_QUERY_LOGS_ANALYSIS_SUMMARY = "建立 AI 消費分析資料（排程）";
     
+    public static final String AI_QUERY_LOGS_GET_ANALYSIS_SUMMARY = "取得帳號的 AI 分析資料";
+    
     /* === API 詳述（@Operation#description），每段末尾都需添加<br>換行 === 
 	 * === 命名格式：「API名稱_方法_DESC」 === */
     
@@ -351,6 +353,9 @@ public final class ApiDocConstants
     
     public static final String AI_QUERY_LOGS_ANALYSIS_DESC = "此 API 為每月自動分析使用者記帳資料之排程功能，禁止手動觸發";
 
+    public static final String AI_QUERY_LOGS_GET_ANALYSIS_DESC = "指定日期區間，取回該帳號在該區間內的所有分析結果。"
+    		+ "如果該區間內有空白資料，則會自動填充空字串資料。";
+    
     /* === 請求資料規則，多條規則使用<ul>標籤 === 
 	 * === 命名格式：「API名稱_請求資料名稱_REQUEST_BODY_RULE」 === */
 
@@ -544,6 +549,36 @@ public final class ApiDocConstants
 				<li><b>year：</b>欲分析之記帳年份，最小限制為 2001</li>
 				<li><b>month：</b>欲分析之記帳月份，範圍為 1~12</li>
 				<li><b>forcedWrite：</b>是否強制覆蓋原先資料，預設為 false</li>
+			</ul>
+			""";
+	
+	public static final String AI_QUERY_LOGS_CALL_REQUEST_BODY_RULE =
+			"""
+			<ul>
+				<li><b>account：欲分析的帳號</b></li>
+				<li><b>year：</b>欲分析之記帳年份，最小限制為 2001</li>
+				<li><b>month：</b>欲分析之記帳月份，範圍為 1~12</li>
+				<li><b>forcedWrite：</b>是否強制覆蓋原先資料，預設為 false</li>
+			</ul>
+			""";
+	
+	public static final String AI_QUERY_LOGS_GET_ANALYSIS_REQUEST_BODY_RULE =
+			"""
+			<ul>
+				<li>
+					<b>from：</b>分析資料起始篩選日期
+					<ul>
+						<li><b>year：</b>年，不可為null或省略，最小限制為2001</li>
+						<li><b>month：</b>月，不可為null或省略，範圍限制為 1 ~ 12</li>
+						<li><b>day：</b>日，可忽略</li>
+					</ul>
+				</li>
+				<li>
+					<b>to：</b>分析資料結束篩選日期
+					<ul>
+						<li>同「from」參數限制</li>
+					</ul>
+				</li>
 			</ul>
 			""";
 	
@@ -787,6 +822,13 @@ public final class ApiDocConstants
 			</ol>
 			""";
 
+	public static final String AI_QUERY_LOGS_GET_ANALYSIS_RESPONSE_400 =
+			"""
+			<ol>
+				<li>使用者未登入</li>
+				<li>日期請求無效（日期參數為空值、或不符合限制、或截止日期早於起始日期）</li>
+			</ol>
+			""";
 	
 	public static final String PASSWORD_NOT_MATCH = "密碼錯誤";
 

@@ -369,8 +369,8 @@ public class PaymentServiceImpl implements PaymentService
 			return new SearchPaymentResponse(ResponseMessages.ACCOUNT_NOT_FOUND);
 		
 		List<Integer> familyIdList = familyDao.selectAll().stream()
-				.filter((Family t) -> t.isMember(account))
-				.map((Family t) -> t.getId())
+				.filter(t -> t.isMember(account))
+				.map(t -> t.getId())
 				.toList();
 		var result = getPaymentInfoOpration(account, familyIdList, -1, 0, false);
 		
@@ -1191,10 +1191,10 @@ public class PaymentServiceImpl implements PaymentService
 		/* 意旨蒐集所有生命週期為零的款項編號，被儲存在此列表的 
 		 * 款項都將永遠從資料庫中移除。 */
 		List<Integer> noLifePaymentIdList = new ArrayList<>();
-		deletedPaymentList = paymentList.stream().filter((Payment t) -> t.isDeleted()).toList();
+		deletedPaymentList = paymentList.stream().filter(t -> t.isDeleted()).toList();
 		noLifePaymentIdList = deletedPaymentList.stream()
-				.filter((Payment t) -> t.getLifeTime() < 0)
-				.map((Payment t) -> t.getPaymentId())
+				.filter(t -> t.getLifeTime() < 0)
+				.map(t -> t.getPaymentId())
 				.toList();
 		paymentDao.deleteByPaymentIdList(noLifePaymentIdList);
 	}

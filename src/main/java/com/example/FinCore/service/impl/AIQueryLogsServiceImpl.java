@@ -78,7 +78,11 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 		final int month = req.month();
 		Boolean forcedWrite = req.forcedWrite();
 		
-		List<String> allAccounts = userDao.findAll().stream().map(t -> t.getAccount()).toList();
+		List<String> allAccounts = userDao.findAll()
+				.stream()
+				.filter(t -> t.isSubscription())
+				.map(t -> t.getAccount())
+				.toList();
 		if(forcedWrite == null)
 			forcedWrite = Boolean.FALSE;
 		

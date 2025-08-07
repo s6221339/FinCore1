@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ import com.example.FinCore.service.itfc.LoginService;
 import com.example.FinCore.service.itfc.PaymentService;
 import com.example.FinCore.vo.AIAnalysisVO;
 import com.example.FinCore.vo.StatisticsIncomeAndOutlayWithBalanceInfoVO;
+import com.example.FinCore.vo.StatisticsPaymentTypeVO;
 import com.example.FinCore.vo.request.AICallRequest;
 import com.example.FinCore.vo.request.AICreateRequest;
 import com.example.FinCore.vo.request.GetAnalysisRequest;
@@ -118,6 +121,9 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 		final String account = req.account();
 		final int year = req.year();
 		final int month = req.month();
+		LocalDate previousDate = LocalDate.of(year, month, 1).minusMonths(1);
+		final int previousYear = previousDate.getYear();
+		final int previousMonth = previousDate.getMonthValue();
 		Boolean forcedWrite = req.forcedWrite();
 		
 		if(!userDao.existsById(account))
@@ -131,30 +137,76 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 		
 		// 取得已存在帳號的所有帳戶
 		List<Balance> balances = balanceDao.getAllBalanceByAccount(account);
-		// 取得關乎所有帳戶上個月的所有未刪除的帳款資料
-		List<Payment> payments = paymentDao.getPaymentListByBalanceIdList(balances.stream()
-					.map(t -> t.getBalanceId())
-					.toList()
-				).stream()
-				.filter(t -> !t.isDeleted() && t.isOnTime(year, month))
-				.toList();
 		
+		// 取得關乎所有帳戶上個月的所有未刪除的帳款資料
+		List<Payment> payments = getPaymentList(balances, year, month);
+		List<Payment> previousPayments = getPaymentList(balances, previousYear, previousMonth);
+		
+		// 僅檢查要分析的月分資料
 		if(payments.isEmpty())
 			return new AICallbackResponse(ResponseMessages.NO_PAYMENT_DATA);
 		
+		// 帳款集合（對帳戶）
 		Map<Balance, List<Payment>> bMap = new HashMap<>();
-		for(Balance b : balances)
-			bMap.put(b, payments.stream().filter(t -> t.getBalanceId() == b.getBalanceId()).toList());
+		generateBalanceMap(bMap, balances, payments);
 		
-		var statisticsList = paymentService.statisticsIncomeAndOutlayWithAllBalance(
-				new StatisticsRequest(account, year, month))
-				.getStatisticsList();
+		Map<Balance, List<Payment>> previousBMap = new HashMap<>();
+		generateBalanceMap(previousBMap, balances, previousPayments);
+		
+		// 收入與支出的統計
+		var ioStatisticsList = getIncomeOutlayStatisticsList(account, year, month);
+		var pioStatisticsList = getIncomeOutlayStatisticsList(account, previousYear, previousMonth);
+		
+		// 款項種類的統計
+		var ptStatisticsList = getPaymentTypeStatisticsList(account, year, month);
+		var pptStatisticsList = getPaymentTypeStatisticsList(account, previousYear, previousMonth);
 		
 		String bq = generateBalanceQuery(balances);
 		String pq = generatePaymentsQuery(bMap);
-		String stq = generateStatisticsQuery(statisticsList);
-		String response = aiService.templateFromFileCode(bq, pq, stq);
+		String previousPQ = generatePaymentsQuery(previousBMap);
+		String iostq = generateIncomeOutlayStatisticsQuery(ioStatisticsList);
+		String piostq = generateIncomeOutlayStatisticsQuery(pioStatisticsList);
+		String ptstq = generatePaymentTypeStatisticsQuery(ptStatisticsList);
+		String pptstq = generatePaymentTypeStatisticsQuery(pptStatisticsList);
+		String response = aiService.templateFromFileCode(variablesFactory(
+				bq, 
+				previousPQ, 
+				piostq, 
+				pptstq, 
+				pq, 
+				iostq, 
+				ptstq));
 		return new AICallbackResponse(ResponseMessages.SUCCESS, response);
+	}
+	
+	private List<Payment> getPaymentList(List<Balance> balances, int year, int month)
+	{
+		return paymentDao.getPaymentListByBalanceIdList(balances.stream()
+				.map(t -> t.getBalanceId())
+				.toList()
+			).stream()
+			.filter(t -> !t.isDeleted() && t.isOnTime(year, month))
+			.toList();
+	}
+	
+	private void generateBalanceMap(Map<Balance, List<Payment>> target, List<Balance> bs, List<Payment> ps)
+	{
+		for(Balance b : bs)
+			target.put(b, ps.stream().filter(t -> t.getBalanceId() == b.getBalanceId()).toList());
+	}
+	
+	private List<StatisticsIncomeAndOutlayWithBalanceInfoVO> getIncomeOutlayStatisticsList(String account, int year, int month)
+	{
+		return paymentService.statisticsIncomeAndOutlayWithAllBalance(
+				new StatisticsRequest(account, year, month))
+				.getStatisticsList();
+	}
+	
+	private List<StatisticsPaymentTypeVO> getPaymentTypeStatisticsList(String account, int year, int month)
+	{
+		return paymentService.statisticsLookupPaymentTypeSummarize(
+				new StatisticsRequest(account, year, month)
+				).getStatisticsList();
 	}
 	
 	/**
@@ -176,6 +228,12 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 	
 	private String generateBalanceQuery(List<Balance> bList)
 	{
+		if(bList.isEmpty())
+		{
+			logger.debug("沒有帳戶資料");
+			return "＜查無資料＞";
+		}
+		
 		StringBuilder sb = new StringBuilder();
 		for(Balance b : bList)
 			sb.append(String.format("－%s（balanceId：%d）\n", b.getName(), b.getBalanceId()));
@@ -190,6 +248,11 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 	
 	private String generatePaymentsQuery(Map<Balance, List<Payment>> source)
 	{
+		if(source.isEmpty())
+		{
+			logger.debug("沒有帳款資料");
+			return "＜查無資料＞";
+		}
 		StringBuilder sb = new StringBuilder();
 		for(Entry<Balance, List<Payment>> entry : source.entrySet())
 		{
@@ -213,31 +276,55 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 		return sb.toString();
 	}
 	
-	private String generateStatisticsQuery(List<StatisticsIncomeAndOutlayWithBalanceInfoVO> stList)
-	throws Exception
+	private String generateIncomeOutlayStatisticsQuery(List<StatisticsIncomeAndOutlayWithBalanceInfoVO> stList)
 	{
 		StringBuilder sb = new StringBuilder();
-		if(stList.size() < 1)
-			throw new Exception("擷取統計資料失敗");
-		
+		if(stList.isEmpty())
+		{
+			logger.debug("沒有統計資料");
+			return "＜查無資料＞";
+		}
 		var st = stList.get(0);
 		sb.append(String.format("統計日期：%d 年 %d 月\n", 
 				st.year(), 
 				st.month()
 				));
 		for(var info : st.incomeAndOutlayInfoVOList())
-		{
-			sb.append(String.format("帳戶：%s（bId：%d） | 支出：%d | 收入：%d\n", 
+			sb.append(String.format("－帳戶：%s（bId：%d） | 支出：%d | 收入：%d\n", 
 					info.balanceInfo().name(), 
 					info.balanceInfo().id(), 
 					info.outlay(), 
 					info.income()
 					));
-		}
 		/*
 		 * Ex.
 		 * 統計日期：2025 年 7 月
-		 * 帳戶：羊羊（bId：1） | 支出：100 | 收入：100
+		 * －帳戶：羊羊（bId：1） | 支出：100 | 收入：100
+		 */
+		return sb.toString();
+	}
+	
+	private String generatePaymentTypeStatisticsQuery(List<StatisticsPaymentTypeVO> stList)
+	{
+		StringBuilder sb = new StringBuilder();
+		if(stList.isEmpty())
+			return "＜查無資料＞";
+		
+		var st = stList.get(0);
+		sb.append(String.format("統計日期：%d 年 %d 月\n", 
+				st.year(), 
+				st.month()
+				));
+		for(var info : st.paymentInfo())
+			sb.append(String.format("－%s｜%d\n", 
+					info.type(), 
+					info.totalAmount()
+					));
+		/*
+		 * Ex.
+		 * 統計日期：2025 年 7 月
+		 * －飲食｜100
+		 * －收入｜100
 		 */
 		return sb.toString();
 	}
@@ -293,6 +380,28 @@ public class AIQueryLogsServiceImpl implements AIQueryLogsService
 				.thenComparing(AIAnalysisVO::month)
 				);
 		return new AIAnalysisResponse(ResponseMessages.SUCCESS, result);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> variablesFactory(
+			String balances, 
+			String previousPayments, 
+			String previousIncomeOutlayStatistics, 
+			String previousPaymentTypeStatistics, 
+			String payments, 
+			String incomeOutlayStatistics, 
+			String paymentTypeStatistics
+			)
+	{
+		Set<Entry<String, Object>> entrySet = new HashSet<>();
+		entrySet.add(Map.entry("balances", balances));
+		entrySet.add(Map.entry("previousPayments", previousPayments));
+		entrySet.add(Map.entry("previousIncomeOutlayStatistics", previousIncomeOutlayStatistics));
+		entrySet.add(Map.entry("previousPaymentTypeStatistics", previousPaymentTypeStatistics));
+		entrySet.add(Map.entry("payments", payments));
+		entrySet.add(Map.entry("incomeOutlayStatistics", incomeOutlayStatistics));
+		entrySet.add(Map.entry("paymentTypeStatistics", paymentTypeStatistics));
+		return Map.ofEntries(entrySet.toArray(Entry[]::new));
 	}
 
 }

@@ -24,16 +24,12 @@ public final class AIService
 		this.chatClient = builder.build();
 	}
 	
-	public String templateFromFileCode(String balances, String payments, String statistics) {
+	public String templateFromFileCode(Map<String, Object> addtionalVariables) 
+	{
 		PromptTemplate promptTemplate = new PromptTemplate(templateResourceFromAIAnalysis);
-		Prompt prompt = promptTemplate.create(Map.of(
-				"balances", balances, 
-				"payments", payments,
-				"statistics", statistics
-				));
+		Prompt prompt = promptTemplate.create(addtionalVariables);
 		ChatResponse response = chatClient.prompt(prompt).call().chatResponse();
 		return response.getResult().getOutput().getText();
 	}
-
 	
 }
